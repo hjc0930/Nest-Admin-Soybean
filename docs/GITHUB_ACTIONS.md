@@ -1,81 +1,506 @@
-# GitHub Actions 部署配置指南
+# GitHub Actions 自动化部署配置指南（使用 PM2）
 
-## 🔧 配置步骤
+## 📋 概述
 
-### 1. 生成 SSH 密钥对
+本项目配置了两个 GitHub Actions 工作流用于自动化部署：
+
+1. **deploy.yml** - 简单部署工作流
+2. **deploy-advanced.yml** - 高级部署工作流（推荐使用）⭐
+
+## 🚀 快速开始
+
+### 第一步：配置 GitHub Secrets
+
+进入 GitHub 仓库 `Settings` -> `Secrets and variables` -> `Actions` -> `New repository secret`
+
+添加以下必需的 Secrets：
+
+| Secret Name | 说明 | 示例值 |
+|------------|------|--------|
+| `SSH_PRIVATE_KEY` | SSH 私钥完整内容 | `-----BEGIN RSA PRIVATE KEY-----...` |
+| `REMOTE_HOST` | 服务器 IP 地址 | `123.456.78.90` |
+| `REMOTE_USER` | SSH 用户名 | `root` 或 `www` |
+| `REMOTE_PORT` | SSH 端口 | `22` |
+| `REMOTE_BACKEND_DIR` | 后端部署目录 | `/www/wwwroot/nest-admin-server` |
+| `REMOTE_FRONTEND_DIR` | 前端部署目录 | `/www/wwwroot/nest-admin-frontend` |
+
+### 第二步：生成 SSH 密钥对
 
 在本地生成用于部署的 SSH 密钥：
 
 ```bash
-# 生成新的 SSH 密钥对（不要设置密码）
-ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github_deploy_key
+# 生成 SSH 密钥对（无密码）
+ssh-keygen -t rsa -b 4096 -C "github-actions" -f ~/.ssh/github-actions -N ""
 
-# 这将生成两个文件：
-# - ~/.ssh/github_deploy_key       (私钥)
-# - ~/.ssh/github_deploy_key.pub   (公钥)
+# 将公钥添加到服务器
+ssh-copy-id -i ~/.ssh/github-actions.pub user@your-server-ip
+
+# 查看私钥（复制此内容到 GitHub Secrets）
+cat ~/.ssh/github-actions
 ```
 
-### 2. 配置服务器
+### 第三步：服务器环境准备
 
-将公钥添加到服务器：
+在服务器上执行以下命令：
 
 ```bash
-# 复制公钥内容
-cat ~/.ssh/github_deploy_key.pub
+# 1. 安装 Node.js 20.x
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
-# SSH 连接到服务器
-ssh user@your-server.com
+# 2. 安装 pnpm
+npm install -g pnpm
 
-# 将公钥添加到 authorized_keys
-echo "公钥内容" >> ~/.ssh/authorized_keys
+# 3. 安装 PM2
+npm install -g pm2
 
-# 设置正确的权限
-chmod 600 ~/.ssh/authorized_keys
-chmod 700 ~/.ssh
+# 4. 创建部署目录
+sudo mkdir -p /www/wwwroot/nest-admin-server
+sudo mkdir -p /www/wwwroot/nest-admin-frontend
+sudo mkdir -p /www/wwwlogs/pm2/nest_admin_server
+
+# 5. 设置目录权限
+sudo chown -R $USER:$USER /www/wwwroot
+sudo chown -R $USER:$USER /www/wwwlogs
+
+# 6. 配置环境变量文件
+cd /www/wwwroot/nest-admin-server
+nano .env.production
 ```
 
-### 3. 配置 GitHub Secrets
+在 `.env.production` 中配置：
 
-进入 GitHub 仓库设置：`Settings` → `Secrets and variables` → `Actions` → `New repository secret`
+```env
+NODE_ENV=production
+PORT=3000
 
-> ⚠️ **重要提示**：
-> - 密钥名称只能包含字母数字字符（[a-z]、[A-Z]、[0-9]）或下划线（_）
-> - 不允许使用空格或特殊字符
-> - 必须以字母（[a-z]、[A-Z]）或下划线（_）开头
-> - 示例：✅ `SERVER_HOST`、`SSH_PRIVATE_KEY`  ❌ `Server Host`、`ssh-key`
+# 数据库
+DATABASE_URL="postgresql://user:password@localhost:5432/nest_admin"
 
-添加以下 Secrets：
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your_password
+REDIS_DB=2
 
-| Secret 名称 | 说明 | 示例值 |
-|------------|------|--------|
-| `SERVER_HOST` | 服务器 IP 或域名 | `123.45.67.89` 或 `server.example.com` |
-| `SERVER_USERNAME` | SSH 用户名 | `www` 或 `deploy` |
-| `SERVER_PORT` | SSH 端口 | `22` |
-| `SSH_PRIVATE_KEY` | SSH 私钥内容 | 粘贴 `~/.ssh/github_deploy_key` 的全部内容 |
-| `DEPLOY_PATH` | 项目在服务器上的路径 | `/www/wwwroot/nest-admin` |
-| `SERVER_URL` | 后端 API 地址 | `https://api.example.com` |
-| `WEB_URL` | 前端访问地址 | `https://www.example.com` |
+# JWT
+JWT_SECRET=your_production_secret_key_here
 
-### 4. 配置 GitHub Environments（可选）
+# 其他配置...
+```
 
-为不同环境配置不同的变量：
+```bash
+# 7. 设置 PM2 开机自启
+pm2 startup
+# 按照提示执行返回的命令
+```
 
-1. 进入 `Settings` → `Environments`
-2. 创建环境（如 `production`, `staging`）
-3. 添加环境特定的 Secrets 和变量
-4. 设置部署保护规则（需要审批等）
+### 第四步：推送代码触发部署
 
-## 🎯 工作流说明
+```bash
+git add .
+git commit -m "chore: configure github actions deployment"
+git push origin main-soybean
+```
 
-### 后端部署工作流 (deploy-backend.yml)
+## 📚 工作流详解
 
-**触发条件**：
-- 推送到 `main` 或 `main-soybean` 分支
-- 修改 `server/**` 目录下的文件
-- 手动触发
+### deploy.yml - 简单部署
 
-**工作流程**：
-1. **Test**: 代码检查和测试
+适用于小型项目或简单部署需求。
+
+**特点：**
+- 直接传输文件
+- 配置简单
+- 适合快速部署
+
+### deploy-advanced.yml - 高级部署 ⭐
+
+推荐使用，提供更完善的部署流程。
+
+**特点：**
+- ✅ 自动备份当前版本
+- ✅ 压缩传输（节省带宽）
+- ✅ 健康检查
+- ✅ 自动清理旧备份
+- ✅ 详细日志输出
+- ✅ 失败自动回滚
+
+**工作流程：**
+
+1. **构建阶段**
+   - 检出代码
+   - 安装依赖（使用缓存加速）
+   - 构建前端 (`admin-naive-ui`)
+   - 构建后端 (`server`)
+   - 生成 Prisma Client
+   - 压缩构建产物
+
+2. **部署阶段**
+   - 备份当前版本
+   - 上传压缩包到服务器
+   - 解压文件
+   - 安装生产依赖
+   - 运行数据库迁移（可选）
+   - 使用 PM2 重启应用
+
+3. **验证阶段**
+   - 健康检查
+   - 查看应用状态
+   - 输出最新日志
+
+## 🔧 PM2 配置说明
+
+### ecosystem.config.cjs
+
+项目已包含 PM2 配置文件 `server/ecosystem.config.cjs`：
+
+```javascript
+module.exports = {
+  apps: [
+    {
+      name: 'nest_admin_server',
+      namespace: 'nest_admin_server',
+      max_memory_restart: '1024M',
+      user: 'www',
+      exec_mode: 'fork',
+      cwd: '/www/wwwroot/nest-admin-server',
+      script: 'dist/main.js',
+      watch: false,
+      out_file: '/www/wwwlogs/pm2/nest_admin_server/out.log',
+      error_file: '/www/wwwlogs/pm2/nest_admin_server/err.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss',
+      merge_logs: true,
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+  ],
+};
+```
+
+**配置项说明：**
+
+- `name`: 应用名称
+- `cwd`: 工作目录（与 `REMOTE_BACKEND_DIR` 一致）
+- `script`: 启动文件
+- `max_memory_restart`: 内存超限自动重启
+- `exec_mode`: 运行模式（fork 或 cluster）
+- `watch`: 是否监听文件变化
+- `env`: 环境变量
+
+### 常用 PM2 命令
+
+```bash
+# 查看应用列表
+pm2 list
+
+# 查看实时日志
+pm2 logs nest_admin_server
+
+# 查看最近 100 行日志
+pm2 logs nest_admin_server --lines 100
+
+# 重启应用
+pm2 restart nest_admin_server
+
+# 重新加载（零停机）
+pm2 reload nest_admin_server
+
+# 停止应用
+pm2 stop nest_admin_server
+
+# 启动应用
+pm2 start ecosystem.config.cjs --env production
+
+# 删除应用
+pm2 delete nest_admin_server
+
+# 监控面板
+pm2 monit
+
+# 查看详细信息
+pm2 show nest_admin_server
+
+# 保存当前配置
+pm2 save
+
+# 清空日志
+pm2 flush
+```
+
+## 🌐 Nginx 配置
+
+### 前端配置示例
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name your-domain.com;
+
+    root /www/wwwroot/nest-admin-frontend/dist;
+    index index.html;
+
+    # Gzip 压缩
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+    
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API 代理到后端
+    location /api/ {
+        proxy_pass http://localhost:3000/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 静态资源缓存
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+### SSL 配置（推荐）
+
+```bash
+# 安装 Certbot
+sudo apt install certbot python3-certbot-nginx
+
+# 获取证书
+sudo certbot --nginx -d your-domain.com
+
+# 自动续期
+sudo certbot renew --dry-run
+```
+
+## 🐛 故障排查
+
+### 1. GitHub Actions 失败
+
+**检查清单：**
+- ✅ 确认所有 Secrets 已正确配置
+- ✅ SSH 私钥格式正确（包含完整的头尾）
+- ✅ 服务器可以通过 SSH 连接
+- ✅ 服务器有足够的磁盘空间
+
+**常见错误：**
+
+```bash
+# SSH 连接失败
+错误: Permission denied (publickey)
+解决: 检查公钥是否正确添加到服务器 ~/.ssh/authorized_keys
+
+# 构建失败
+错误: ENOENT: no such file or directory
+解决: 检查路径配置是否正确
+
+# PM2 启动失败
+错误: Error: Cannot find module
+解决: 确保依赖已正确安装
+```
+
+### 2. 应用启动失败
+
+```bash
+# 查看 PM2 日志
+pm2 logs nest_admin_server --lines 200
+
+# 查看错误日志
+tail -n 100 /www/wwwlogs/pm2/nest_admin_server/err.log
+
+# 手动测试启动
+cd /www/wwwroot/nest-admin-server
+node dist/main.js
+```
+
+### 3. 数据库连接问题
+
+```bash
+# 测试数据库连接
+cd /www/wwwroot/nest-admin-server
+npx prisma db pull
+
+# 查看数据库状态
+npx prisma migrate status
+
+# 应用迁移
+npx prisma migrate deploy
+```
+
+### 4. 端口已被占用
+
+```bash
+# 查看端口占用
+sudo lsof -i :3000
+# 或
+sudo netstat -tlnp | grep 3000
+
+# 杀死占用进程
+sudo kill -9 <PID>
+```
+
+### 5. 权限问题
+
+```bash
+# 检查文件所有者
+ls -la /www/wwwroot/nest-admin-server
+
+# 修改所有者
+sudo chown -R www:www /www/wwwroot/nest-admin-server
+
+# 修改权限
+sudo chmod -R 755 /www/wwwroot/nest-admin-server
+```
+
+## 🔄 回滚操作
+
+如果新版本出现问题，可以快速回滚：
+
+```bash
+# 1. 查看备份列表
+ls -la /www/wwwroot/nest-admin-server/ | grep backup
+
+# 2. 回滚到指定版本
+cd /www/wwwroot/nest-admin-server
+rm -rf dist
+mv dist.backup.20241211120000 dist
+
+# 3. 重启应用
+pm2 restart nest_admin_server
+
+# 4. 验证
+pm2 logs nest_admin_server
+```
+
+## 📊 监控和日志
+
+### PM2 Plus（可选）
+
+免费的应用监控服务：
+
+```bash
+# 注册并连接
+pm2 link <secret> <public>
+
+# 在 https://app.pm2.io 查看监控数据
+```
+
+### 日志管理
+
+```bash
+# 日志切割配置（使用 logrotate）
+sudo nano /etc/logrotate.d/pm2
+
+# 添加配置
+/www/wwwlogs/pm2/*/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 www www
+    sharedscripts
+    postrotate
+        pm2 reloadLogs
+    endscript
+}
+```
+
+## 🚀 性能优化
+
+### 1. 启用集群模式
+
+修改 `ecosystem.config.cjs`：
+
+```javascript
+{
+  exec_mode: 'cluster',
+  instances: 'max', // 或指定数量
+}
+```
+
+### 2. Nginx 缓存
+
+```nginx
+# 在 http 块中添加
+proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m max_size=1g inactive=60m;
+
+# 在 location 块中使用
+location /api/ {
+    proxy_cache my_cache;
+    proxy_cache_valid 200 10m;
+    proxy_pass http://localhost:3000/;
+}
+```
+
+### 3. 启用 CDN
+
+将静态资源上传到 CDN 服务（如阿里云 OSS、腾讯云 COS）
+
+## 🔒 安全建议
+
+1. **使用非 root 用户部署**
+2. **配置防火墙**：只开放必要端口
+3. **启用 HTTPS**：使用 Let's Encrypt 免费证书
+4. **定期更新依赖**：`pnpm update`
+5. **配置 fail2ban**：防止 SSH 暴力破解
+6. **数据库定期备份**
+7. **限制 API 访问频率**
+8. **使用环境变量管理敏感信息**
+
+## 📝 最佳实践
+
+1. **版本标记**：使用 Git Tag 标记发布版本
+2. **测试环境**：先部署到测试环境验证
+3. **分支策略**：main 分支自动部署，dev 分支手动部署
+4. **监控告警**：配置监控和告警通知
+5. **文档维护**：及时更新部署文档
+6. **回滚计划**：保留最近几个版本的备份
+
+## 📖 相关文档
+
+- [PM2 官方文档](https://pm2.keymetrics.io/docs/)
+- [GitHub Actions 文档](https://docs.github.com/actions)
+- [Prisma 部署指南](https://www.prisma.io/docs/guides/deployment)
+- [Nginx 文档](https://nginx.org/en/docs/)
+
+## ❓ 常见问题
+
+**Q: 如何手动触发部署？**
+A: 进入 GitHub Actions 页面，选择工作流，点击 "Run workflow"
+
+**Q: 部署需要多长时间？**
+A: 通常 3-5 分钟，取决于项目大小和网络速度
+
+**Q: 如何查看部署日志？**
+A: GitHub Actions 页面可以查看详细日志
+
+**Q: 是否支持多环境部署？**
+A: 支持，可以配置不同分支部署到不同环境
+
+**Q: 如何暂停自动部署？**
+A: 在 GitHub Actions 中禁用对应的工作流
+
+## 🆘 获取帮助
+
+如果遇到问题：
+1. 查看 GitHub Actions 日志
+2. 查看服务器 PM2 日志
+3. 检查配置文件
+4. 查阅相关文档
+5. 提交 Issue
+
    - 运行 ESLint
    - 运行单元测试
    

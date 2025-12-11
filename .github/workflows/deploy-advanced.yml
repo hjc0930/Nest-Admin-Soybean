@@ -1,0 +1,197 @@
+name: Deploy with PM2 (Advanced)
+
+on:
+  push:
+    branches:
+      - main
+      - main-soybean
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      # 构建前端
+      - name: Install and build frontend
+        run: |
+          cd admin-naive-ui
+          pnpm install --frozen-lockfile
+          pnpm run build
+        env:
+          NODE_ENV: production
+
+      # 构建后端
+      - name: Install and build backend
+        run: |
+          cd server
+          pnpm install --frozen-lockfile
+          pnpm run prisma:generate
+          pnpm run build
+
+      # 压缩构建产物
+      - name: Archive production artifacts
+        run: |
+          mkdir -p deploy-package
+          
+          # 打包前端
+          cd admin-naive-ui
+          tar -czf ../deploy-package/frontend.tar.gz dist/
+          cd ..
+          
+          # 打包后端
+          cd server
+          tar -czf ../deploy-package/backend.tar.gz dist/ prisma/ package.json pnpm-lock.yaml ecosystem.config.cjs
+          cd ..
+
+      # 上传到服务器并部署
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.REMOTE_PORT }}
+          script: |
+            # 创建临时目录
+            mkdir -p /tmp/nest-admin-deploy
+            
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.REMOTE_PORT }}
+          source: "deploy-package/*"
+          target: "/tmp/nest-admin-deploy/"
+
+      - name: Extract and restart services
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.REMOTE_PORT }}
+          script: |
+            set -e
+            
+            # 设置变量
+            FRONTEND_DIR="${{ secrets.REMOTE_FRONTEND_DIR }}"
+            BACKEND_DIR="${{ secrets.REMOTE_BACKEND_DIR }}"
+            DEPLOY_TMP="/tmp/nest-admin-deploy/deploy-package"
+            
+            # 备份当前版本
+            if [ -d "$BACKEND_DIR/dist" ]; then
+              echo "Backing up current backend..."
+              cp -r "$BACKEND_DIR/dist" "$BACKEND_DIR/dist.backup.$(date +%Y%m%d%H%M%S)"
+            fi
+            
+            if [ -d "$FRONTEND_DIR" ]; then
+              echo "Backing up current frontend..."
+              cp -r "$FRONTEND_DIR" "$FRONTEND_DIR.backup.$(date +%Y%m%d%H%M%S)"
+            fi
+            
+            # 解压前端
+            echo "Extracting frontend..."
+            mkdir -p "$FRONTEND_DIR"
+            tar -xzf "$DEPLOY_TMP/frontend.tar.gz" -C "$FRONTEND_DIR" --strip-components=1
+            
+            # 解压后端
+            echo "Extracting backend..."
+            mkdir -p "$BACKEND_DIR"
+            tar -xzf "$DEPLOY_TMP/backend.tar.gz" -C "$BACKEND_DIR"
+            
+            # 安装生产依赖
+            echo "Installing production dependencies..."
+            cd "$BACKEND_DIR"
+            pnpm install --prod --frozen-lockfile
+            
+            # 生成 Prisma Client
+            echo "Generating Prisma Client..."
+            pnpm run prisma:generate
+            
+            # 运行数据库迁移（可选）
+            # pnpm run prisma:deploy
+            
+            # 使用 PM2 重启应用
+            echo "Restarting application with PM2..."
+            if pm2 list | grep -q "nest_admin_server"; then
+              pm2 reload ecosystem.config.cjs --env production
+            else
+              pm2 start ecosystem.config.cjs --env production
+            fi
+            
+            # 保存 PM2 配置
+            pm2 save
+            
+            # 清理临时文件
+            echo "Cleaning up..."
+            rm -rf /tmp/nest-admin-deploy
+            
+            # 清理旧备份（保留最近5个）
+            cd "$BACKEND_DIR"
+            ls -dt dist.backup.* 2>/dev/null | tail -n +6 | xargs -r rm -rf
+            
+            cd "$(dirname "$FRONTEND_DIR")"
+            ls -dt "$(basename "$FRONTEND_DIR").backup."* 2>/dev/null | tail -n +6 | xargs -r rm -rf
+            
+            echo "Deployment completed successfully!"
+            
+            # 显示 PM2 状态
+            pm2 list
+            pm2 logs nest_admin_server --lines 20 --nostream
+
+      - name: Health check
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.REMOTE_PORT }}
+          script: |
+            # 等待服务启动
+            sleep 5
+            
+            # 检查 PM2 状态
+            if pm2 list | grep -q "nest_admin_server.*online"; then
+              echo "✅ Application is running"
+              exit 0
+            else
+              echo "❌ Application failed to start"
+              pm2 logs nest_admin_server --lines 50 --nostream
+              exit 1
+            fi
