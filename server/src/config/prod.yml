@@ -1,0 +1,70 @@
+# 生产环境配置
+# 注意：生产环境应使用环境变量，此文件提供默认值
+app:
+  prefix: ''
+  port: 8080
+  logger:
+    # 项目日志存储路径
+    dir: '/var/log/nest-admin'
+  # 文件相关
+  file:
+    # 生产环境建议使用 COS/OSS 等云存储
+    isLocal: false
+    # location 文件上传后存储目录
+    location: '/data/upload'
+    # 文件服务器地址，生产环境必须配置为真实域名
+    domain: 'https://your-domain.com'
+    # 文件虚拟路径
+    serveRoot: '/profile'
+    # 文件大小限制，单位M
+    maxSize: 10
+
+# 腾讯云 COS 配置（生产环境推荐使用）
+cos:
+  secretId: ''
+  secretKey: ''
+  bucket: ''
+  region: ''
+  domain: ''
+  location: ''
+
+# 数据库配置
+db:
+  postgresql:
+    host: '127.0.0.1'
+    username: 'postgres'
+    password: 'change-this-password'
+    database: 'nest-admin'
+    port: 5432
+    ssl: true
+
+# Redis 配置
+redis:
+  host: 'redis'
+  password: 'redis123'
+  port: 6379
+  db: 0
+  keyPrefix: 'nest-admin:'
+
+# JWT 配置
+jwt:
+  secretkey: 'CHANGE_THIS_SECRET_KEY_IN_PRODUCTION'
+  expiresin: '24h'
+  refreshExpiresIn: '7d'
+
+# 权限白名单配置
+perm:
+  router:
+    whitelist:
+      [
+        { path: '/captchaImage', method: 'GET' },
+        { path: '/registerUser', method: 'GET' },
+        { path: '/register', method: 'POST' },
+        { path: '/login', method: 'POST' },
+        { path: '/logout', method: 'POST' },
+      ]
+
+# 用户相关
+user:
+  initialPassword: '123456'
+
