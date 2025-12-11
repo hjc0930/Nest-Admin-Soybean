@@ -1,25 +1,24 @@
-# 生产环境配置
-# 注意：生产环境应使用环境变量，此文件提供默认值
+# 测试环境配置
 app:
-  prefix: ''
+  prefix: '/api'
   port: 8080
   logger:
     # 项目日志存储路径
-    dir: '/var/log/nest-admin'
+    dir: '../logs/test'
   # 文件相关
   file:
-    # 生产环境建议使用 COS/OSS 等云存储
-    isLocal: false
+    # 测试环境使用本地存储
+    isLocal: true
     # location 文件上传后存储目录
-    location: '/data/upload'
-    # 文件服务器地址，生产环境必须配置为真实域名
-    domain: 'https://your-domain.com'
+    location: '../upload/test'
+    # 文件服务器地址
+    domain: 'http://localhost:8080'
     # 文件虚拟路径
     serveRoot: '/profile'
     # 文件大小限制，单位M
     maxSize: 10
 
-# 腾讯云 COS 配置（生产环境推荐使用）
+# 腾讯云cos配置（测试环境可不配置）
 cos:
   secretId: ''
   secretKey: ''
@@ -33,27 +32,27 @@ db:
   postgresql:
     host: '127.0.0.1'
     username: 'postgres'
-    password: 'change-this-password'
-    database: 'nest-admin'
+    password: '123456'
+    database: 'nest-admin-test'
     port: 5432
-    ssl: true
+    ssl: false
     schema: 'public'
 
-# Redis 配置
+# redis 配置
 redis:
-  host: 'redis'
-  password: 'redis123'
+  host: 'localhost'
+  password: '123456'
   port: 6379
-  db: 0
-  keyPrefix: 'nest-admin:'
+  db: 3
+  keyPrefix: 'test:'
 
-# JWT 配置
+# jwt 配置
 jwt:
-  secretkey: 'CHANGE_THIS_SECRET_KEY_IN_PRODUCTION'
-  expiresin: '24h'
-  refreshExpiresIn: '7d'
+  secretkey: 'test_secretkey'
+  expiresin: '1h'
+  refreshExpiresIn: '2h'
 
-# 权限白名单配置
+# 权限 白名单配置
 perm:
   router:
     whitelist:
@@ -80,16 +79,16 @@ user:
 
 # 多租户配置
 tenant:
-  # 是否启用多租户
+  # 测试环境启用多租户
   enabled: true
-  # 超级管理员租户ID (该租户可以访问所有租户数据)
+  # 超级管理员租户ID
   superTenantId: '000000'
-  # 默认租户ID (新用户注册时的默认租户)
+  # 默认租户ID
   defaultTenantId: '000000'
 
 # 加解密配置
 crypto:
-  # 生产环境建议启用加解密
+  # 测试环境不启用加解密
   enabled: false
   # RSA 公钥 (PEM 格式，留空则自动生成)
   rsaPublicKey: ''
@@ -102,4 +101,3 @@ client:
   defaultClientId: 'pc'
   # 默认授权类型
   defaultGrantType: 'password'
-
