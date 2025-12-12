@@ -1,6 +1,7 @@
 import { Module, Global, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/index';
+import { validate } from './config/env.validation';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthGuard } from 'src/common/guards/auth.guard';
 import { PermissionGuard } from 'src/common/guards/permission.guard';
@@ -24,6 +25,12 @@ import { PrismaModule } from './prisma/prisma.module';
       cache: true,
       load: [configuration],
       isGlobal: true,
+      validate,
+      envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`, '.env'],
+      validationOptions: {
+        allowUnknown: true,
+        abortEarly: false,
+      },
     }),
     // 数据库改为 Prisma + PostgreSQL
     PrismaModule,

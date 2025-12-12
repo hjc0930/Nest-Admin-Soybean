@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { StatusEnum, StatusEnumSchema, DataScopeEnum, DataScopeEnumSchema } from 'src/common/enum';
+import { DeptTreeNodeVo } from 'src/common/dto/dept-tree-node.vo';
 
 /**
  * 角色基础信息
@@ -51,20 +52,6 @@ export class RoleListVo {
 
   @ApiProperty({ description: '总数量' })
   total: number;
-}
-
-/**
- * 部门树节点
- */
-export class DeptTreeNodeVo {
-  @ApiProperty({ description: '节点ID' })
-  id: number;
-
-  @ApiProperty({ description: '节点标签' })
-  label: string;
-
-  @ApiProperty({ description: '子节点列表', type: [DeptTreeNodeVo], required: false })
-  children?: DeptTreeNodeVo[];
 }
 
 /**

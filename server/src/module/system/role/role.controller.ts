@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, Query, Delete, Res } from '@ne
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { Response } from 'express';
-import { CreateRoleDto, UpdateRoleDto, ListRoleDto, ChangeStatusDto, AuthUserCancelDto, AuthUserCancelAllDto, AuthUserSelectAllDto } from './dto/index';
+import { CreateRoleDto, UpdateRoleDto, ListRoleDto, ChangeRoleStatusDto, AuthUserCancelDto, AuthUserCancelAllDto, AuthUserSelectAllDto } from './dto/index';
 import { AllocatedListDto } from '../user/dto/index';
 import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
 import { Api } from 'src/common/decorators/api.decorator';
@@ -108,12 +108,12 @@ export class RoleController {
   @Api({
     summary: '角色管理-修改状态',
     description: '启用或停用角色',
-    body: ChangeStatusDto,
+    body: ChangeRoleStatusDto,
   })
   @RequirePermission('system:role:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Put('changeStatus')
-  changeStatus(@Body() changeStatusDto: ChangeStatusDto) {
+  changeStatus(@Body() changeStatusDto: ChangeRoleStatusDto) {
     return this.roleService.changeStatus(changeStatusDto);
   }
 

@@ -4,7 +4,8 @@ import { DeptService } from './dept.service';
 import { CreateDeptDto, UpdateDeptDto, ListDeptDto } from './dto/index';
 import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
 import { Api } from 'src/common/decorators/api.decorator';
-import { DeptVo, DeptTreeNodeVo } from './vo/dept.vo';
+import { DeptVo } from './vo/dept.vo';
+import { DeptTreeNodeVo } from 'src/common/dto/dept-tree-node.vo';
 import { Operlog } from 'src/common/decorators/operlog.decorator';
 import { BusinessType } from 'src/common/constant/business.constant';
 

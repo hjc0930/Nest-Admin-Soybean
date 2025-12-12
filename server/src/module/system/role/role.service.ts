@@ -7,7 +7,7 @@ import { ExportTable } from 'src/common/utils/export';
 
 import { DataScopeEnum } from 'src/common/enum/index';
 import { MenuService } from '../menu/menu.service';
-import { CreateRoleDto, UpdateRoleDto, ListRoleDto, ChangeStatusDto } from './dto/index';
+import { CreateRoleDto, UpdateRoleDto, ListRoleDto, ChangeRoleStatusDto } from './dto/index';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -138,7 +138,7 @@ export class RoleService {
     return ResultData.ok(res);
   }
 
-  async changeStatus(changeStatusDto: ChangeStatusDto) {
+  async changeStatus(changeStatusDto: ChangeRoleStatusDto) {
     const res = await this.prisma.sysRole.update({
       where: { roleId: changeStatusDto.roleId },
       data: { status: changeStatusDto.status },

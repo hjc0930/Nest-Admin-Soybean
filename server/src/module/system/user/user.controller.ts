@@ -5,7 +5,7 @@ import { Response } from 'express';
 import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
 import { RequireRole } from 'src/common/decorators/require-role.decorator';
 import { UploadService } from 'src/module/upload/upload.service';
-import { CreateUserDto, UpdateUserDto, ListUserDto, ChangeStatusDto, ResetPwdDto, UpdateProfileDto, UpdatePwdDto } from './dto/index';
+import { CreateUserDto, UpdateUserDto, ListUserDto, ChangeUserStatusDto, ResetPwdDto, UpdateProfileDto, UpdatePwdDto } from './dto/index';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ResultData } from 'src/common/utils/result';
 import { User, UserDto, UserTool, UserToolType } from 'src/module/system/user/user.decorator';
@@ -13,7 +13,7 @@ import { BusinessType } from 'src/common/constant/business.constant';
 import { Operlog } from 'src/common/decorators/operlog.decorator';
 import { Api } from 'src/common/decorators/api.decorator';
 import { UserVo, UserListVo, UserDetailVo, UserProfileVo, UserAvatarVo, AuthRoleVo } from './vo/user.vo';
-import { DeptTreeNodeVo } from 'src/module/system/dept/vo/dept.vo';
+import { DeptTreeNodeVo } from 'src/common/dto/dept-tree-node.vo';
 
 @ApiTags('用户管理')
 @Controller('system/user')
@@ -206,12 +206,12 @@ export class UserController {
   @Api({
     summary: '用户-修改状态',
     description: '启用或停用用户账号',
-    body: ChangeStatusDto,
+    body: ChangeUserStatusDto,
   })
   @RequireRole('admin')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Put('changeStatus')
-  changeStatus(@Body() changeStatusDto: ChangeStatusDto) {
+  changeStatus(@Body() changeStatusDto: ChangeUserStatusDto) {
     return this.userService.changeStatus(changeStatusDto);
   }
 

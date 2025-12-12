@@ -10,7 +10,7 @@ import { ExportTable } from 'src/common/utils/export';
 import { CacheEnum, DelFlagEnum, StatusEnum, DataScopeEnum } from 'src/common/enum/index';
 import { LOGIN_TOKEN_EXPIRESIN, SYS_USER_TYPE } from 'src/common/constant/index';
 import { ResultData } from 'src/common/utils/result';
-import { CreateUserDto, UpdateUserDto, ListUserDto, ChangeStatusDto, ResetPwdDto, AllocatedListDto, UpdateProfileDto, UpdatePwdDto } from './dto/index';
+import { CreateUserDto, UpdateUserDto, ListUserDto, ChangeUserStatusDto, ResetPwdDto, AllocatedListDto, UpdateProfileDto, UpdatePwdDto } from './dto/index';
 import { RegisterDto, LoginDto } from '../../main/dto/index';
 import { AuthUserCancelDto, AuthUserCancelAllDto, AuthUserSelectAllDto } from '../role/dto/index';
 
@@ -622,7 +622,7 @@ export class UserService {
     return ResultData.ok();
   }
 
-  async changeStatus(changeStatusDto: ChangeStatusDto) {
+  async changeStatus(changeStatusDto: ChangeUserStatusDto) {
     const userData = await this.prisma.sysUser.findUnique({
       where: { userId: changeStatusDto.userId },
       select: { userType: true },

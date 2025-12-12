@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { DeptTreeNodeVo } from 'src/common/dto/dept-tree-node.vo';
 
 /**
  * 部门基础信息
@@ -42,20 +43,6 @@ export class DeptVo {
 
   @ApiProperty({ description: '子部门列表', type: [DeptVo], required: false })
   children?: DeptVo[];
-}
-
-/**
- * 部门树节点
- */
-export class DeptTreeNodeVo {
-  @ApiProperty({ description: '部门ID' })
-  id: number;
-
-  @ApiProperty({ description: '部门名称' })
-  label: string;
-
-  @ApiProperty({ description: '子节点列表', type: [DeptTreeNodeVo], required: false })
-  children?: DeptTreeNodeVo[];
 }
 
 /**

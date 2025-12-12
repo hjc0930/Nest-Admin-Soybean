@@ -29,6 +29,9 @@
     "cleanup": "sa cleanup",
     "commit": "sa git-commit",
     "commit:zh": "sa git-commit -l=zh-cn",
+    "deploy:dev": "node deploy.cjs dev",
+    "deploy:test": "node deploy.cjs test",
+    "deploy:prod": "node deploy.cjs prod",
     "dev": "vite --mode dev",
     "dev:prod": "vite --mode prod",
     "dev:test": "vite --mode test",
@@ -107,7 +110,11 @@
     "vite-plugin-svg-icons": "2.0.1",
     "vite-plugin-vue-devtools": "8.0.3",
     "vue-eslint-parser": "10.2.0",
-    "vue-tsc": "3.1.4"
+    "vue-tsc": "3.1.4",
+    "ssh2": "^1.15.0",
+    "ora": "^5.4.1",
+    "chalk": "^4.1.2",
+    "compressing": "^1.10.0"
   },
   "simple-git-hooks": {
     "commit-msg": "pnpm sa git-commit-verify",
