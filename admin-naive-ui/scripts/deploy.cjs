@@ -21,6 +21,9 @@ const ora = require('ora');
 const chalk = require('chalk');
 const compressing = require('compressing');
 
+// 项目根目录（脚本在 scripts 目录中，需要访问上一级目录）
+const projectRoot = path.resolve(__dirname, '..');
+
 // 读取配置文件
 const deployConfig = require('./deploy.config.cjs');
 
@@ -53,7 +56,7 @@ function formatTime() {
 function execCommand(command, description) {
   spinner = ora(description).start();
   try {
-    execSync(command, { stdio: 'inherit', cwd: __dirname });
+    execSync(command, { stdio: 'inherit', cwd: projectRoot });
     spinner.succeed(chalk.green(`✓ ${description}`));
     return true;
   } catch (error) {
@@ -133,7 +136,7 @@ async function deploy() {
   }
 
   // 2. 检查 dist 目录是否存在
-  const distPath = path.join(__dirname, config.distPath);
+  const distPath = path.join(projectRoot, config.distPath);
   if (!fs.existsSync(distPath)) {
     console.log(chalk.red(`❌ 打包目录不存在: ${distPath}`));
     process.exit(1);
@@ -143,7 +146,7 @@ async function deploy() {
   console.log('');
   console.log(chalk.cyan('📦 步骤 2: 压缩文件'));
   const zipFileName = `dist_${formatTime()}.tar.gz`;
-  const zipFilePath = path.join(__dirname, zipFileName);
+  const zipFilePath = path.join(projectRoot, zipFileName);
   
   spinner = ora('正在压缩文件...').start();
   try {

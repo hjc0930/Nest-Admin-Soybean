@@ -90,11 +90,20 @@ tenant:
 # 加解密配置
 crypto:
   # 生产环境建议启用加解密
-  enabled: false
+  enabled: true
   # RSA 公钥 (PEM 格式，留空则自动生成)
-  rsaPublicKey: ''
+  rsaPublicKey: 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKoR8mX0rGKLqzcWmOzbfj64K8ZIgOdHnzkXSOVOZbFu/TJhZ7rFAN+eaGkl3C4buccQd/EjEsj9ir7ijT7h96MCAwEAAQ=='
   # RSA 私钥 (PEM 格式，留空则自动生成)
-  rsaPrivateKey: ''
+  rsaPrivateKey: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIBOwIBAAJBAKoR8mX0rGKLqzcWmOzbfj64K8ZIgOdHnzkXSOVOZbFu/TJhZ7rF
+    AN+eaGkl3C4buccQd/EjEsj9ir7ijT7h96MCAwEAAQJAQs0wjHPzR8hF6fKdnUPg
+    cFh0iM4g8b4qFYrfCXUuQu1xfJpW3H3xVgJN5vKSYp8KjhzGPPKWNSKCz0lKwX+h
+    0QIhANTg7LqH4jqmGpXVLAqHt8HHBxoJV+bQQzgX3XnZvNn1AiEAzK0x9K7vP8bL
+    vqLJX5AJZxKNZj3jC7P1NdHh4vQYrOsCIQCW9FqdMmPULJRHQZLBVmGPT6b5vJL7
+    qOZvBfLTxR/8FQIgbMXCg6cTdJLqQz5lF8t7yLCFqH7P9AkH4UvJL8bVzs0CIQC0
+    4HwLJnHF8TvN4TqF8qLHzVR9lMPKjTL0zP2NhQ5mQg==
+    -----END RSA PRIVATE KEY-----
 
 # 客户端配置 (用于 OAuth2 / 多端登录)
 client:

@@ -97,10 +97,31 @@ export default () => ({
   },
 
   gen: {
-    author: process.env.GEN_AUTHOR || 'nestAdmin',
+    author: process.env.GEN_AUTHOR || 'linlingqin77',
     packageName: process.env.GEN_PACKAGE_NAME || 'system',
     moduleName: process.env.GEN_MODULE_NAME || 'system',
     autoRemovePre: bool(process.env.GEN_AUTO_REMOVE_PRE, false),
     tablePrefix: (process.env.GEN_TABLE_PREFIX || 'sys_').split(','),
+  },
+
+  user: {
+    initialPassword: process.env.USER_INITIAL_PASSWORD || '123456',
+  },
+
+  tenant: {
+    enabled: bool(process.env.TENANT_ENABLED, true),
+    superTenantId: process.env.TENANT_SUPER_ID || '000000',
+    defaultTenantId: process.env.TENANT_DEFAULT_ID || '000000',
+  },
+
+  crypto: {
+    enabled: bool(process.env.CRYPTO_ENABLED, false),
+    rsaPublicKey: process.env.CRYPTO_RSA_PUBLIC_KEY || '',
+    rsaPrivateKey: process.env.CRYPTO_RSA_PRIVATE_KEY || '',
+  },
+
+  client: {
+    defaultClientId: process.env.CLIENT_DEFAULT_ID || 'pc',
+    defaultGrantType: process.env.CLIENT_DEFAULT_GRANT_TYPE || 'password',
   },
 });

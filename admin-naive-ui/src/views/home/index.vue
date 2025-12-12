@@ -18,13 +18,13 @@ const gap = computed(() => (appStore.isMobile ? 0 : 16));
     <NAlert title="如遇问题请先看这里" type="warning">
       <div class="text-18px">
         <div>
-          开发前请先查看 ReadMe.md 文件中的
+          开发前请先查看 ReadMe.md 文件和
           <NA
-            href="https://gitee.com/xlsea/ruoyi-plus-soybean#%E5%BC%80%E5%8F%91%E5%89%8D%E5%BF%85%E7%9C%8B"
+            href="https://github.com/linlingqin77/Nest-Admin"
             target="_blank"
             rel="noopener noreferrer"
           >
-            开发前必看
+            项目文档
           </NA>
         </div>
         <div>如遇菜单无法点击，请检查是否已替换菜单 SQL</div>

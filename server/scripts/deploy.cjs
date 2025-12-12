@@ -21,6 +21,9 @@ const ora = require('ora');
 const chalk = require('chalk');
 const compressing = require('compressing');
 
+// 项目根目录（脚本在 scripts 目录中，需要访问上一级目录）
+const projectRoot = path.resolve(__dirname, '..');
+
 // 读取配置文件
 const deployConfig = require('./deploy.config.cjs');
 
@@ -53,7 +56,7 @@ function formatTime() {
 function execCommand(command, description) {
   spinner = ora(description).start();
   try {
-    execSync(command, { stdio: 'inherit', cwd: __dirname });
+    execSync(command, { stdio: 'inherit', cwd: projectRoot });
     spinner.succeed(chalk.green(`✓ ${description}`));
     return true;
   } catch (error) {
@@ -127,7 +130,7 @@ async function deploy() {
 
   // 1. 清理旧的构建产物
   console.log(chalk.cyan('🧹 步骤 1: 清理旧的构建产物'));
-  const distPath = path.join(__dirname, 'dist');
+  const distPath = path.join(projectRoot, 'dist');
   if (fs.existsSync(distPath)) {
     execCommand('rm -rf dist', '正在清理旧的构建产物...');
   } else {
@@ -154,13 +157,13 @@ async function deploy() {
     'dist',
     'prisma',
     'package.json',
-    'ecosystem.config.cjs',
+    'scripts/ecosystem.config.cjs',
     'public'
   ];
 
   const missingFiles = [];
   requiredFiles.forEach(file => {
-    const filePath = path.join(__dirname, file);
+    const filePath = path.join(projectRoot, file);
     if (!checkExists(filePath)) {
       missingFiles.push(file);
     }
@@ -177,22 +180,22 @@ async function deploy() {
   console.log(chalk.cyan('📦 步骤 4: 准备部署文件'));
   spinner = ora('正在准备文件...').start();
 
-  const tempDir = path.join(__dirname, '.deploy-temp');
+  const tempDir = path.join(projectRoot, '.deploy-temp');
   if (fs.existsSync(tempDir)) {
-    execSync(`rm -rf ${tempDir}`, { cwd: __dirname });
+    execSync(`rm -rf ${tempDir}`, { cwd: projectRoot });
   }
   fs.mkdirSync(tempDir);
 
   try {
     // 复制 dist 目录的内容到临时目录根部
-    execSync(`cp -r dist/* ${tempDir}/`, { cwd: __dirname });
+    execSync(`cp -r dist/* ${tempDir}/`, { cwd: projectRoot });
     
     // 复制其他必要文件到临时目录
-    execSync(`cp -r prisma ${tempDir}/`, { cwd: __dirname });
-    execSync(`cp -r public ${tempDir}/`, { cwd: __dirname });
-    execSync(`cp package.json ${tempDir}/`, { cwd: __dirname });
-    execSync(`cp pnpm-lock.yaml ${tempDir}/`, { cwd: __dirname, stdio: 'ignore' });
-    execSync(`cp ecosystem.config.cjs ${tempDir}/`, { cwd: __dirname });
+    execSync(`cp -r prisma ${tempDir}/`, { cwd: projectRoot });
+    execSync(`cp -r public ${tempDir}/`, { cwd: projectRoot });
+    execSync(`cp package.json ${tempDir}/`, { cwd: projectRoot });
+    execSync(`cp pnpm-lock.yaml ${tempDir}/`, { cwd: projectRoot, stdio: 'ignore' });
+    execSync(`cp scripts/ecosystem.config.cjs ${tempDir}/`, { cwd: projectRoot });
     
     // 如果配置了复制 .env 文件，根据环境选择对应的 .env 文件
     if (config.includeEnvFile) {
@@ -201,11 +204,11 @@ async function deploy() {
       
       // 优先使用环境特定的文件，否则使用默认的 .env
       // 始终重命名为 .env 上传到服务器（避免服务器上同时存在两个文件）
-      if (checkExists(path.join(__dirname, envFile))) {
-        execSync(`cp ${envFile} ${tempDir}/.env`, { cwd: __dirname });
+      if (checkExists(path.join(projectRoot, envFile))) {
+        execSync(`cp ${envFile} ${tempDir}/.env`, { cwd: projectRoot });
         console.log(chalk.gray(`  使用环境文件: ${envFile} -> .env`));
-      } else if (checkExists(path.join(__dirname, defaultEnv))) {
-        execSync(`cp ${defaultEnv} ${tempDir}/.env`, { cwd: __dirname });
+      } else if (checkExists(path.join(projectRoot, defaultEnv))) {
+        execSync(`cp ${defaultEnv} ${tempDir}/.env`, { cwd: projectRoot });
         console.log(chalk.gray(`  使用环境文件: ${defaultEnv}`));
       } else {
         console.log(chalk.yellow(`  ⚠ 未找到环境文件，将不包含 .env`));
@@ -223,14 +226,14 @@ async function deploy() {
   console.log('');
   console.log(chalk.cyan('📦 步骤 5: 压缩部署文件'));
   const zipFileName = `server_deploy_${formatTime()}.tar.gz`;
-  const zipFilePath = path.join(__dirname, zipFileName);
+  const zipFilePath = path.join(projectRoot, zipFileName);
   
   spinner = ora('正在压缩文件...').start();
   try {
     await compressing.tgz.compressDir(tempDir, zipFilePath);
     
     // 清理临时目录
-    execSync(`rm -rf ${tempDir}`, { cwd: __dirname });
+    execSync(`rm -rf ${tempDir}`, { cwd: projectRoot });
     
     const stats = fs.statSync(zipFilePath);
     const fileSizeMB = (stats.size / (1024 * 1024)).toFixed(2);

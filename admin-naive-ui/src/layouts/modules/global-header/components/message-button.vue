@@ -16,7 +16,7 @@ const noticeNum = computed(() => {
 });
 
 const toGitee = () => {
-  window.open('https://gitee.com/xlsea/ruoyi-plus-soybean', '_blank');
+  window.open('https://github.com/linlingqin77/Nest-Admin', '_blank');
 };
 </script>
 
