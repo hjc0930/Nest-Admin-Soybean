@@ -24,9 +24,11 @@ const tableProps = useTableProps();
 useDict('sys_common_status');
 useDict('sys_device_type');
 
-const { columns, columnChecks, data, getData, loading, searchParams, resetSearchParams } = useTable({
+const { columns, columnChecks, data, getData, loading, mobilePagination, searchParams, resetSearchParams } = useTable({
   apiFn: fetchGetOnlineUserList,
   apiParams: {
+    pageNum: 1,
+    pageSize: 10,
     // if you want to use the searchParams in Form, you need to define the following properties, and the value is null
     // the value can not be undefined, otherwise the property in Form will not be reactive
     userName: null,
@@ -149,7 +151,7 @@ async function handleForceLogout(tokenId: string) {
           :show-export="false" @refresh="getData" />
       </template>
       <NDataTable :columns="columns" :data="data" v-bind="tableProps" :flex-height="!appStore.isMobile" :scroll-x="962"
-        :loading="loading" remote :row-key="row => row.tokenId" class="sm:h-full" />
+        :loading="loading" remote :row-key="row => row.tokenId" :pagination="mobilePagination" class="sm:h-full" />
     </NCard>
   </div>
 </template>

@@ -21,7 +21,7 @@ export class OnlineController {
   })
   @RequirePermission('monitor:online:list')
   @Get('/list')
-  findAll(@Query() query) {
+  findAll(@Query() query: OnlineListDto) {
     return this.onlineService.findAll(query);
   }
 

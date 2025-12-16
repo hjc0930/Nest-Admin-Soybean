@@ -18204,7 +18204,48 @@
       "get": {
         "description": "查询当前在线用户列表",
         "operationId": "OnlineController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "pageNum",
+            "required": false,
+            "in": "query",
+            "description": "当前页码",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ipaddr",
+            "required": false,
+            "in": "query",
+            "description": "登录IP地址",
+            "schema": {
+              "minLength": 0,
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "name": "userName",
+            "required": false,
+            "in": "query",
+            "description": "用户名",
+            "schema": {
+              "minLength": 0,
+              "maxLength": 50,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "操作成功",
