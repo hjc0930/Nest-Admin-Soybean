@@ -7,7 +7,7 @@ import { fetchBatchDeleteRole, fetchGetRoleList, fetchUpdateRoleStatus } from '@
 import { useAppStore } from '@/store/modules/app';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { $t } from '@/locales';
 import ButtonIcon from '@/components/custom/button-icon.vue';
@@ -26,6 +26,8 @@ const { download } = useDownload();
 const { hasAuth } = useAuth();
 
 useDict('sys_normal_disable');
+
+const tableProps = useTableProps();
 
 const { bool: dataScopeDrawerVisible, setTrue: openDataScopeDrawer } = useBoolean(false);
 const { bool: authUserDrawerVisible, setTrue: openAuthUserDrawer } = useBoolean(false);
@@ -254,38 +256,16 @@ function handleAuthUser(row: Api.System.Role) {
     <RoleSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <NCard title="角色列表" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="hasAuth('system:role:add')"
-          :show-delete="hasAuth('system:role:remove')"
-          :show-export="hasAuth('system:role:export')"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
-          @export="handleExport"
-          @refresh="getData"
-        />
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="hasAuth('system:role:add')" :show-delete="hasAuth('system:role:remove')"
+          :show-export="hasAuth('system:role:export')" @add="handleAdd" @delete="handleBatchDelete"
+          @export="handleExport" @refresh="getData" />
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="1200"
-        :loading="loading"
-        remote
-        :row-key="row => row.roleId"
-        :pagination="mobilePagination"
-        class="sm:h-full"
-      />
-      <RoleOperateDrawer
-        v-model:visible="drawerVisible"
-        :operate-type="operateType"
-        :row-data="editingData"
-        @submitted="getData"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="1200" :loading="loading" remote :row-key="row => row.roleId"
+        :pagination="mobilePagination" class="sm:h-full" />
+      <RoleOperateDrawer v-model:visible="drawerVisible" :operate-type="operateType" :row-data="editingData"
+        @submitted="getData" />
       <RoleDataScopeDrawer v-model:visible="dataScopeDrawerVisible" :row-data="editingData" @submitted="getData" />
       <RoleAuthUserDrawer v-model:visible="authUserDrawerVisible" :row-data="editingData" @submitted="getData" />
     </NCard>

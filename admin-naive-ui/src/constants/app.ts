@@ -78,3 +78,13 @@ export const themeTableSizeRecord: Record<UnionKey.ThemeTableSize, App.I18n.I18n
 };
 
 export const themeTableSizeOptions = transformRecordToOption(themeTableSizeRecord);
+
+// Component size options
+export const themeComponentSizeRecord: Record<UnionKey.ThemeComponentSize, App.I18n.I18nKey> = {
+  tiny: 'theme.component.size.tiny',
+  small: 'theme.component.size.small',
+  medium: 'theme.component.size.medium',
+  large: 'theme.component.size.large'
+};
+
+export const themeComponentSizeOptions = transformRecordToOption(themeComponentSizeRecord);

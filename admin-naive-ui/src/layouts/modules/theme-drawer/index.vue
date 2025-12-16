@@ -5,6 +5,7 @@ import { $t } from '@/locales';
 import AppearanceSettings from './modules/appearance/index.vue';
 import LayoutSettings from './modules/layout/index.vue';
 import GeneralSettings from './modules/general/index.vue';
+import ComponentSettings from './modules/component/index.vue';
 import ConfigOperation from './modules/config-operation.vue';
 import PresetSettings from './modules/preset/index.vue';
 
@@ -34,6 +35,7 @@ const drawerWidth = computed(() => {
         <NTab name="appearance" :tab="$t('theme.tabs.appearance')"></NTab>
         <NTab name="layout" :tab="$t('theme.tabs.layout')"></NTab>
         <NTab name="general" :tab="$t('theme.tabs.general')"></NTab>
+        <NTab name="component" :tab="$t('theme.tabs.component')"></NTab>
         <NTab name="preset" :tab="$t('theme.tabs.preset')"></NTab>
       </NTabs>
 
@@ -42,6 +44,7 @@ const drawerWidth = computed(() => {
           <AppearanceSettings v-if="activeTab === 'appearance'" />
           <LayoutSettings v-else-if="activeTab === 'layout'" />
           <GeneralSettings v-else-if="activeTab === 'general'" />
+          <ComponentSettings v-else-if="activeTab === 'component'" />
           <PresetSettings v-else-if="activeTab === 'preset'" />
         </KeepAlive>
       </div>

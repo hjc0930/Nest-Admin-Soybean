@@ -6,7 +6,7 @@ import { fetchBatchDeletePost, fetchGetPostDeptSelect, fetchGetPostList } from '
 import { useAppStore } from '@/store/modules/app';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import DictTag from '@/components/custom/dict-tag.vue';
 import { $t } from '@/locales';
@@ -22,6 +22,8 @@ useDict('sys_normal_disable');
 const appStore = useAppStore();
 const { download } = useDownload();
 const { hasAuth } = useAuth();
+
+const tableProps = useTableProps();
 
 const {
   columns,
@@ -231,22 +233,10 @@ function handleResetSearch() {
     <template #sider>
       <NInput v-model:value="deptPattern" clearable :placeholder="$t('common.keywordSearch')" />
       <NSpin class="dept-tree" :show="treeLoading">
-        <NTree
-          v-model:expanded-keys="expandedKeys"
-          v-model:selected-keys="selectedKeys"
-          block-node
-          show-line
-          :data="deptData as []"
-          :show-irrelevant-nodes="false"
-          :pattern="deptPattern"
-          block-line
-          class="infinite-scroll h-full min-h-200px py-3"
-          key-field="id"
-          label-field="label"
-          virtual-scroll
-          :selectable="selectable"
-          @update:selected-keys="handleClickTree"
-        >
+        <NTree v-model:expanded-keys="expandedKeys" v-model:selected-keys="selectedKeys" block-node show-line
+          :data="deptData as []" :show-irrelevant-nodes="false" :pattern="deptPattern" block-line
+          class="infinite-scroll h-full min-h-200px py-3" key-field="id" label-field="label" virtual-scroll
+          :selectable="selectable" @update:selected-keys="handleClickTree">
           <template #empty>
             <NEmpty description="暂无部门信息" class="h-full min-h-200px justify-center" />
           </template>
@@ -257,39 +247,16 @@ function handleResetSearch() {
       <PostSearch v-model:model="searchParams" @reset="handleResetSearch" @search="getDataByPage" />
       <NCard title="岗位信息列表" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
         <template #header-extra>
-          <TableHeaderOperation
-            v-model:columns="columnChecks"
-            :disabled-delete="checkedRowKeys.length === 0"
-            :loading="loading"
-            :show-add="hasAuth('system:post:add')"
-            :show-delete="hasAuth('system:post:remove')"
-            :show-export="hasAuth('system:post:export')"
-            @add="handleAdd"
-            @delete="handleBatchDelete"
-            @export="handleExport"
-            @refresh="getData"
-          />
+          <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+            :loading="loading" :show-add="hasAuth('system:post:add')" :show-delete="hasAuth('system:post:remove')"
+            :show-export="hasAuth('system:post:export')" @add="handleAdd" @delete="handleBatchDelete"
+            @export="handleExport" @refresh="getData" />
         </template>
-        <NDataTable
-          v-model:checked-row-keys="checkedRowKeys"
-          :columns="columns"
-          :data="data"
-          size="small"
-          :flex-height="!appStore.isMobile"
-          :scroll-x="962"
-          :loading="loading"
-          remote
-          :row-key="row => row.postId"
-          :pagination="mobilePagination"
-          class="sm:h-full"
-        />
-        <PostOperateDrawer
-          v-model:visible="drawerVisible"
-          :operate-type="operateType"
-          :row-data="editingData"
-          :dept-data="deptData"
-          @submitted="getData"
-        />
+        <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+          :flex-height="!appStore.isMobile" :scroll-x="962" :loading="loading" remote :row-key="row => row.postId"
+          :pagination="mobilePagination" class="sm:h-full" />
+        <PostOperateDrawer v-model:visible="drawerVisible" :operate-type="operateType" :row-data="editingData"
+          :dept-data="deptData" @submitted="getData" />
       </NCard>
     </div>
   </TableSiderLayout>

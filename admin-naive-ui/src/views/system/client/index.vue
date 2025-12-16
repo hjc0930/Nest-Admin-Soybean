@@ -4,7 +4,7 @@ import { fetchBatchDeleteClient, fetchGetClientList, fetchUpdateClientStatus } f
 import { useAppStore } from '@/store/modules/app';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { $t } from '@/locales';
 import DictTag from '@/components/custom/dict-tag.vue';
@@ -24,6 +24,8 @@ useDict('sys_normal_disable');
 const appStore = useAppStore();
 const { download } = useDownload();
 const { hasAuth } = useAuth();
+
+const tableProps = useTableProps();
 
 const {
   columns,
@@ -236,38 +238,16 @@ async function handleStatusChange(
     <ClientSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <NCard :title="$t('page.system.client.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="hasAuth('system:client:add')"
-          :show-delete="hasAuth('system:client:remove')"
-          :show-export="hasAuth('system:client:export')"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
-          @export="handleExport"
-          @refresh="getData"
-        />
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="hasAuth('system:client:add')" :show-delete="hasAuth('system:client:remove')"
+          :show-export="hasAuth('system:client:export')" @add="handleAdd" @delete="handleBatchDelete"
+          @export="handleExport" @refresh="getData" />
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="1200"
-        :loading="loading"
-        remote
-        :row-key="row => row.id"
-        :pagination="mobilePagination"
-        class="sm:h-full"
-      />
-      <ClientOperateDrawer
-        v-model:visible="drawerVisible"
-        :operate-type="operateType"
-        :row-data="editingData"
-        @submitted="getData"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="1200" :loading="loading" remote :row-key="row => row.id"
+        :pagination="mobilePagination" class="sm:h-full" />
+      <ClientOperateDrawer v-model:visible="drawerVisible" :operate-type="operateType" :row-data="editingData"
+        @submitted="getData" />
     </NCard>
   </div>
 </template>

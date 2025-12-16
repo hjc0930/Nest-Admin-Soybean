@@ -11,7 +11,7 @@ import {
 import { useAppStore } from '@/store/modules/app';
 import { useAuthStore } from '@/store/modules/auth';
 import { useAuth } from '@/hooks/business/auth';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDownload } from '@/hooks/business/download';
 import { useDict } from '@/hooks/business/dict';
 import DictTag from '@/components/custom/dict-tag.vue';
@@ -29,6 +29,8 @@ useDict('sys_normal_disable');
 const appStore = useAppStore();
 const { download } = useDownload();
 const { hasAuth } = useAuth();
+
+const tableProps = useTableProps();
 const { userInfo } = useAuthStore();
 
 const isSuperAdmin = computed(() => {
@@ -246,18 +248,10 @@ async function handleExport() {
     <TenantSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <NCard title="租户列表" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="hasAuth('system:tenant:add')"
-          :show-delete="hasAuth('system:tenant:delete')"
-          :show-export="hasAuth('system:tenant:export')"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
-          @export="handleExport"
-          @refresh="getData"
-        >
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="hasAuth('system:tenant:add')" :show-delete="hasAuth('system:tenant:delete')"
+          :show-export="hasAuth('system:tenant:export')" @add="handleAdd" @delete="handleBatchDelete"
+          @export="handleExport" @refresh="getData">
           <template #prefix>
             <NButton v-if="isSuperAdmin" ghost size="small" @click="handleSyncTenantDict">
               <template #icon>
@@ -274,25 +268,11 @@ async function handleExport() {
           </template>
         </TableHeaderOperation>
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="962"
-        :loading="loading"
-        remote
-        :row-key="row => row.id"
-        :pagination="mobilePagination"
-        class="sm:h-full"
-      />
-      <TenantOperateDrawer
-        v-model:visible="drawerVisible"
-        :operate-type="operateType"
-        :row-data="editingData"
-        @submitted="getData"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="962" :loading="loading" remote :row-key="row => row.id"
+        :pagination="mobilePagination" class="sm:h-full" />
+      <TenantOperateDrawer v-model:visible="drawerVisible" :operate-type="operateType" :row-data="editingData"
+        @submitted="getData" />
     </NCard>
   </div>
 </template>

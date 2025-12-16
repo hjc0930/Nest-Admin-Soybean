@@ -23,6 +23,8 @@ const appStore = useAppStore();
 const { download } = useDownload();
 const { hasAuth } = useAuth();
 
+const tableProps = useTableProps();
+
 const {
   columns,
   columnChecks,
@@ -176,25 +178,13 @@ async function handleCleanOperLog() {
     <OperLogSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <NCard title="操作日志列表" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="false"
-          :show-delete="hasAuth('monitor:operlog:remove')"
-          :show-export="hasAuth('monitor:operlog:export')"
-          @delete="handleBatchDelete"
-          @export="handleExport"
-          @refresh="getData"
-        >
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="false" :show-delete="hasAuth('monitor:operlog:remove')"
+          :show-export="hasAuth('monitor:operlog:export')" @delete="handleBatchDelete" @export="handleExport"
+          @refresh="getData">
           <template #prefix>
-            <NButton
-              v-if="hasAuth('monitor:operlog:remove')"
-              type="error"
-              ghost
-              size="small"
-              @click="handleCleanOperLog"
-            >
+            <NButton v-if="hasAuth('monitor:operlog:remove')" type="error" ghost size="small"
+              @click="handleCleanOperLog">
               <template #icon>
                 <icon-material-symbols:warning-outline-rounded />
               </template>
@@ -203,19 +193,9 @@ async function handleCleanOperLog() {
           </template>
         </TableHeaderOperation>
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="962"
-        :loading="loading"
-        remote
-        :row-key="row => row.operId"
-        :pagination="mobilePagination"
-        class="sm:h-full"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" size="small"
+        :flex-height="!appStore.isMobile" :scroll-x="962" :loading="loading" remote :row-key="row => row.operId"
+        :pagination="mobilePagination" class="sm:h-full" />
       <OperLogViewDrawer v-model:visible="drawerVisible" :row-data="editingData" />
     </NCard>
   </div>

@@ -9,7 +9,7 @@ import {
 import { useAppStore } from '@/store/modules/app';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { getBrowserIcon, getOsIcon } from '@/utils/icon-tag-format';
 import DictTag from '@/components/custom/dict-tag.vue';
@@ -26,6 +26,8 @@ defineOptions({
 const appStore = useAppStore();
 const { download } = useDownload();
 const { hasAuth } = useAuth();
+
+const tableProps = useTableProps();
 
 useDict('sys_common_status');
 useDict('sys_device_type');
@@ -230,25 +232,13 @@ async function handleUnlockLoginInfor(username: string) {
     <LoginInforSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <NCard title="登录日志列表" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="false"
-          :show-delete="hasAuth('monitor:logininfor:remove')"
-          :show-export="hasAuth('monitor:logininfor:export')"
-          @delete="handleBatchDelete"
-          @export="handleExport"
-          @refresh="getData"
-        >
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="false" :show-delete="hasAuth('monitor:logininfor:remove')"
+          :show-export="hasAuth('monitor:logininfor:export')" @delete="handleBatchDelete" @export="handleExport"
+          @refresh="getData">
           <template #prefix>
-            <NButton
-              v-if="hasAuth('monitor:logininfor:remove')"
-              type="error"
-              ghost
-              size="small"
-              @click="handleCleanLoginInfor"
-            >
+            <NButton v-if="hasAuth('monitor:logininfor:remove')" type="error" ghost size="small"
+              @click="handleCleanLoginInfor">
               <template #icon>
                 <icon-material-symbols:warning-outline-rounded />
               </template>
@@ -257,19 +247,9 @@ async function handleUnlockLoginInfor(username: string) {
           </template>
         </TableHeaderOperation>
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="962"
-        :loading="loading"
-        remote
-        :row-key="row => row.infoId"
-        :pagination="mobilePagination"
-        class="sm:h-full"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="962" :loading="loading" remote :row-key="row => row.infoId"
+        :pagination="mobilePagination" class="sm:h-full" />
       <LoginInforViewDrawer v-model:visible="drawerVisible" :row-data="editingData" />
     </NCard>
   </div>

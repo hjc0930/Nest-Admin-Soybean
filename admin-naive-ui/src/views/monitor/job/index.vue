@@ -5,7 +5,7 @@ import { useBoolean } from '@sa/hooks';
 import { jsonClone } from '@sa/utils';
 import { fetchChangeJobStatus, fetchDeleteJob, fetchGetJobList, fetchRunJob } from '@/service/api/monitor/job';
 import { useAppStore } from '@/store/modules/app';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
@@ -262,18 +262,10 @@ function handleCronConfirm(cron: string) {
     <JobSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <NCard title="定时任务" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="hasAuth('monitor:job:add')"
-          :show-delete="hasAuth('monitor:job:remove')"
-          :show-export="hasAuth('monitor:job:export')"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
-          @export="handleExport"
-          @refresh="getData"
-        >
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="hasAuth('monitor:job:add')" :show-delete="hasAuth('monitor:job:remove')"
+          :show-export="hasAuth('monitor:job:export')" @add="handleAdd" @delete="handleBatchDelete"
+          @export="handleExport" @refresh="getData">
           <template #after>
             <NButton v-if="hasAuth('monitor:job:query')" size="small" ghost @click="handleJobLog()">
               <template #icon>
@@ -284,27 +276,11 @@ function handleCronConfirm(cron: string) {
           </template>
         </TableHeaderOperation>
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="1000"
-        :loading="loading"
-        remote
-        :row-key="row => row.jobId"
-        :pagination="mobilePagination"
-        class="h-full"
-      />
-      <JobOperateDrawer
-        ref="operateDrawerRef"
-        v-model:visible="drawerVisible"
-        :operate-type="operateType"
-        :row-data="editingData"
-        @submitted="getDataByPage"
-        @show-cron="handleShowCron"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="1000" :loading="loading" remote :row-key="row => row.jobId"
+        :pagination="mobilePagination" class="h-full" />
+      <JobOperateDrawer ref="operateDrawerRef" v-model:visible="drawerVisible" :operate-type="operateType"
+        :row-data="editingData" @submitted="getDataByPage" @show-cron="handleShowCron" />
       <JobDetailDrawer v-model:visible="detailVisible" :row-data="detailData" />
       <CronModal v-model:visible="cronVisible" :expression="cronExpression" @confirm="handleCronConfirm" />
     </NCard>

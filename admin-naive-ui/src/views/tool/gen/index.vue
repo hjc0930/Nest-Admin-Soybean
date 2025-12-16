@@ -11,7 +11,7 @@ import {
   fetchSynchGenDbList
 } from '@/service/api/tool';
 import { useAppStore } from '@/store/modules/app';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDownload } from '@/hooks/business/download';
 import { useAuth } from '@/hooks/business/auth';
 import { $t } from '@/locales';
@@ -26,6 +26,8 @@ const appStore = useAppStore();
 const { zip } = useDownload();
 const { bool: importVisible, setTrue: openImportVisible } = useBoolean();
 const { bool: previewVisible, setTrue: openPreviewVisible } = useBoolean();
+
+const tableProps = useTableProps();
 
 const {
   columns,
@@ -261,31 +263,16 @@ getDataNames();
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-12px overflow-hidden lt-sm:overflow-auto">
-    <GenTableSearch
-      v-model:model="searchParams"
-      :options="dataNameOptions"
-      @reset="resetSearchParams"
-      @search="getDataByPage"
-    />
+    <GenTableSearch v-model:model="searchParams" :options="dataNameOptions" @reset="resetSearchParams"
+      @search="getDataByPage" />
     <TableRowCheckAlert v-model:checked-row-keys="checkedRowKeys" />
     <NCard title="代码生成" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="false"
-          @delete="handleBatchDelete"
-          @refresh="getData"
-        >
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="false" @delete="handleBatchDelete" @refresh="getData">
           <template #prefix>
-            <NButton
-              :disabled="checkedRowKeys.length === 0"
-              size="small"
-              ghost
-              type="primary"
-              @click="() => handleGenCode()"
-            >
+            <NButton :disabled="checkedRowKeys.length === 0" size="small" ghost type="primary"
+              @click="() => handleGenCode()">
               <template #icon>
                 <icon-material-symbols:download-rounded class="text-icon" />
               </template>
@@ -300,26 +287,13 @@ getDataNames();
           </template>
         </TableHeaderOperation>
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="1200"
-        :loading="loading"
-        remote
-        :row-key="row => row.tableId"
-        :pagination="mobilePagination"
-        class="sm:h-full"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="1200" :loading="loading" remote :row-key="row => row.tableId"
+        :pagination="mobilePagination" class="sm:h-full" />
       <GenTableImportDrawer v-model:visible="importVisible" :options="dataNameOptions" @submitted="getData" />
       <GenTableOperateDrawer v-model:visible="drawerVisible" :row-data="editingData" @submitted="getData" />
-      <GenTablePreviewDrawer
-        v-model:visible="previewVisible"
-        :row-data="editingData"
-        @submitted="() => handleGenCode(editingData!)"
-      />
+      <GenTablePreviewDrawer v-model:visible="previewVisible" :row-data="editingData"
+        @submitted="() => handleGenCode(editingData!)" />
     </NCard>
   </div>
 </template>

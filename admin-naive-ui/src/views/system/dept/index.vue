@@ -6,6 +6,7 @@ import { fetchBatchDeleteDept, fetchGetDeptList } from '@/service/api/system/dep
 import { useAppStore } from '@/store/modules/app';
 import { useAuth } from '@/hooks/business/auth';
 import { useTreeTable, useTreeTableOperate } from '@/hooks/common/tree-table';
+import { useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import DictTag from '@/components/custom/dict-tag.vue';
 import { $t } from '@/locales';
@@ -21,6 +22,8 @@ useDict('sys_normal_disable');
 
 const appStore = useAppStore();
 const { hasAuth } = useAuth();
+
+const tableProps = useTableProps();
 
 const {
   columns,
@@ -170,14 +173,8 @@ async function handleAddOperate() {
     <DeptSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getData" />
     <NCard :title="$t('page.system.dept.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :loading="loading"
-          :show-add="hasAuth('system:dept:add')"
-          :show-delete="false"
-          @add="handleAddOperate"
-          @refresh="getData"
-        >
+        <TableHeaderOperation v-model:columns="columnChecks" :loading="loading" :show-add="hasAuth('system:dept:add')"
+          :show-delete="false" @add="handleAddOperate" @refresh="getData">
           <template #prefix>
             <NButton v-if="!isCollapse" :disabled="!data.length" size="small" @click="expandAll">
               <template #icon>
@@ -194,24 +191,11 @@ async function handleAddOperate() {
           </template>
         </TableHeaderOperation>
       </template>
-      <NDataTable
-        v-model:expanded-row-keys="expandedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :indent="32"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="962"
-        :loading="loading"
-        :row-key="row => row.deptId"
-        class="sm:h-full"
-      />
-      <DeptOperateDrawer
-        v-model:visible="drawerVisible"
-        :operate-type="operateType"
-        :row-data="editingData"
-        @submitted="getData"
-      />
+      <NDataTable v-model:expanded-row-keys="expandedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :indent="32" :flex-height="!appStore.isMobile" :scroll-x="962" :loading="loading" :row-key="row => row.deptId"
+        class="sm:h-full" />
+      <DeptOperateDrawer v-model:visible="drawerVisible" :operate-type="operateType" :row-data="editingData"
+        @submitted="getData" />
     </NCard>
   </div>
 </template>

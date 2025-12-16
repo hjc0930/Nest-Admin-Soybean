@@ -68,6 +68,16 @@ declare namespace UnionKey {
    */
   type ThemeTableSize = 'small' | 'medium' | 'large';
 
+  /**
+   * The component size
+   *
+   * - tiny: tiny size
+   * - small: small size
+   * - medium: medium size
+   * - large: large size
+   */
+  type ThemeComponentSize = 'tiny' | 'small' | 'medium' | 'large';
+
   /** Unocss animate key */
   type UnoCssAnimateKey =
     | 'pulse'

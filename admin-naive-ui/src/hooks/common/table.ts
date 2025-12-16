@@ -4,6 +4,7 @@ import type { PaginationProps } from 'naive-ui';
 import { jsonClone } from '@sa/utils';
 import { useBoolean, useHookTable } from '@sa/hooks';
 import { useAppStore } from '@/store/modules/app';
+import { useThemeStore } from '@/store/modules/theme';
 import { $t } from '@/locales';
 
 type TableData = NaiveUI.TableData;
@@ -147,8 +148,8 @@ export function useTable<A extends NaiveUI.TableApiFn>(config: NaiveUI.NaiveTabl
     },
     ...(showTotal
       ? {
-          prefix: page => $t('datatable.itemCount', { total: page.itemCount })
-        }
+        prefix: page => $t('datatable.itemCount', { total: page.itemCount })
+      }
       : {})
   });
 
@@ -280,4 +281,23 @@ export function useTableOperate<T extends TableData = TableData>(data: Ref<T[]>,
 
 function isTableColumnHasKey<T>(column: TableColumn<T>): column is NaiveUI.TableColumnWithKey<T> {
   return Boolean((column as NaiveUI.TableColumnWithKey<T>).key);
+}
+
+/**
+ * Use table props from theme store
+ * 
+ * @description This hook provides reactive table properties from theme configuration
+ * @returns Table properties object that can be spread onto NDataTable component
+ */
+export function useTableProps() {
+  const themeStore = useThemeStore();
+
+  return computed(() => ({
+    size: themeStore.table.size,
+    bordered: themeStore.table.bordered,
+    bottomBordered: themeStore.table.bottomBordered,
+    singleColumn: themeStore.table.singleColumn,
+    singleLine: themeStore.table.singleLine,
+    striped: themeStore.table.striped
+  }));
 }

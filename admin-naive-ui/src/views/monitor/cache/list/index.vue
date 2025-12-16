@@ -3,6 +3,7 @@ import { h, ref } from 'vue';
 import { NButton, NCard, NDataTable, NForm, NFormItem, NGi, NGrid, NInput, NSpin } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { useLoading } from '@sa/hooks';
+import { useTableProps } from '@/hooks/common/table';
 import {
   fetchClearCacheAll,
   fetchClearCacheKey,
@@ -18,6 +19,8 @@ defineOptions({
 
 const { loading: namesLoading, startLoading: startNamesLoading, endLoading: endNamesLoading } = useLoading();
 const { loading: keysLoading, startLoading: startKeysLoading, endLoading: endKeysLoading } = useLoading();
+
+const tableProps = useTableProps();
 
 // 缓存名称列表
 const cacheNames = ref<Api.Monitor.CacheName[]>([]);
@@ -255,7 +258,8 @@ getCacheNames();
           </template>
           <NSpin :show="namesLoading">
             <NDataTable :columns="nameColumns" :data="cacheNames" :max-height="500"
-              :row-key="(row: Api.Monitor.CacheName) => row.cacheName" :row-props="handleNameRowProps" striped />
+              :row-key="(row: Api.Monitor.CacheName) => row.cacheName" :row-props="handleNameRowProps"
+              v-bind="tableProps" />
           </NSpin>
         </NCard>
       </NGi>
@@ -272,7 +276,7 @@ getCacheNames();
           </template>
           <NSpin :show="keysLoading">
             <NDataTable :columns="keyColumns" :data="cacheKeys" :max-height="500"
-              :row-key="(row: { key: string }) => row.key" :row-props="handleKeyRowProps" striped />
+              :row-key="(row: { key: string }) => row.key" :row-props="handleKeyRowProps" v-bind="tableProps" />
           </NSpin>
         </NCard>
       </NGi>

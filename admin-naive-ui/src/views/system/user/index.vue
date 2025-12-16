@@ -5,7 +5,7 @@ import { useBoolean, useLoading } from '@sa/hooks';
 import { jsonClone } from '@sa/utils';
 import { fetchBatchDeleteUser, fetchGetDeptTree, fetchGetUserList, fetchUpdateUserStatus } from '@/service/api/system';
 import { useAppStore } from '@/store/modules/app';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
@@ -28,6 +28,8 @@ useDict('sys_normal_disable');
 const { hasAuth } = useAuth();
 const appStore = useAppStore();
 const { download } = useDownload();
+
+const tableProps = useTableProps();
 
 const { bool: importVisible, setTrue: openImportModal } = useBoolean();
 const { bool: passwordVisible, setTrue: openPasswordDrawer } = useBoolean();
@@ -311,21 +313,10 @@ function handleResetSearch() {
     <template #sider>
       <NInput v-model:value="deptPattern" clearable :placeholder="$t('common.keywordSearch')" />
       <NSpin class="dept-tree" :show="treeLoading">
-        <NTree
-          v-model:expanded-keys="expandedKeys"
-          v-model:selected-keys="selectedKeys"
-          block-node
-          show-line
-          :data="deptData as []"
-          :show-irrelevant-nodes="false"
-          :pattern="deptPattern"
-          class="infinite-scroll h-full min-h-200px py-3"
-          key-field="id"
-          label-field="label"
-          virtual-scroll
-          :selectable="selectable"
-          @update:selected-keys="handleClickTree"
-        >
+        <NTree v-model:expanded-keys="expandedKeys" v-model:selected-keys="selectedKeys" block-node show-line
+          :data="deptData as []" :show-irrelevant-nodes="false" :pattern="deptPattern"
+          class="infinite-scroll h-full min-h-200px py-3" key-field="id" label-field="label" virtual-scroll
+          :selectable="selectable" @update:selected-keys="handleClickTree">
           <template #empty>
             <NEmpty :description="$t('page.system.dept.empty')" class="h-full min-h-200px justify-center" />
           </template>
@@ -337,18 +328,10 @@ function handleResetSearch() {
       <TableRowCheckAlert v-model:checked-row-keys="checkedRowKeys" />
       <NCard :title="$t('page.system.user.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
         <template #header-extra>
-          <TableHeaderOperation
-            v-model:columns="columnChecks"
-            :disabled-delete="checkedRowKeys.length === 0"
-            :loading="loading"
-            :show-add="hasAuth('system:user:add')"
-            :show-delete="hasAuth('system:user:remove')"
-            :show-export="hasAuth('system:user:export')"
-            @add="handleAdd"
-            @delete="handleBatchDelete"
-            @export="handleExport"
-            @refresh="getData"
-          >
+          <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+            :loading="loading" :show-add="hasAuth('system:user:add')" :show-delete="hasAuth('system:user:remove')"
+            :show-export="hasAuth('system:user:export')" @add="handleAdd" @delete="handleBatchDelete"
+            @export="handleExport" @refresh="getData">
             <template #after>
               <NButton v-if="hasAuth('system:user:import')" size="small" ghost @click="handleImport">
                 <template #icon>
@@ -359,28 +342,12 @@ function handleResetSearch() {
             </template>
           </TableHeaderOperation>
         </template>
-        <NDataTable
-          v-model:checked-row-keys="checkedRowKeys"
-          :columns="columns"
-          :data="data"
-          size="small"
-          :flex-height="!appStore.isMobile"
-          :scroll-x="1200"
-          :loading="loading"
-          remote
-          :row-key="row => row.userId"
-          :pagination="mobilePagination"
-          class="h-full"
-        />
+        <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+          :flex-height="!appStore.isMobile" :scroll-x="1200" :loading="loading" remote :row-key="row => row.userId"
+          :pagination="mobilePagination" class="h-full" />
         <UserImportModal v-model:visible="importVisible" @submitted="getData" />
-        <UserOperateDrawer
-          v-model:visible="drawerVisible"
-          :operate-type="operateType"
-          :row-data="editingData"
-          :dept-data="deptData"
-          :dept-id="searchParams.deptId"
-          @submitted="getDataByPage"
-        />
+        <UserOperateDrawer v-model:visible="drawerVisible" :operate-type="operateType" :row-data="editingData"
+          :dept-data="deptData" :dept-id="searchParams.deptId" @submitted="getDataByPage" />
         <UserPasswordDrawer v-model:visible="passwordVisible" :row-data="editingData" />
       </NCard>
     </div>

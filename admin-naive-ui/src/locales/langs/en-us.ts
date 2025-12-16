@@ -87,6 +87,7 @@ const local: App.I18n.Schema = {
       appearance: 'Appearance',
       layout: 'Layout',
       general: 'General',
+      component: 'Component',
       preset: 'Preset'
     },
     appearance: {
@@ -234,6 +235,16 @@ const local: App.I18n.Schema = {
       globalSearch: {
         title: 'Global Search Settings',
         visible: 'Display Global Search Button'
+      }
+    },
+    componentPropsTitle: 'Component Props',
+    component: {
+      size: {
+        title: 'Component Size',
+        tiny: 'Tiny',
+        small: 'Small',
+        medium: 'Medium',
+        large: 'Large'
       }
     },
     tablePropsTitle: 'Table Props',

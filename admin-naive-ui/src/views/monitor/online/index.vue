@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { fetchForceLogout, fetchGetOnlineUserList } from '@/service/api/monitor/online';
 import { useAppStore } from '@/store/modules/app';
 import { useAuth } from '@/hooks/business/auth';
-import { useTable } from '@/hooks/common/table';
+import { useTable, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { getBrowserIcon, getOsIcon } from '@/utils/icon-tag-format';
 import ButtonIcon from '@/components/custom/button-icon.vue';
@@ -18,6 +18,8 @@ defineOptions({
 
 const appStore = useAppStore();
 const { hasAuth } = useAuth();
+
+const tableProps = useTableProps();
 
 useDict('sys_common_status');
 useDict('sys_device_type');
@@ -143,26 +145,11 @@ async function handleForceLogout(tokenId: string) {
     <OnlineSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getData" />
     <NCard title="在线用户列表" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :loading="loading"
-          :show-add="false"
-          :show-delete="false"
-          :show-export="false"
-          @refresh="getData"
-        />
+        <TableHeaderOperation v-model:columns="columnChecks" :loading="loading" :show-add="false" :show-delete="false"
+          :show-export="false" @refresh="getData" />
       </template>
-      <NDataTable
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="962"
-        :loading="loading"
-        remote
-        :row-key="row => row.tokenId"
-        class="sm:h-full"
-      />
+      <NDataTable :columns="columns" :data="data" v-bind="tableProps" :flex-height="!appStore.isMobile" :scroll-x="962"
+        :loading="loading" remote :row-key="row => row.tokenId" class="sm:h-full" />
     </NCard>
   </div>
 </template>

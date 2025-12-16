@@ -126,6 +126,8 @@ declare namespace App {
         /** Time format for watermark text */
         timeFormat: string;
       };
+      /** Component size */
+      componentSize: UnionKey.ThemeComponentSize;
       table: {
         /** Whether to show the table border */
         bordered: boolean;
@@ -413,6 +415,7 @@ declare namespace App {
           appearance: string;
           layout: string;
           general: string;
+          component: string;
           preset: string;
         };
         appearance: {
@@ -433,17 +436,17 @@ declare namespace App {
             apply: string;
             applySuccess: string;
             [key: string]:
-              | {
-                  name: string;
-                  desc: string;
-                }
-              | string;
+            | {
+              name: string;
+              desc: string;
+            }
+            | string;
           };
         };
         layout: {
           layoutMode: { title: string } & Record<UnionKey.ThemeLayoutMode, string> & {
-              [K in `${UnionKey.ThemeLayoutMode}_detail`]: string;
-            };
+            [K in `${UnionKey.ThemeLayoutMode}_detail`]: string;
+          };
           tab: {
             title: string;
             visible: string;
@@ -512,6 +515,11 @@ declare namespace App {
           copySuccessMsg: string;
           resetConfig: string;
           resetSuccessMsg: string;
+        };
+        // RuoYi custom: component settings
+        componentPropsTitle: string;
+        component: {
+          size: { title: string; tiny: string; small: string; medium: string; large: string };
         };
         // RuoYi custom: table settings
         tablePropsTitle: string;
@@ -1040,8 +1048,8 @@ declare namespace App {
 
     type GetI18nKey<T extends Record<string, unknown>, K extends keyof T = keyof T> = K extends string
       ? T[K] extends Record<string, unknown>
-        ? `${K}.${GetI18nKey<T[K]>}`
-        : K
+      ? `${K}.${GetI18nKey<T[K]>}`
+      : K
       : never;
 
     type I18nKey = GetI18nKey<Schema>;

@@ -9,7 +9,7 @@ import {
 } from '@/service/api/system';
 import { useAppStore } from '@/store/modules/app';
 import { useDict } from '@/hooks/business/dict';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { arraysEqualSet } from '@/utils/common';
 import { $t } from '@/locales';
 import DictTag from '@/components/custom/dict-tag.vue';
@@ -36,6 +36,8 @@ const visible = defineModel<boolean>('visible', {
 });
 
 const appStore = useAppStore();
+
+const tableProps = useTableProps();
 
 const title = computed(() => '分配用户权限');
 
@@ -184,15 +186,8 @@ function reset() {
 </script>
 
 <template>
-  <NDrawer
-    v-model:show="visible"
-    :title="title"
-    display-directive="show"
-    :width="1300"
-    class="max-w-90%"
-    content-class="h-full"
-    wrapper-class="h-full"
-  >
+  <NDrawer v-model:show="visible" :title="title" display-directive="show" :width="1300" class="max-w-90%"
+    content-class="h-full" wrapper-class="h-full">
     <NDrawerContent :title="title" :native-scrollbar="false" closable body-class="h-full" body-content-class="h-full">
       <div class="h-full flex-col-stretch gap-12px overflow-hidden lt-sm:overflow-auto">
         <NForm :model="searchParams" label-placement="left" :label-width="80">
@@ -210,14 +205,8 @@ function reset() {
               <DeptTreeSelect v-model:value="searchParams.deptId" placeholder="请选择部门" />
             </NFormItemGi>
             <NFormItemGi span="24 s:12 m:10" label="创建时间" path="createTime" class="pr-24px">
-              <NDatePicker
-                ref="datePickerRef"
-                v-model:formatted-value="dateRangeCreateTime"
-                type="datetimerange"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                clearable
-                @update:formatted-value="onDateRangeCreateTimeUpdate"
-              />
+              <NDatePicker ref="datePickerRef" v-model:formatted-value="dateRangeCreateTime" type="datetimerange"
+                value-format="yyyy-MM-dd HH:mm:ss" clearable @update:formatted-value="onDateRangeCreateTimeUpdate" />
             </NFormItemGi>
             <NFormItemGi span="24 s:12 m:6" class="pr-24px" :show-feedback="false">
               <NSpace class="w-full" justify="end">
@@ -239,19 +228,9 @@ function reset() {
         </NForm>
         <TableRowCheckAlert v-model:checked-row-keys="checkedRowKeys" />
         <NCard :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
-          <NDataTable
-            v-model:checked-row-keys="checkedRowKeys"
-            :columns="columns"
-            :data="data"
-            size="small"
-            :flex-height="!appStore.isMobile"
-            :scroll-x="962"
-            :loading="loading"
-            remote
-            :row-key="row => row.userId"
-            :pagination="mobilePagination"
-            class="h-full"
-          />
+          <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" size="small"
+            :flex-height="!appStore.isMobile" :scroll-x="962" :loading="loading" remote :row-key="row => row.userId"
+            :pagination="mobilePagination" class="h-full" />
         </NCard>
       </div>
       <template #footer>

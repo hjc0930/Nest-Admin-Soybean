@@ -5,7 +5,7 @@ import { useBoolean, useLoading } from '@sa/hooks';
 import { fetchBatchDeleteOss, fetchGetOssList } from '@/service/api/system/oss';
 import { fetchGetConfigByKey, fetchUpdateConfigByKey } from '@/service/api/system/config';
 import { useAppStore } from '@/store/modules/app';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
 import { useRouterPush } from '@/hooks/common/router';
@@ -274,25 +274,12 @@ function handleToOssConfig() {
     <OssSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <NCard title="OSS 对象存储列表" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="false"
-          :show-delete="hasAuth('system:oss:delete')"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
-          @refresh="getData"
-        >
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="false" :show-delete="hasAuth('system:oss:delete')" @add="handleAdd"
+          @delete="handleBatchDelete" @refresh="getData">
           <template #prefix>
-            <NSwitch
-              v-model:value="preview"
-              class="mt-1px"
-              :loading="previewLoading"
-              size="large"
-              :round="false"
-              @update:value="handleUpdatePreview"
-            >
+            <NSwitch v-model:value="preview" class="mt-1px" :loading="previewLoading" size="large" :round="false"
+              @update:value="handleUpdatePreview">
               <template #checked>
                 <span class="text-14px">禁用预览</span>
               </template>
@@ -322,19 +309,9 @@ function handleToOssConfig() {
           </template>
         </TableHeaderOperation>
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="962"
-        :loading="loading"
-        remote
-        :row-key="row => row.ossId"
-        :pagination="mobilePagination"
-        class="sm:h-full"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="962" :loading="loading" remote :row-key="row => row.ossId"
+        :pagination="mobilePagination" class="sm:h-full" />
       <OssUploadModal v-model:visible="uploadVisible" :upload-type="fileUploadType" @close="getDataByPage" />
     </NCard>
   </div>

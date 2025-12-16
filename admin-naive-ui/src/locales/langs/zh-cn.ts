@@ -87,6 +87,7 @@ const local: App.I18n.Schema = {
       appearance: '外观',
       layout: '布局',
       general: '通用',
+      component: '组件',
       preset: '预设'
     },
     appearance: {
@@ -231,6 +232,16 @@ const local: App.I18n.Schema = {
       globalSearch: {
         title: '全局搜索设置',
         visible: '显示全局搜索按钮'
+      }
+    },
+    componentPropsTitle: '组件配置',
+    component: {
+      size: {
+        title: '组件大小',
+        tiny: '极小',
+        small: '小',
+        medium: '中',
+        large: '大'
       }
     },
     tablePropsTitle: '表格配置',

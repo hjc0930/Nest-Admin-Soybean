@@ -4,7 +4,7 @@ import { fetchBatchDeleteConfig, fetchGetConfigList, fetchRefreshCache } from '@
 import { useAppStore } from '@/store/modules/app';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { $t } from '@/locales';
 import DictTag from '@/components/custom/dict-tag.vue';
@@ -21,6 +21,8 @@ useDict('sys_yes_no');
 const appStore = useAppStore();
 const { download } = useDownload();
 const { hasAuth } = useAuth();
+
+const tableProps = useTableProps();
 
 const {
   columns,
@@ -195,18 +197,10 @@ async function handleRefreshCache() {
     <ConfigSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <NCard :title="$t('page.system.config.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="hasAuth('system:config:add')"
-          :show-delete="hasAuth('system:config:remove')"
-          :show-export="hasAuth('system:config:export')"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
-          @export="handleExport"
-          @refresh="getData"
-        >
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="hasAuth('system:config:add')" :show-delete="hasAuth('system:config:remove')"
+          :show-export="hasAuth('system:config:export')" @add="handleAdd" @delete="handleBatchDelete"
+          @export="handleExport" @refresh="getData">
           <template #prefix>
             <NButton v-if="hasAuth('system:config:remove')" ghost size="small" @click="handleRefreshCache">
               <template #icon>
@@ -217,25 +211,11 @@ async function handleRefreshCache() {
           </template>
         </TableHeaderOperation>
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="962"
-        :loading="loading"
-        remote
-        :row-key="row => row.configId"
-        :pagination="mobilePagination"
-        class="sm:h-full"
-      />
-      <ConfigOperateDrawer
-        v-model:visible="drawerVisible"
-        :operate-type="operateType"
-        :row-data="editingData"
-        @submitted="getData"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="962" :loading="loading" remote :row-key="row => row.configId"
+        :pagination="mobilePagination" class="sm:h-full" />
+      <ConfigOperateDrawer v-model:visible="drawerVisible" :operate-type="operateType" :row-data="editingData"
+        @submitted="getData" />
     </NCard>
   </div>
 </template>

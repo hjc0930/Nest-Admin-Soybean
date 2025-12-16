@@ -65,6 +65,7 @@ export const themeSettings: App.Theme.ThemeSetting = {
     enableTime: false,
     timeFormat: 'YYYY-MM-DD HH:mm'
   },
+  componentSize: 'medium',
   table: {
     bordered: true,
     bottomBordered: true,

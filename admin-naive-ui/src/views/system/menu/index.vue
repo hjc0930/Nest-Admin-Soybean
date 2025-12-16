@@ -8,6 +8,7 @@ import { fetchDeleteMenu, fetchGetMenuList } from '@/service/api/system';
 import { useAppStore } from '@/store/modules/app';
 import { useDict } from '@/hooks/business/dict';
 import { useAuth } from '@/hooks/business/auth';
+import { useTableProps } from '@/hooks/common/table';
 import { handleTree } from '@/utils/common';
 import { $t } from '@/locales';
 import SvgIcon from '@/components/custom/svg-icon.vue';
@@ -23,6 +24,7 @@ const defaultIcon = import.meta.env.VITE_MENU_ICON;
 
 const { hasAuth } = useAuth();
 const appStore = useAppStore();
+const tableProps = useTableProps();
 const editingData = ref<Api.System.Menu>();
 const operateType = ref<NaiveUI.TableOperateType>('add');
 const { loading, startLoading, endLoading } = useLoading();
@@ -340,56 +342,26 @@ const renderIframeQuery = (queryParam: string) => {
   <TableSiderLayout default-expanded>
     <template #header>{{ $t('page.system.menu.title') }}</template>
     <template #header-extra>
-      <ButtonIcon
-        v-if="hasAuth('system:menu:add')"
-        size="small"
-        icon="material-symbols:add-rounded"
-        class="h-28px text-icon color-primary"
-        :tooltip-content="$t('page.system.menu.addMenu')"
-        @click.stop="handleAddMenu(0)"
-      />
-      <ButtonIcon
-        v-if="hasAuth('system:menu:add')"
-        size="small"
-        icon="material-symbols:delete-outline"
-        class="h-28px text-icon color-error"
-        :tooltip-content="$t('page.system.menu.cascadeDelete')"
-        @click.stop="openCascadeDeleteDrawer"
-      />
-      <ButtonIcon
-        size="small"
-        icon="material-symbols:refresh-rounded"
-        class="h-28px text-icon"
-        :tooltip-content="$t('common.refresh')"
-        @click.stop="reset"
-      />
+      <ButtonIcon v-if="hasAuth('system:menu:add')" size="small" icon="material-symbols:add-rounded"
+        class="h-28px text-icon color-primary" :tooltip-content="$t('page.system.menu.addMenu')"
+        @click.stop="handleAddMenu(0)" />
+      <ButtonIcon v-if="hasAuth('system:menu:add')" size="small" icon="material-symbols:delete-outline"
+        class="h-28px text-icon color-error" :tooltip-content="$t('page.system.menu.cascadeDelete')"
+        @click.stop="openCascadeDeleteDrawer" />
+      <ButtonIcon size="small" icon="material-symbols:refresh-rounded" class="h-28px text-icon"
+        :tooltip-content="$t('common.refresh')" @click.stop="reset" />
     </template>
     <template #sider>
       <div class="flex gap-6px">
         <NInput v-model:value="name" size="small" :placeholder="$t('page.system.menu.form.menuName.required')" />
       </div>
       <NSpin :show="loading" class="infinite-scroll">
-        <NTree
-          ref="menuTreeRef"
-          v-model:checked-keys="checkedKeys"
-          v-model:expanded-keys="expandedKeys"
-          :cancelable="false"
-          block-node
-          show-line
-          :data="treeData as []"
-          :default-expanded-keys="[0]"
-          :show-irrelevant-nodes="false"
-          :pattern="name"
-          class="menu-tree h-full min-h-200px py-3"
-          key-field="menuId"
-          label-field="menuName"
-          virtual-scroll
-          checkable
-          :render-label="renderLabel"
-          :render-prefix="renderPrefix"
+        <NTree ref="menuTreeRef" v-model:checked-keys="checkedKeys" v-model:expanded-keys="expandedKeys"
+          :cancelable="false" block-node show-line :data="treeData as []" :default-expanded-keys="[0]"
+          :show-irrelevant-nodes="false" :pattern="name" class="menu-tree h-full min-h-200px py-3" key-field="menuId"
+          label-field="menuName" virtual-scroll checkable :render-label="renderLabel" :render-prefix="renderPrefix"
           :render-suffix="renderSuffix"
-          @update:selected-keys="(_: Array<string & number>, option: Array<TreeOption | null>) => handleClickTree(option)"
-        >
+          @update:selected-keys="(_: Array<string & number>, option: Array<TreeOption | null>) => handleClickTree(option)">
           <template #empty>
             <NEmpty :description="$t('page.system.menu.emptyMenu')" class="h-full min-h-200px justify-center" />
           </template>
@@ -398,22 +370,12 @@ const renderIframeQuery = (queryParam: string) => {
     </template>
     <div class="h-full flex-col-stretch gap-16px">
       <template v-if="currentMenu">
-        <NCard
-          :title="$t('page.system.menu.menuDetail')"
-          :bordered="false"
-          size="small"
-          class="max-h-50% card-wrapper"
-          content-class="overflow-auto mb-12px"
-        >
+        <NCard :title="$t('page.system.menu.menuDetail')" :bordered="false" size="small" class="max-h-50% card-wrapper"
+          content-class="overflow-auto mb-12px">
           <template #header-extra>
             <NSpace>
-              <NButton
-                v-if="isCatalog && hasAuth('system:menu:add')"
-                size="small"
-                ghost
-                type="primary"
-                @click="handleAddMenu(currentMenu.menuId!)"
-              >
+              <NButton v-if="isCatalog && hasAuth('system:menu:add')" size="small" ghost type="primary"
+                @click="handleAddMenu(currentMenu.menuId!)">
                 <template #icon>
                   <icon-material-symbols-add-rounded />
                 </template>
@@ -427,13 +389,8 @@ const renderIframeQuery = (queryParam: string) => {
               </NButton>
               <NPopconfirm @positive-click="() => handleDeleteMenu()">
                 <template #trigger>
-                  <NButton
-                    v-if="hasAuth('system:menu:remove')"
-                    size="small"
-                    ghost
-                    type="error"
-                    :disabled="btnData.length > 0 || btnLoading"
-                  >
+                  <NButton v-if="hasAuth('system:menu:remove')" size="small" ghost type="error"
+                    :disabled="btnData.length > 0 || btnLoading">
                     <template #icon>
                       <icon-material-symbols-delete-outline />
                     </template>
@@ -444,14 +401,8 @@ const renderIframeQuery = (queryParam: string) => {
               </NPopconfirm>
             </NSpace>
           </template>
-          <NDescriptions
-            label-placement="left"
-            size="small"
-            bordered
-            :column="appStore.isMobile ? 1 : 2"
-            label-class="w-20% min-w-88px"
-            content-class="w-100px"
-          >
+          <NDescriptions label-placement="left" size="small" bordered :column="appStore.isMobile ? 1 : 2"
+            label-class="w-20% min-w-88px" content-class="w-100px">
             <NDescriptionsItem :label="$t('page.system.menu.menuType')">
               <NTag class="m-1" size="small" type="primary">{{ menuTypeRecord[currentMenu.menuType!] }}</NTag>
             </NDescriptionsItem>
@@ -465,17 +416,14 @@ const renderIframeQuery = (queryParam: string) => {
               {{ currentMenu.component }}
             </NDescriptionsItem>
             <NDescriptionsItem
-              :label="!isExternalType ? $t('page.system.menu.path') : $t('page.system.menu.externalPath')"
-            >
+              :label="!isExternalType ? $t('page.system.menu.path') : $t('page.system.menu.externalPath')">
               {{ currentMenu.path }}
             </NDescriptionsItem>
             <NDescriptionsItem v-if="isMenu && !isExternalType && !isIframeType" :label="$t('page.system.menu.query')">
               {{ currentMenu.queryParam }}
             </NDescriptionsItem>
-            <NDescriptionsItem
-              v-if="isMenu && !isExternalType && isIframeType"
-              :label="$t('page.system.menu.iframeQuery')"
-            >
+            <NDescriptionsItem v-if="isMenu && !isExternalType && isIframeType"
+              :label="$t('page.system.menu.iframeQuery')">
               {{ renderIframeQuery(currentMenu.queryParam) }}
             </NDescriptionsItem>
             <NDescriptionsItem v-if="!isCatalog" :label="$t('page.system.menu.perms')">
@@ -497,38 +445,21 @@ const renderIframeQuery = (queryParam: string) => {
           </NDescriptions>
         </NCard>
 
-        <NCard
-          :title="$t('page.system.menu.buttonPermissionList')"
-          :bordered="false"
-          size="small"
-          class="h-full overflow-auto card-wrapper"
-          content-class="overflow-auto mb-12px"
-        >
+        <NCard :title="$t('page.system.menu.buttonPermissionList')" :bordered="false" size="small"
+          class="h-full overflow-auto card-wrapper" content-class="overflow-auto mb-12px">
           <template #header-extra>
-            <ButtonIcon
-              size="small"
-              icon="ic-round-refresh"
-              class="h-28px text-icon"
-              :tooltip-content="$t('common.refresh')"
-              @click.stop="getBtnMenuList"
-            />
+            <ButtonIcon size="small" icon="ic-round-refresh" class="h-28px text-icon"
+              :tooltip-content="$t('common.refresh')" @click.stop="getBtnMenuList" />
           </template>
-          <NDataTable class="h-full" :loading="btnLoading" :columns="btnColumns" :data="btnData" />
+          <NDataTable class="h-full" :loading="btnLoading" :columns="btnColumns" :data="btnData" v-bind="tableProps" />
         </NCard>
       </template>
       <NCard v-else :bordered="false" size="small" class="h-full card-wrapper">
         <NEmpty class="h-full flex-center" size="large" />
       </NCard>
     </div>
-    <MenuOperateDrawer
-      v-model:visible="drawerVisible"
-      :operate-type="operateType"
-      :row-data="editingData"
-      :tree-data="treeData"
-      :pid="createPid"
-      :menu-type="createType"
-      @submitted="handleSubmitted"
-    />
+    <MenuOperateDrawer v-model:visible="drawerVisible" :operate-type="operateType" :row-data="editingData"
+      :tree-data="treeData" :pid="createPid" :menu-type="createType" @submitted="handleSubmitted" />
     <MenuCascadeDeleteModal v-model:visible="cascadeDeleteVisible" @submitted="handleSubmitted" />
   </TableSiderLayout>
 </template>

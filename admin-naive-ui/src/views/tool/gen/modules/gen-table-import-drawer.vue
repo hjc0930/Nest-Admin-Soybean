@@ -22,6 +22,8 @@ const emit = defineEmits<Emits>();
 
 const appStore = useAppStore();
 
+const tableProps = useTableProps();
+
 const { columns, data, getData, getDataByPage, loading, mobilePagination, searchParams } = useTable({
   apiFn: fetchGetGenDbList,
   immediate: false,
@@ -108,26 +110,12 @@ watch(visible, async () => {
   <NDrawer v-model:show="visible" display-directive="show" :width="800" class="max-w-90%">
     <NDrawerContent title="导入表" :native-scrollbar="false" closable>
       <div class="h-full flex-col">
-        <GenTableDbSearch
-          v-model:model="searchParams"
-          :options="dataNameOptions"
-          @reset="handleResetSearchParams"
-          @search="getDataByPage"
-        />
+        <GenTableDbSearch v-model:model="searchParams" :options="dataNameOptions" @reset="handleResetSearchParams"
+          @search="getDataByPage" />
         <TableRowCheckAlert v-model:checked-row-keys="checkedRowKeys" class="mb-16px" />
-        <NDataTable
-          v-model:checked-row-keys="checkedRowKeys"
-          :columns="columns"
-          :data="data"
-          size="small"
-          :flex-height="!appStore.isMobile"
-          :scroll-x="750"
-          :loading="loading"
-          remote
-          :row-key="row => row.tableName"
-          :pagination="mobilePagination"
-          class="flex-1"
-        />
+        <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" size="small"
+          :flex-height="!appStore.isMobile" :scroll-x="750" :loading="loading" remote :row-key="row => row.tableName"
+          :pagination="mobilePagination" class="flex-1" />
       </div>
       <template #footer>
         <NSpace :size="16">

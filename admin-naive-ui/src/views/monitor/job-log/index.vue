@@ -6,7 +6,7 @@ import { useBoolean } from '@sa/hooks';
 import { jsonClone } from '@sa/utils';
 import { fetchCleanJobLog, fetchDeleteJobLog, fetchGetJobLogList } from '@/service/api/monitor/job-log';
 import { useAppStore } from '@/store/modules/app';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
@@ -28,6 +28,8 @@ const appStore = useAppStore();
 const { download } = useDownload();
 const route = useRoute();
 const router = useRouter();
+
+const tableProps = useTableProps();
 
 const { bool: detailVisible, setTrue: openDetailDrawer } = useBoolean();
 const detailData = ref<Api.Monitor.JobLog | null>(null);
@@ -215,17 +217,10 @@ onMounted(() => {
     <JobLogSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <NCard title="调度日志" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="false"
-          :show-delete="hasAuth('monitor:job:remove')"
-          :show-export="hasAuth('monitor:job:export')"
-          @delete="handleBatchDelete"
-          @export="handleExport"
-          @refresh="getData"
-        >
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="false" :show-delete="hasAuth('monitor:job:remove')"
+          :show-export="hasAuth('monitor:job:export')" @delete="handleBatchDelete" @export="handleExport"
+          @refresh="getData">
           <template #after>
             <NButton v-if="hasAuth('monitor:job:remove')" size="small" type="error" ghost @click="handleClean">
               <template #icon>
@@ -242,19 +237,9 @@ onMounted(() => {
           </template>
         </TableHeaderOperation>
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="1000"
-        :loading="loading"
-        remote
-        :row-key="row => row.jobLogId"
-        :pagination="mobilePagination"
-        class="h-full"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="1000" :loading="loading" remote :row-key="row => row.jobLogId"
+        :pagination="mobilePagination" class="h-full" />
       <JobLogDetailDrawer v-model:visible="detailVisible" :row-data="detailData" />
     </NCard>
   </div>

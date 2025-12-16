@@ -3,7 +3,7 @@ import { NTime } from 'naive-ui';
 import { useLoading } from '@sa/hooks';
 import { fetchGetOnlineDeviceList, fetchKickOutCurrentDevice } from '@/service/api/monitor';
 import { useAppStore } from '@/store/modules/app';
-import { useTable } from '@/hooks/common/table';
+import { useTable, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { getBrowserIcon, getOsIcon } from '@/utils/icon-tag-format';
 import { $t } from '@/locales';
@@ -18,6 +18,8 @@ defineOptions({
 useDict('sys_device_type');
 
 const appStore = useAppStore();
+
+const tableProps = useTableProps();
 const { loading: btnLoading, startLoading: startBtnLoading, endLoading: endBtnLoading } = useLoading(false);
 
 const { columns, data, loading, getData } = useTable({
@@ -108,17 +110,8 @@ async function forceLogout(tokenId: string) {
 </script>
 
 <template>
-  <NDataTable
-    :columns="columns"
-    :data="data"
-    size="small"
-    :flex-height="!appStore.isMobile"
-    :scroll-x="962"
-    :loading="loading"
-    remote
-    :row-key="row => row.noticeId"
-    class="h-full"
-  />
+  <NDataTable :columns="columns" :data="data" v-bind="tableProps" :flex-height="!appStore.isMobile" :scroll-x="962"
+    :loading="loading" remote :row-key="row => row.noticeId" class="h-full" />
 </template>
 
 <style scoped></style>

@@ -15,6 +15,7 @@ import { fetchGetDictTypeOption } from '@/service/api/system';
 import { fetchGetGenTableInfo, fetchUpdateGenTable } from '@/service/api/tool';
 import { useAppStore } from '@/store/modules/app';
 import { useFormRules } from '@/hooks/common/form';
+import { useTableProps } from '@/hooks/common/table';
 import { $t } from '@/locales';
 
 defineOptions({
@@ -27,6 +28,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const tableProps = useTableProps();
 
 const visible = defineModel<boolean>('visible', {
   default: false
@@ -289,13 +292,8 @@ const columns: NaiveUI.TableColumn<Api.Tool.GenTableColumn>[] = [
       <NSpin :show="loading" class="h-full" content-class="h-full">
         <NTabs v-model:value="tab" type="segment" animated class="h-full" pane-class="h-full">
           <NTabPane name="basic" tab="基本信息" display-directive="show">
-            <NForm
-              v-if="genTableInfo?.info"
-              ref="basicFormRef"
-              class="mx-auto max-w-800px"
-              :model="genTableInfo.info"
-              :rules="basicRules"
-            >
+            <NForm v-if="genTableInfo?.info" ref="basicFormRef" class="mx-auto max-w-800px" :model="genTableInfo.info"
+              :rules="basicRules">
               <NGrid :x-gap="16" responsive="screen" item-responsive>
                 <NFormItemGi span="24 s:12" label="表名称" path="tableName">
                   <NInput v-model:value="genTableInfo.info.tableName" />
@@ -317,32 +315,17 @@ const columns: NaiveUI.TableColumn<Api.Tool.GenTableColumn>[] = [
           </NTabPane>
           <NTabPane name="dragTable" tab="字段信息" display-directive="show">
             <div class="h-full flex-col">
-              <NDataTable
-                :columns="columns"
-                :data="genTableInfo?.rows"
-                size="small"
-                :flex-height="!appStore.isMobile"
-                :scroll-x="1800"
-                remote
-                class="flex-1"
-              />
+              <NDataTable :columns="columns" :data="genTableInfo?.rows" v-bind="tableProps"
+                :flex-height="!appStore.isMobile" :scroll-x="1800" remote class="flex-1" />
             </div>
           </NTabPane>
           <NTabPane name="genInfo" tab="生成信息" display-directive="show">
-            <NForm
-              v-if="genTableInfo?.info"
-              ref="infoFormRef"
-              class="mx-auto max-w-800px"
-              :model="genTableInfo.info"
-              :rules="infoRules"
-            >
+            <NForm v-if="genTableInfo?.info" ref="infoFormRef" class="mx-auto max-w-800px" :model="genTableInfo.info"
+              :rules="infoRules">
               <NGrid :x-gap="16" responsive="screen" item-responsive>
                 <NFormItemGi span="24 s:12" label="生成模板" path="tplCategory">
-                  <NSelect
-                    v-model:value="genTableInfo.info.tplCategory"
-                    :options="genTplCategoryOptions"
-                    placeholder="请选择生成模板"
-                  />
+                  <NSelect v-model:value="genTableInfo.info.tplCategory" :options="genTplCategoryOptions"
+                    placeholder="请选择生成模板" />
                 </NFormItemGi>
                 <NFormItemGi span="24 s:12" path="packageName">
                   <template #label>
@@ -398,12 +381,8 @@ const columns: NaiveUI.TableColumn<Api.Tool.GenTableColumn>[] = [
                   </template>
                   <NRadioGroup v-model:value="genTableInfo.info.genType">
                     <NSpace :span="16">
-                      <NRadio
-                        v-for="option in genTypeOptions"
-                        :key="option.value"
-                        :label="option.label"
-                        :value="option.value"
-                      />
+                      <NRadio v-for="option in genTypeOptions" :key="option.value" :label="option.label"
+                        :value="option.value" />
                     </NSpace>
                   </NRadioGroup>
                 </NFormItemGi>
@@ -423,16 +402,11 @@ const columns: NaiveUI.TableColumn<Api.Tool.GenTableColumn>[] = [
                         <span>树编码字段</span>
                       </div>
                     </template>
-                    <NSelect
-                      v-model:value="genTableInfo.info.treeCode"
-                      placeholder="请选择树编码字段"
-                      :options="
-                        genTableInfo.rows.map(column => ({
-                          value: column.columnName,
-                          label: column.columnName + '：' + column.columnComment
-                        }))
-                      "
-                    />
+                    <NSelect v-model:value="genTableInfo.info.treeCode" placeholder="请选择树编码字段" :options="genTableInfo.rows.map(column => ({
+                      value: column.columnName,
+                      label: column.columnName + '：' + column.columnComment
+                    }))
+                      " />
                   </NFormItemGi>
                   <NFormItemGi span="24 s:12" path="treeParentCode">
                     <template #label>
@@ -441,16 +415,11 @@ const columns: NaiveUI.TableColumn<Api.Tool.GenTableColumn>[] = [
                         <span>树父编码字段</span>
                       </div>
                     </template>
-                    <NSelect
-                      v-model:value="genTableInfo.info.treeParentCode"
-                      placeholder="请选择树父编码字段"
-                      :options="
-                        genTableInfo.rows.map(column => ({
-                          value: column.columnName,
-                          label: column.columnName + '：' + column.columnComment
-                        }))
-                      "
-                    />
+                    <NSelect v-model:value="genTableInfo.info.treeParentCode" placeholder="请选择树父编码字段" :options="genTableInfo.rows.map(column => ({
+                      value: column.columnName,
+                      label: column.columnName + '：' + column.columnComment
+                    }))
+                      " />
                   </NFormItemGi>
                   <NFormItemGi span="24 s:12" path="treeName">
                     <template #label>
@@ -459,16 +428,11 @@ const columns: NaiveUI.TableColumn<Api.Tool.GenTableColumn>[] = [
                         <span>树名称字段</span>
                       </div>
                     </template>
-                    <NSelect
-                      v-model:value="genTableInfo.info.treeName"
-                      placeholder="请选择树名称字段"
-                      :options="
-                        genTableInfo.rows.map(column => ({
-                          value: column.columnName,
-                          label: column.columnName + '：' + column.columnComment
-                        }))
-                      "
-                    />
+                    <NSelect v-model:value="genTableInfo.info.treeName" placeholder="请选择树名称字段" :options="genTableInfo.rows.map(column => ({
+                      value: column.columnName,
+                      label: column.columnName + '：' + column.columnComment
+                    }))
+                      " />
                   </NFormItemGi>
                 </NGrid>
               </template>

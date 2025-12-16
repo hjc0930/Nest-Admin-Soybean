@@ -9,7 +9,7 @@ import {
 import { useAppStore } from '@/store/modules/app';
 import { useAuth } from '@/hooks/business/auth';
 import { useDownload } from '@/hooks/business/download';
-import { useTable, useTableOperate } from '@/hooks/common/table';
+import { useTable, useTableOperate, useTableProps } from '@/hooks/common/table';
 import { useDict } from '@/hooks/business/dict';
 import { $t } from '@/locales';
 import ButtonIcon from '@/components/custom/button-icon.vue';
@@ -25,6 +25,8 @@ defineOptions({
 const appStore = useAppStore();
 const { download } = useDownload();
 const { hasAuth } = useAuth();
+
+const tableProps = useTableProps();
 
 useDict('sys_normal_disable', false);
 
@@ -196,45 +198,19 @@ async function handleStatusChange(
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <TenantPackageSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
-    <NCard
-      :title="$t('page.system.tenantPackage.title')"
-      :bordered="false"
-      size="small"
-      class="card-wrapper sm:flex-1-hidden"
-    >
+    <NCard :title="$t('page.system.tenantPackage.title')" :bordered="false" size="small"
+      class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          :show-add="hasAuth('system:tenantPackage:add')"
-          :show-delete="hasAuth('system:tenantPackage:remove')"
-          :show-export="hasAuth('system:tenantPackage:export')"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
-          @export="handleExport"
-          @refresh="getData"
-        />
+        <TableHeaderOperation v-model:columns="columnChecks" :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading" :show-add="hasAuth('system:tenantPackage:add')"
+          :show-delete="hasAuth('system:tenantPackage:remove')" :show-export="hasAuth('system:tenantPackage:export')"
+          @add="handleAdd" @delete="handleBatchDelete" @export="handleExport" @refresh="getData" />
       </template>
-      <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
-        :columns="columns"
-        :data="data"
-        size="small"
-        :flex-height="!appStore.isMobile"
-        :scroll-x="962"
-        :loading="loading"
-        remote
-        :row-key="row => row.packageId"
-        :pagination="mobilePagination"
-        class="sm:h-full"
-      />
-      <TenantPackageOperateDrawer
-        v-model:visible="drawerVisible"
-        :operate-type="operateType"
-        :row-data="editingData"
-        @submitted="getData"
-      />
+      <NDataTable v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" v-bind="tableProps"
+        :flex-height="!appStore.isMobile" :scroll-x="962" :loading="loading" remote :row-key="row => row.packageId"
+        :pagination="mobilePagination" class="sm:h-full" />
+      <TenantPackageOperateDrawer v-model:visible="drawerVisible" :operate-type="operateType" :row-data="editingData"
+        @submitted="getData" />
     </NCard>
   </div>
 </template>
