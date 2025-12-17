@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { Prisma, SysDept, SysPost, SysRole, SysUser } from '@prisma/client';
 import { GetNowDate, GenerateUUID, Uniq, FormatDate, FormatDateFields } from 'src/common/utils/index';
 import { ExportTable } from 'src/common/utils/export';
+import { PaginationHelper } from 'src/common/utils/pagination.helper';
 
 import { CacheEnum, DelFlagEnum, StatusEnum, DataScopeEnum } from 'src/common/enum/index';
 import { LOGIN_TOKEN_EXPIRESIN, SYS_USER_TYPE } from 'src/common/constant/index';
@@ -37,14 +38,6 @@ export class UserService {
     private readonly redisService: RedisService,
     private readonly configService: ConfigService,
   ) { }
-
-  private getPagination(payload: { pageSize?: number | string; pageNum?: number | string }) {
-    const pageSize = Number(payload.pageSize ?? 10);
-    const pageNum = Number(payload.pageNum ?? 1);
-    const take = pageSize;
-    const skip = take * (pageNum - 1);
-    return { pageSize, pageNum, skip, take };
-  }
 
   private async attachDeptInfo(users: SysUser[]): Promise<UserWithDept[]> {
     if (!users.length) {
@@ -208,33 +201,36 @@ export class UserService {
     }
 
     if (query.userName) {
-      where.userName = { contains: query.userName };
+      where.userName = PaginationHelper.buildStringFilter(query.userName);
     }
 
     if (query.phonenumber) {
-      where.phonenumber = { contains: query.phonenumber };
+      where.phonenumber = PaginationHelper.buildStringFilter(query.phonenumber);
     }
 
     if (query.status) {
       where.status = query.status;
     }
 
-    const createTime = this.buildDateRange(query.params);
+    const createTime = PaginationHelper.buildDateRange(query.params);
     if (createTime) {
       where.createTime = createTime;
     }
 
-    const { skip, take } = this.getPagination(query);
+    const { skip, take } = PaginationHelper.getPagination(query);
 
-    const [list, total] = await this.prisma.$transaction([
-      this.prisma.sysUser.findMany({
+    // 使用 PaginationHelper 优化分页查询
+    const { rows: list, total } = await PaginationHelper.paginateWithTransaction<SysUser>(
+      this.prisma,
+      'sysUser',
+      {
         where,
         skip,
         take,
         orderBy: { createTime: 'desc' },
-      }),
-      this.prisma.sysUser.count({ where }),
-    ]);
+      },
+      { where }
+    );
 
     const listWithDept = await this.attachDeptInfo(list);
 
@@ -675,7 +671,7 @@ export class UserService {
       where.phonenumber = { contains: query.phonenumber };
     }
 
-    const { skip, take } = this.getPagination(query);
+    const { skip, take } = PaginationHelper.getPagination(query);
     const [list, total] = await this.prisma.$transaction([this.prisma.sysUser.findMany({ where, skip, take, orderBy: { createTime: 'desc' } }), this.prisma.sysUser.count({ where })]);
 
     const listWithDept = await this.attachDeptInfo(list);
@@ -710,7 +706,7 @@ export class UserService {
       where.phonenumber = { contains: query.phonenumber };
     }
 
-    const { skip, take } = this.getPagination(query);
+    const { skip, take } = PaginationHelper.getPagination(query);
     const [list, total] = await this.prisma.$transaction([this.prisma.sysUser.findMany({ where, skip, take, orderBy: { createTime: 'desc' } }), this.prisma.sysUser.count({ where })]);
 
     const listWithDept = await this.attachDeptInfo(list);

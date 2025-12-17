@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsStrongPassword } from 'src/common/validators/password.validator';
 
 /**
  * 登录请求 DTO - 匹配 Soybean 前端
@@ -64,6 +65,7 @@ export class AuthRegisterDto {
   @ApiProperty({ description: '密码', required: true })
   @IsNotEmpty({ message: '密码不能为空' })
   @IsString()
+  @IsStrongPassword()
   @MinLength(5)
   @MaxLength(20)
   password: string;
