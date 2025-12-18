@@ -157,9 +157,6 @@ function handleSecondaryMenuClick(key: string) {
     emit('secondaryMenuChange', key);
 }
 
-// Refs
-const storageStatsRef = ref();
-
 // 暴露方法
 defineExpose({
     activeMenu,
