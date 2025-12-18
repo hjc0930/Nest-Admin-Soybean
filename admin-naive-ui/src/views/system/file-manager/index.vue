@@ -123,9 +123,9 @@
                 </n-button>
 
                 <!-- 存储空间 -->
-                <!-- <div v-if="!isMobile" class="storage-stats-toolbar">
+                <div v-if="!isMobile" class="storage-stats-toolbar">
                   <storage-stats />
-                </div> -->
+                </div>
               </n-space>
             </div>
           </div>
