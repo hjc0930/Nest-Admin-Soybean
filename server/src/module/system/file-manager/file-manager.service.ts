@@ -14,7 +14,7 @@ import * as fs from 'fs';
 import archiver from 'archiver';
 import { Response } from 'express';
 import { FileAccessService } from './services/file-access.service';
-import { VersionService } from '../upload/services/version.service';
+import { VersionService } from '../../upload/services/version.service';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

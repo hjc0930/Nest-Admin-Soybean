@@ -14,8 +14,8 @@ import COS from 'cos-nodejs-sdk-v5';
 import Mime from 'mime-types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TenantContext } from 'src/common/tenant/tenant.context';
-import { VersionService } from 'src/module/system/upload/services/version.service';
-import type { ThumbnailJobData } from 'src/module/system/upload/processors/thumbnail.processor';
+import { VersionService } from './services/version.service';
+import type { ThumbnailJobData } from './processors/thumbnail.processor';
 
 @Injectable()
 export class UploadService {

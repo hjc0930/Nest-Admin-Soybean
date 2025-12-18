@@ -8,7 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { IgnoreTenant } from 'src/common/tenant/tenant.decorator';
 import { TenantContext } from 'src/common/tenant/tenant.context';
 import { NoticeService } from 'src/module/system/notice/notice.service';
-import { VersionService } from 'src/module/system/upload/services/version.service';
+import { VersionService } from 'src/module/upload/services/version.service';
 
 @Injectable()
 export class TaskService implements OnModuleInit {

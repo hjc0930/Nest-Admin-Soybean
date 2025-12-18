@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileManagerController } from './file-manager.controller';
 import { FileManagerService } from './file-manager.service';
 import { FileAccessService } from './services/file-access.service';
-import { VersionService } from '../upload/services/version.service';
+import { VersionService } from '../../upload/services/version.service';
 
 @Module({
   imports: [
