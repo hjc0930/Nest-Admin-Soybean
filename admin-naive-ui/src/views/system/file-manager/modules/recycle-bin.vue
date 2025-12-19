@@ -59,6 +59,7 @@ import {
     fetchClearRecycle
 } from '@/service/api';
 import { formatFileSize, formatDateTime } from '@/utils/common';
+import { $t } from '@/locales';
 
 const message = useMessage();
 const dialog = useDialog();
@@ -173,7 +174,7 @@ async function getRecycleList() {
             pagination.pageCount = Math.ceil(data.total / (pagination.pageSize || 20));
         }
     } catch (error) {
-        message.error('获取回收站列表失败');
+        message.error($t('page.fileManager.getRecycleListFailed'));
     } finally {
         loading.value = false;
     }
@@ -214,19 +215,19 @@ function handleCheck(keys: (string | number)[]) {
 /** 恢复文件 */
 function handleRestore(uploadIds: string[]) {
     dialog.warning({
-        title: '恢复文件',
-        content: `确定要恢复选中的 ${uploadIds.length} 个文件吗？`,
-        positiveText: '确定',
-        negativeText: '取消',
+        title: $t('page.fileManager.restoreFile'),
+        content: $t('page.fileManager.restoreFileConfirm', { count: uploadIds.length }),
+        positiveText: $t('common.confirm'),
+        negativeText: $t('common.cancel'),
         onPositiveClick: async () => {
             try {
                 await fetchRestoreFiles(uploadIds);
-                message.success('恢复成功');
+                message.success($t('page.fileManager.restoreFileSuccess'));
                 checkedRowKeys.value = [];
                 selectedRows.value = [];
                 getRecycleList();
             } catch (error) {
-                message.error('恢复失败');
+                message.error($t('page.fileManager.restoreFileFailed'));
             }
         }
     });
@@ -235,7 +236,7 @@ function handleRestore(uploadIds: string[]) {
 /** 批量恢复 */
 function handleBatchRestore() {
     if (checkedRowKeys.value.length === 0) {
-        message.warning('请选择要恢复的文件');
+        message.warning($t('page.fileManager.selectFilesToRestore'));
         return;
     }
     handleRestore(checkedRowKeys.value);
@@ -244,19 +245,19 @@ function handleBatchRestore() {
 /** 彻底删除文件 */
 function handleDelete(uploadIds: string[]) {
     dialog.error({
-        title: '彻底删除',
-        content: `确定要彻底删除选中的 ${uploadIds.length} 个文件吗？此操作不可恢复！`,
-        positiveText: '确定',
-        negativeText: '取消',
+        title: $t('page.fileManager.permanentDelete'),
+        content: $t('page.fileManager.permanentDeleteConfirm', { count: uploadIds.length }),
+        positiveText: $t('common.confirm'),
+        negativeText: $t('common.cancel'),
         onPositiveClick: async () => {
             try {
                 await fetchClearRecycle(uploadIds);
-                message.success('删除成功');
+                message.success($t('common.deleteSuccess'));
                 checkedRowKeys.value = [];
                 selectedRows.value = [];
                 getRecycleList();
             } catch (error) {
-                message.error('删除失败');
+                message.error($t('page.fileManager.deleteFailed'));
             }
         }
     });
@@ -265,7 +266,7 @@ function handleDelete(uploadIds: string[]) {
 /** 批量删除 */
 function handleBatchDelete() {
     if (checkedRowKeys.value.length === 0) {
-        message.warning('请选择要删除的文件');
+        message.warning($t('page.fileManager.selectFilesToDelete'));
         return;
     }
     handleDelete(checkedRowKeys.value);

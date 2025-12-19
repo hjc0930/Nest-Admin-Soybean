@@ -44,6 +44,7 @@ import { useMessage, useDialog } from 'naive-ui';
 import { useThemeStore } from '@/store/modules/theme';
 import { fetchGetFileVersions, fetchRestoreVersion, fetchGetFileAccessToken, downloadFile } from '@/service/api';
 import { formatFileSize, formatDateTime } from '@/utils/common';
+import { $t } from '@/locales';
 
 interface Props {
     /** 文件ID */
@@ -82,7 +83,7 @@ async function open(fileId: string, fileName: string) {
             currentVersion.value = data.currentVersion;
         }
     } catch (error) {
-        message.error('获取版本历史失败');
+        message.error($t('page.fileManager.getVersionsFailed'));
     } finally {
         loading.value = false;
     }
@@ -91,10 +92,10 @@ async function open(fileId: string, fileName: string) {
 /** 恢复版本 */
 function handleRestore(version: Api.System.FileManager.FileVersion) {
     dialog.warning({
-        title: '恢复版本',
-        content: `确定要恢复到版本 ${version.version} 吗？这将创建一个新的版本。`,
-        positiveText: '确定',
-        negativeText: '取消',
+        title: $t('page.fileManager.restoreVersion'),
+        content: $t('page.fileManager.restoreVersionConfirm', { version: version.version }),
+        positiveText: $t('common.confirm'),
+        negativeText: $t('common.cancel'),
         onPositiveClick: async () => {
             try {
                 const { data } = await fetchRestoreVersion({
@@ -103,15 +104,15 @@ function handleRestore(version: Api.System.FileManager.FileVersion) {
                 });
 
                 if (data) {
-                    message.success(`已恢复到版本 ${version.version}，新版本号为 ${data.newVersion}`);
+                    message.success($t('page.fileManager.restoreVersionSuccess', { version: version.version, newVersion: data.newVersion }));
                     emit('success');
                     modalVisible.value = false;
                 }
             } catch (error: any) {
                 if (error.message?.includes('已被修改')) {
-                    message.error('文件已被修改，请刷新后重试');
+                    message.error($t('page.fileManager.fileModified'));
                 } else {
-                    message.error('恢复版本失败');
+                    message.error($t('page.fileManager.restoreVersionFailed'));
                 }
             }
         }
@@ -124,10 +125,10 @@ async function handleDownload(version: Api.System.FileManager.FileVersion) {
         const { data } = await fetchGetFileAccessToken(version.uploadId);
         if (data) {
             downloadFile(version.uploadId, data.token);
-            message.success('开始下载');
+            message.success($t('page.fileManager.downloadStarted'));
         }
     } catch (error) {
-        message.error('获取下载链接失败');
+        message.error($t('page.fileManager.getDownloadLinkFailed'));
     }
 }
 

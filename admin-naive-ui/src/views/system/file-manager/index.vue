@@ -42,9 +42,9 @@
               <!-- 批量操作栏 -->
               <template v-if="selectedItems.length > 0">
                 <n-space :size="8" align="center">
-                  <n-tag v-if="!isMobile" :bordered="false" type="info" size="small" round>
+                  <!-- <n-tag v-if="!isMobile" :bordered="false" type="info" size="small" round>
                     已选 {{ selectedItems.length }} 项
-                  </n-tag>
+                  </n-tag> -->
                   <n-button :size="themeStore.componentSize" @click="selectedItems = []" secondary>
                     取消
                   </n-button>
@@ -81,8 +81,7 @@
               </n-button>
 
               <!-- 上传文件 -->
-              <n-upload :show-file-list="false" multiple :max="20" @change="handleUploadChange"
-                :custom-request="() => { }">
+              <n-upload ref="uploadRef" :show-file-list="false" multiple :max="20" :custom-request="handleCustomUpload">
                 <n-button type="primary" :size="themeStore.componentSize">
                   <template #icon>
                     <icon-carbon-upload />
@@ -237,7 +236,6 @@ import FileGrid from './components/file-grid.vue';
 import DragUploadOverlay from '@/components/drag-upload-overlay/index.vue';
 import UploadPanel from '@/components/upload-panel/index.vue';
 import type { UploadTask } from '@/components/upload-panel/index.vue';
-import type { FileItem as FileListItem } from './components/file-list.vue';
 import { useFileDrag, useDropTarget } from './hooks/use-file-drag';
 import type { DragItem } from './hooks/use-file-drag';
 import {
@@ -246,7 +244,7 @@ import {
   getFileIcon,
   SEARCH_WIDTH
 } from './constants';
-import { formatFileSize as formatSize, formatDate as formatDateTime } from './constants';
+import { $t } from '@/locales';
 
 defineOptions({
   name: 'SystemFileManager'
@@ -334,6 +332,7 @@ const moveFileModalRef = ref();
 const batchShareModalRef = ref();
 const versionModalRef = ref();
 const sidebarMenuRef = ref();
+const uploadRef = ref();
 
 // 文件夹树数据
 const allFolders = ref<any[]>([]);
@@ -398,7 +397,15 @@ async function loadFileList() {
       }
     }
 
+    console.log('🔍 [loadFileList] 请求参数:', queryParams);
+    console.log('🔍 [loadFileList] 当前文件夹ID:', currentFolderId.value);
+    console.log('🔍 [loadFileList] 活跃文件类型:', activeFileType.value);
+
     const { data: filesData } = await fetchGetFileList(queryParams);
+
+    console.log('✅ [loadFileList] API 响应:', filesData);
+
+    console.log('✅ [loadFileList] API 响应:', filesData);
 
     const folderItems: FileItem[] = currentFolderChildren.map((f: any) => ({
       type: 'folder' as const,
@@ -406,6 +413,8 @@ async function loadFileList() {
       name: f.folderName,
       createTime: f.createTime
     }));
+
+    console.log('📁 [loadFileList] 文件夹项:', folderItems);
 
     let fileItems: FileItem[] = (filesData?.rows || []).map((f: any) => ({
       type: 'file' as const,
@@ -419,16 +428,24 @@ async function loadFileList() {
       url: f.url
     }));
 
+    console.log('📄 [loadFileList] 文件项（过滤前）:', JSON.stringify(fileItems, null, 2));
+
     // 如果是"其他"类型，前端再过滤一次
     if (activeFileType.value === 'other') {
       fileItems = fileItems.filter((f) => {
         const category = getFileTypeCategory(f.ext || '');
         return category === 'other';
       });
+      console.log('📄 [loadFileList] 文件项（过滤后）:', fileItems);
     }
 
     fileList.value = [...folderItems, ...fileItems];
     pagination.itemCount = (filesData?.total || 0) + folderItems.length;
+
+    console.log('✨ [loadFileList] 最终列表:', JSON.stringify(fileList.value, null, 2));
+    console.log('📊 [loadFileList] 总数:', pagination.itemCount);
+    console.log('🎨 [loadFileList] 视图模式:', viewMode.value);
+    console.log('📋 [loadFileList] fileList.value.length:', fileList.value.length);
   } finally {
     loading.value = false;
   }
@@ -635,24 +652,24 @@ function handleRename(item: FileItem) {
       const newName = inputValue.value?.trim();
 
       if (!newName) {
-        message.warning('名称不能为空');
+        message.warning($t('page.fileManager.nameCannotBeEmpty'));
         return false;
       }
 
-      try {
-        if (item.type === 'folder') {
-          message.info('文件夹重命名功能待实现');
-        } else {
+      if (item.type === 'folder') {
+        message.info($t('page.fileManager.folderRenameNotImplemented'));
+      } else {
+        try {
           await fetchRenameFile({
             uploadId: item.id as string,
             newFileName: newName
           });
-          message.success('重命名成功');
+          message.success($t('common.renameSuccess'));
           loadFileList();
+        } catch {
+          // 错误消息已在请求工具中显示
+          return false;
         }
-      } catch (error) {
-        message.error('重命名失败');
-        return false;
       }
     }
   });
@@ -672,11 +689,11 @@ function handleDelete(item: FileItem) {
         } else {
           await fetchBatchDeleteFiles([item.id as string]);
         }
-        message.success('删除成功');
+        message.success($t('common.deleteSuccess'));
         await loadFolderTree();
         await loadFileList();
-      } catch (error: any) {
-        message.error(error?.message || '删除失败');
+      } catch {
+        // 错误消息已在请求工具中显示
       }
     }
   });
@@ -685,7 +702,7 @@ function handleDelete(item: FileItem) {
 // 批量删除
 function handleBatchDelete() {
   if (selectedItems.value.length === 0) {
-    message.warning('请选择要删除的项目');
+    message.warning($t('page.fileManager.pleaseSelectItemsToDelete'));
     return;
   }
 
@@ -698,52 +715,47 @@ function handleBatchDelete() {
     positiveText: '确定',
     negativeText: '取消',
     onPositiveClick: async () => {
-      try {
-        const errors: string[] = [];
+      let hasError = false;
 
-        // 删除文件
-        if (fileIds.length > 0) {
-          try {
-            await fetchBatchDeleteFiles(fileIds as string[]);
-          } catch (e: any) {
-            errors.push(e?.message || '删除文件失败');
-          }
+      // 删除文件
+      if (fileIds.length > 0) {
+        try {
+          await fetchBatchDeleteFiles(fileIds as string[]);
+        } catch {
+          hasError = true;
         }
-
-        // 逐个删除文件夹（因为可能有不同的错误）
-        for (const folderId of folderIds) {
-          try {
-            await fetchDeleteFolder(folderId as number);
-          } catch (e: any) {
-            errors.push(e?.message || `删除文件夹${folderId}失败`);
-          }
-        }
-
-        if (errors.length > 0) {
-          message.error(errors.join('; '));
-        } else {
-          message.success('删除成功');
-        }
-
-        selectedItems.value = [];
-        await loadFolderTree();
-        await loadFileList();
-      } catch (error: any) {
-        message.error(error?.message || '删除失败');
       }
+
+      // 逐个删除文件夹（因为可能有不同的错误）
+      for (const folderId of folderIds) {
+        try {
+          await fetchDeleteFolder(folderId as number);
+        } catch {
+          hasError = true;
+        }
+      }
+
+      if (!hasError) {
+        message.success($t('common.deleteSuccess'));
+      }
+      // 如果有错误，错误消息已在请求工具中显示
+
+      selectedItems.value = [];
+      await loadFolderTree();
+      await loadFileList();
     }
   });
 }
 
 function handleBatchMove() {
   if (selectedItems.value.length === 0) {
-    message.warning('请选择要移动的文件');
+    message.warning($t('page.fileManager.pleaseSelectFilesToMove'));
     return;
   }
 
   const fileIds = selectedItems.value.filter((id) => typeof id === 'string');
   if (fileIds.length === 0) {
-    message.warning('只能移动文件，不能移动文件夹');
+    message.warning($t('page.fileManager.cannotMoveFolders'));
     return;
   }
 
@@ -752,13 +764,13 @@ function handleBatchMove() {
 
 function handleBatchShare() {
   if (selectedItems.value.length === 0) {
-    message.warning('请选择要分享的文件');
+    message.warning($t('page.fileManager.pleaseSelectFilesToShare'));
     return;
   }
 
   const fileIds = selectedItems.value.filter((id) => typeof id === 'string');
   if (fileIds.length === 0) {
-    message.warning('只能分享文件，不能分享文件夹');
+    message.warning($t('page.fileManager.cannotShareFolders'));
     return;
   }
 
@@ -767,11 +779,11 @@ function handleBatchShare() {
 
 async function handleBatchDownload() {
   if (selectedItems.value.length === 0) {
-    message.warning('请选择要下载的文件');
+    message.warning($t('page.fileManager.pleaseSelectFilesToDownload'));
     return;
   }
 
-  message.info('批量下载功能开发中...');
+  message.info($t('page.fileManager.batchDownloadNotImplemented'));
 }
 
 // 拖拽上传
@@ -788,45 +800,52 @@ function handleDrop(e: DragEvent) {
 async function handleUploadFiles(files: File[]) {
   if (files.length === 0) return;
 
+  console.log('handleUploadFiles called with files:', files.map(f => ({ name: f.name, type: f.type, size: f.size })));
+
   const uploadPromises = files.map(async (file) => {
     try {
       await fetchUploadFile(file, currentFolderId.value === 0 ? undefined : currentFolderId.value);
       return { file, success: true };
     } catch (error: any) {
-      // 提取错误消息
-      const errorMsg = error?.response?.data?.msg || error?.message || '上传失败';
-      return { file, success: false, error: errorMsg };
+      // 错误消息已在请求工具中显示，这里只收集结果
+      return { file, success: false, error: error.message || '上传失败' };
     }
   });
 
-  try {
-    const results = await Promise.all(uploadPromises);
-    const successCount = results.filter((r) => r.success).length;
-    const failedCount = results.filter((r) => !r.success).length;
-    const failedFiles = results.filter((r) => !r.success);
+  const results = await Promise.all(uploadPromises);
+  const successCount = results.filter((r) => r.success).length;
+  const failedCount = results.filter((r) => !r.success).length;
 
-    if (failedCount === 0) {
-      message.success(`上传成功 ${successCount} 个文件`);
-    } else if (successCount === 0) {
-      // 显示第一个错误的详细信息
-      const firstError = failedFiles[0]?.error || '上传失败';
-      message.error(failedCount > 1 ? `上传失败 ${failedCount} 个文件：${firstError}` : firstError);
-    } else {
-      message.warning(`上传完成：成功 ${successCount} 个，失败 ${failedCount} 个`);
-    }
+  if (failedCount === 0) {
+    message.success($t('page.fileManager.uploadSuccess', { count: successCount }));
+  } else if (successCount > 0) {
+    message.warning($t('page.fileManager.uploadPartialSuccess', { successCount, failedCount }));
+  }
+  // 如果全部失败，错误消息已经在请求工具中显示了
 
-    // 只要有成功的就刷新列表
-    if (successCount > 0) {
-      loadFileList();
-    }
-  } catch (error) {
-    message.error('上传过程发生错误');
+  // 只要有成功的就刷新列表
+  if (successCount > 0) {
+    loadFileList();
   }
 }
 
-function handleUploadChange(options: any) {
-  const files = options.fileList.map((f: any) => f.file).filter(Boolean);
-  handleUploadFiles(files);
+// 自定义上传请求处理函数
+async function handleCustomUpload({ file, onFinish, onError }: any) {
+  // 获取实际的 File 对象
+  const actualFile = file.file as File;
+  if (!actualFile) {
+    onError();
+    return;
+  }
+
+  try {
+    await fetchUploadFile(actualFile, currentFolderId.value === 0 ? undefined : currentFolderId.value);
+    onFinish();
+    loadFileList();
+  } catch {
+    // 错误消息已在请求工具中显示
+    onError();
+  }
 }
 
 // 格式化文件大小
@@ -865,7 +884,7 @@ function formatDate(dateStr: string): string {
 // 侧边栏菜单变化处理
 function handleResetMenuData() {
   loadFolderTree();
-  message.success('已刷新');
+  message.success($t('common.refreshSuccess'));
 }
 
 function handlePrimaryMenuChange(key: string) {
@@ -873,7 +892,7 @@ function handlePrimaryMenuChange(key: string) {
   // 处理一级菜单变化（分享、回收站等）
   if (key === 'share') {
     currentView.value = 'share';
-    message.info('我的分享功能开发中...');
+    message.info($t('page.fileManager.sharedNotImplemented'));
   } else if (key === 'recycle') {
     currentView.value = 'recycle';
   } else {
@@ -888,7 +907,7 @@ function handleSecondaryMenuChange(key: string) {
   if (key === 'all-files') {
     handleFileTypeChange('all');
   } else if (key === 'recent') {
-    message.info('最近使用功能开发中...');
+    message.info($t('page.fileManager.recentNotImplemented'));
   } else {
     // 文件类型筛选
     handleFileTypeChange(key as FileTypeCategory);
@@ -898,12 +917,12 @@ function handleSecondaryMenuChange(key: string) {
 // 上传面板操作
 function handleUploadPause(taskId: string) {
   console.log('Pause upload:', taskId);
-  message.info('暂停上传功能开发中...');
+  message.info($t('page.fileManager.pauseUploadNotImplemented'));
 }
 
 function handleUploadResume(taskId: string) {
   console.log('Resume upload:', taskId);
-  message.info('继续上传功能开发中...');
+  message.info($t('page.fileManager.resumeUploadNotImplemented'));
 }
 
 function handleUploadCancel(taskId: string) {
@@ -915,7 +934,7 @@ function handleUploadCancel(taskId: string) {
 
 function handleUploadRetry(taskId: string) {
   console.log('Retry upload:', taskId);
-  message.info('重试上传功能开发中...');
+  message.info($t('page.fileManager.retryUploadNotImplemented'));
 }
 
 // 全局拖拽上传处理
@@ -1009,24 +1028,24 @@ async function refreshList() {
 
 // 文件拖拽到文件夹（从FileGrid组件触发）
 async function handleFileDrop(fileId: string | number, targetFolderId: string | number) {
-  try {
-    console.log('Moving file:', fileId, 'to folder:', targetFolderId);
-    console.log('Current folder:', currentFolderId.value);
+  console.log('Moving file:', fileId, 'to folder:', targetFolderId);
+  console.log('Current folder:', currentFolderId.value);
 
-    const result = await fetchMoveFiles({
+  try {
+    const { data: result } = await fetchMoveFiles({
       uploadIds: [String(fileId)],
       targetFolderId: Number(targetFolderId)
     });
 
     console.log('Move result:', result);
-    message.success('移动成功');
+    message.success($t('common.moveSuccess'));
 
     // 刷新文件夹树和文件列表
     await loadFolderTree();
     await loadFileList();
   } catch (error) {
     console.error('Move error:', error);
-    message.error('移动失败: ' + ((error as any)?.message || '未知错误'));
+    // 错误消息已在请求工具中显示
   }
 }
 
@@ -1059,10 +1078,10 @@ async function handleFolderDrop(targetFolderId: number, e: DragEvent) {
       uploadIds: [fileId],
       targetFolderId
     });
-    message.success('移动成功');
+    message.success($t('common.moveSuccess'));
     loadFileList();
-  } catch (error) {
-    message.error('移动失败');
+  } catch {
+    // 错误消息已在请求工具中显示
   }
 }
 

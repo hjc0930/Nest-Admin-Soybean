@@ -3,6 +3,7 @@ import { ref, reactive } from 'vue';
 import { NModal, NCard, NForm, NFormItem, NInput, NInputNumber, NSwitch, NButton, NSpace, NList, NListItem, useMessage } from 'naive-ui';
 import { useThemeStore } from '@/store/modules/theme';
 import { fetchCreateShare } from '@/service/api';
+import { $t } from '@/locales';
 
 const message = useMessage();
 const themeStore = useThemeStore();
@@ -79,13 +80,13 @@ async function handleCreateShares() {
         });
 
         const successCount = shareResults.value.filter(r => r.success).length;
-        message.success(`成功创建 ${successCount} 个分享链接`);
+        message.success($t('page.fileManager.batchShareSuccess', { count: successCount }));
 
         if (successCount < uploadIds.value.length) {
-            message.warning(`${uploadIds.value.length - successCount} 个文件分享失败`);
+            message.warning($t('page.fileManager.batchSharePartialFailed', { count: uploadIds.value.length - successCount }));
         }
     } catch (error) {
-        message.error('批量分享失败');
+        message.error($t('page.fileManager.batchShareFailed'));
     } finally {
         loading.value = false;
     }
@@ -93,9 +94,9 @@ async function handleCreateShares() {
 
 function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text).then(() => {
-        message.success('复制成功');
+        message.success($t('common.copySuccess'));
     }).catch(() => {
-        message.error('复制失败');
+        message.error($t('common.copyFailed'));
     });
 }
 

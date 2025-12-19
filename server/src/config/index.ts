@@ -77,6 +77,7 @@ export default () => ({
         (env === 'production' ? 'https://your-domain.com' : 'http://localhost:8080'),
       serveRoot: process.env.FILE_SERVE_ROOT || '/profile',
       maxSize: num(process.env.FILE_MAX_SIZE, 10),
+      thumbnailEnabled: bool(process.env.FILE_THUMBNAIL_ENABLED, true),
     },
   },
 

@@ -169,6 +169,23 @@ export class FileManagerService {
       },
     });
 
+    // 添加详细日志以便调试
+    if (hasFiles > 0) {
+      const files = await this.prisma.sysUpload.findMany({
+        where: {
+          tenantId,
+          folderId,
+          delFlag: DelFlagEnum.NORMAL,
+        },
+        select: {
+          uploadId: true,
+          fileName: true,
+          delFlag: true,
+        },
+      });
+      this.logger.warn(`文件夹 ${folderId} 下有 ${hasFiles} 个文件，详细信息:`, files);
+    }
+
     BusinessException.throwIf(
       hasFiles > 0,
       '该文件夹下存在文件，无法删除',
@@ -369,16 +386,46 @@ export class FileManagerService {
   async deleteFiles(uploadIds: string[], username: string) {
     const tenantId = TenantContext.getTenantId();
 
+    // 计算总文件大小（用于更新存储用量）
+    let totalSizeMB = 0;
+
     // 批量删除文件
     for (const uploadId of uploadIds) {
-      await this.prisma.sysUpload.update({
+      // 先获取文件信息以计算大小
+      const file = await this.prisma.sysUpload.findUnique({
         where: { uploadId },
+        select: { size: true, delFlag: true, fileName: true },
+      });
+
+      // 只有未删除的文件才需要计算大小和更新
+      if (file && file.delFlag !== '1') {
+        // 将字节转换为MB（向上取整，与上传时保持一致）
+        const fileSizeMB = Math.ceil(file.size / 1024 / 1024);
+        totalSizeMB += fileSizeMB;
+
+        // 标记为已删除
+        await this.prisma.sysUpload.update({
+          where: { uploadId },
+          data: {
+            delFlag: '1',
+            updateBy: username,
+            updateTime: new Date(),
+          },
+        });
+
+        this.logger.log(`删除文件: ${file.fileName}, 大小: ${fileSizeMB}MB`);
+      }
+    }
+
+    // 更新租户存储用量（减少）
+    if (totalSizeMB > 0) {
+      await this.prisma.sysTenant.update({
+        where: { tenantId },
         data: {
-          delFlag: '1',
-          updateBy: username,
-          updateTime: new Date(),
+          storageUsed: { decrement: totalSizeMB },
         },
       });
+      this.logger.log(`租户${tenantId}存储使用量减少${totalSizeMB}MB`);
     }
 
     return Result.ok();

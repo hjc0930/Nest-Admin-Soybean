@@ -500,9 +500,8 @@ export class UploadService {
 
     //对文件名转码
     const originalname = iconv.decode(Buffer.from(file.originalname, 'binary'), 'utf8');
-    const ext = Mime.extension(file.mimetype);
-    //重新生成文件名加上时间戳
-    const newFileName = this.getNewFileName(originalname) + '.' + ext;
+    //重新生成文件名加上时间戳（已包含扩展名）
+    const newFileName = this.getNewFileName(originalname);
     //文件路径
     const targetFile = path.posix.join(baseDirPath, newFileName);
     //文件目录
@@ -532,7 +531,7 @@ export class UploadService {
     };
   }
   /**
-   * 生成新的文件名
+   * 生成新的文件名（在文件名后添加时间戳，保留扩展名）
    * @param originalname
    * @returns
    */
@@ -540,9 +539,9 @@ export class UploadService {
     if (!originalname) {
       return originalname;
     }
-    const newFileNameArr = originalname.split('.');
-    newFileNameArr[newFileNameArr.length - 1] = `${newFileNameArr[newFileNameArr.length - 1]}_${new Date().getTime()}`;
-    return newFileNameArr.join('.');
+    const ext = path.extname(originalname); // 获取扩展名（如 '.mov'）
+    const nameWithoutExt = path.basename(originalname, ext); // 获取不含扩展名的文件名
+    return `${nameWithoutExt}_${new Date().getTime()}${ext}`;
   }
 
   /**

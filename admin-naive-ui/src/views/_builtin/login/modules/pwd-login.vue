@@ -50,18 +50,22 @@ const rules = computed<Record<RuleKey, App.Global.FormRule[]>>(() => {
 });
 async function handleFetchTenantList() {
   startTenantLoading();
-  const { data, error } = await fetchTenantList();
-  if (error) return;
-  tenantEnabled.value = data.tenantEnabled;
-  if (data.tenantEnabled) {
-    tenantOption.value = data.voList.map(tenant => {
-      return {
-        label: tenant.companyName,
-        value: tenant.tenantId
-      };
-    });
+  try {
+    const data = await fetchTenantList();
+    tenantEnabled.value = data.tenantEnabled;
+    if (data.tenantEnabled) {
+      tenantOption.value = data.voList.map(tenant => {
+        return {
+          label: tenant.companyName,
+          value: tenant.tenantId
+        };
+      });
+    }
+  } catch {
+    // error handled by request interceptor
+  } finally {
+    endTenantLoading();
   }
-  endTenantLoading();
 }
 
 handleFetchTenantList();
@@ -85,8 +89,8 @@ async function handleSubmit() {
 
 async function handleFetchCaptchaCode() {
   startCodeLoading();
-  const { data, error } = await fetchCaptchaCode();
-  if (!error) {
+  try {
+    const data = await fetchCaptchaCode();
     captchaEnabled.value = data.captchaEnabled;
     if (data.captchaEnabled && data.img) {
       model.uuid = data.uuid;
@@ -123,9 +127,12 @@ handleLoginRember();
 // handleRegister();
 
 async function handleSocialLogin(type: Api.System.SocialSource) {
-  const { data, error } = await fetchSocialAuthBinding(type, model.tenantId);
-  if (error) return;
-  window.location.href = data;
+  try {
+    const data = await fetchSocialAuthBinding(type, model.tenantId);
+    window.location.href = data;
+  } catch {
+    // error handled by request interceptor
+  }
 }
 </script>
 
