@@ -36,7 +36,7 @@ export function setupUnplugin(viteEnv: Env.ImportMeta) {
         IconsResolver({
           customCollections: [collectionName],
           componentPrefix: VITE_ICON_PREFIX,
-          enabledCollections: ['carbon', 'mdi', 'material-symbols']
+          enabledCollections: ['carbon', 'mdi', 'material-symbols', 'gridicons', 'ant-design', 'line-md', 'ph', 'majesticons']
         })
       ]
     }),

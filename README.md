@@ -14,7 +14,7 @@
 
 集成强大的权限管理、多租户架构、请求加密、完善的日志监控
 
-[在线演示](https://your-demo-url.com) | [快速开始](#快速开始) | [文档](#文档) | [更新日志](CHANGELOG.md) | [🎯 优化报告](server/docs/OPTIMIZATION_README.md)
+[在线演示](https://www.linlingqin.top/) | [快速开始](#快速开始) | [文档](#文档) | [更新日志](CHANGELOG.md) | [🎯 优化报告](server/docs/OPTIMIZATION_README.md)
 
 </div>
 
