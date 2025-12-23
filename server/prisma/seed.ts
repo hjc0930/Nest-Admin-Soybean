@@ -3669,7 +3669,7 @@ async function main() {
         email: 'demo@example.com',
         phonenumber: '13800138000',
         sex: '0',
-        password: '$2b$10$UrJrjy0kxyrTO1UvhRVsvex35mB1s1jzAraIA9xtzPmlLmRtZXEXS',
+        password: '$2b$10$g3kM8fAzWz4LAb9bgBJAruofmfFL13xUw1QqOTdrLvouZCLbY7sVa',
         status: '0',
         delFlag: '0',
         loginIp: '127.0.0.1',
