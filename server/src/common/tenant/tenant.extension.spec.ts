@@ -1,7 +1,10 @@
 import { TenantContext } from './tenant.context';
-
-// 引入实际的扩展逻辑函数进行测试
-// 注意：由于 tenantExtension 是 Prisma 扩展，我们测试其内部逻辑
+import {
+  hasTenantField,
+  addTenantFilter,
+  setTenantId,
+  setTenantIdForMany,
+} from './tenant.middleware';
 
 // 辅助函数：在租户上下文中运行测试
 const runWithTenant = <T>(tenantId: string, ignoreTenant: boolean, fn: () => T): T => {
@@ -10,27 +13,6 @@ const runWithTenant = <T>(tenantId: string, ignoreTenant: boolean, fn: () => T):
 
 describe('Tenant Extension Logic', () => {
   describe('hasTenantField', () => {
-    // 需要租户隔离的模型列表
-    const TENANT_MODELS = [
-      'SysConfig',
-      'SysDept',
-      'SysDictData',
-      'SysDictType',
-      'SysJob',
-      'SysLogininfor',
-      'SysMenu',
-      'SysNotice',
-      'SysOperLog',
-      'SysPost',
-      'SysRole',
-      'SysUpload',
-      'SysUser',
-    ];
-
-    const hasTenantField = (model: string): boolean => {
-      return TENANT_MODELS.includes(model);
-    };
-
     it('should return true for tenant models', () => {
       expect(hasTenantField('SysUser')).toBe(true);
       expect(hasTenantField('SysRole')).toBe(true);
@@ -46,35 +28,6 @@ describe('Tenant Extension Logic', () => {
   });
 
   describe('addTenantFilter', () => {
-    const TENANT_MODELS = ['SysUser', 'SysRole'];
-
-    const hasTenantField = (model: string): boolean => TENANT_MODELS.includes(model);
-
-    const addTenantFilter = (model: string, args: any): any => {
-      if (!hasTenantField(model)) {
-        return args;
-      }
-
-      if (TenantContext.isIgnoreTenant()) {
-        return args;
-      }
-
-      if (TenantContext.isSuperTenant()) {
-        return args;
-      }
-
-      const tenantId = TenantContext.getTenantId();
-      if (!tenantId) {
-        return args;
-      }
-
-      args = args || {};
-      args.where = args.where || {};
-      args.where.tenantId = tenantId;
-
-      return args;
-    };
-
     it('should not modify args for non-tenant models', () => {
       runWithTenant('100001', false, () => {
         const args = { where: { id: 1 } };
@@ -126,30 +79,6 @@ describe('Tenant Extension Logic', () => {
   });
 
   describe('setTenantId for create', () => {
-    const TENANT_MODELS = ['SysUser', 'SysRole'];
-
-    const hasTenantField = (model: string): boolean => TENANT_MODELS.includes(model);
-
-    const setTenantId = (model: string, args: any): any => {
-      if (!hasTenantField(model)) {
-        return args;
-      }
-
-      const tenantId = TenantContext.getTenantId();
-      if (!tenantId) {
-        return args;
-      }
-
-      args = args || {};
-      args.data = args.data || {};
-
-      if (!args.data.tenantId) {
-        args.data.tenantId = tenantId;
-      }
-
-      return args;
-    };
-
     it('should set tenantId when creating data', () => {
       runWithTenant('100001', false, () => {
         const args = { data: { userName: 'test', nickName: 'Test' } };
@@ -176,31 +105,6 @@ describe('Tenant Extension Logic', () => {
   });
 
   describe('setTenantIdForMany for createMany', () => {
-    const TENANT_MODELS = ['SysUser'];
-
-    const hasTenantField = (model: string): boolean => TENANT_MODELS.includes(model);
-
-    const setTenantIdForMany = (model: string, args: any): any => {
-      if (!hasTenantField(model)) {
-        return args;
-      }
-
-      const tenantId = TenantContext.getTenantId();
-      if (!tenantId) {
-        return args;
-      }
-
-      args = args || {};
-      if (Array.isArray(args.data)) {
-        args.data = args.data.map((item: any) => ({
-          ...item,
-          tenantId: item.tenantId || tenantId,
-        }));
-      }
-
-      return args;
-    };
-
     it('should set tenantId for all items in batch create', () => {
       runWithTenant('100001', false, () => {
         const args = {

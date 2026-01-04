@@ -7,6 +7,7 @@ import {
   DEFAULT_SLOW_QUERY_THRESHOLD,
   SlowQueryLog,
 } from 'src/common/prisma/slow-query-logger.middleware';
+import { createTenantMiddleware } from 'src/common/tenant/tenant.middleware';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
@@ -36,6 +37,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         },
       },
     });
+
+    // 注册租户中间件 - 自动添加租户过滤和设置租户ID
+    this.$use(createTenantMiddleware());
 
     // 注册慢查询日志中间件 (阈值: 500ms，符合需求 2.10)
     this.$use(

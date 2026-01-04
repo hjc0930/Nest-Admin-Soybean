@@ -1,89 +1,232 @@
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import { AppConfigService } from 'src/config/app-config.service';
+import { Prisma } from '@prisma/client';
 import { TenantContext } from './tenant.context';
 
 /**
- * 租户中间件 - 从请求中提取租户信息并设置到上下文
+ * 需要租户隔离的模型列表
  */
-@Injectable()
-export class TenantMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(TenantMiddleware.name);
+export const TENANT_MODELS = [
+  'SysConfig',
+  'SysDept',
+  'SysDictData',
+  'SysDictType',
+  'SysJob',
+  'SysLogininfor',
+  'SysMenu',
+  'SysNotice',
+  'SysOperLog',
+  'SysPost',
+  'SysRole',
+  'SysUpload',
+  'SysUser',
+];
 
-  constructor(private config: AppConfigService) {}
+/**
+ * 检查模型是否需要租户过滤
+ */
+export function hasTenantField(model: string): boolean {
+  return TENANT_MODELS.includes(model);
+}
 
-  use(req: Request, res: Response, next: NextFunction) {
-    // 检查是否启用多租户
-    const tenantEnabled = this.config.tenant.enabled;
-
-    if (!tenantEnabled) {
-      // 未启用多租户时，使用默认租户ID
-      TenantContext.run({ tenantId: TenantContext.SUPER_TENANT_ID }, () => {
-        next();
-      });
-      return;
-    }
-
-    // 从请求头获取租户ID（Soybean 前端约定的 header 名称）
-    const tenantId = this.extractTenantId(req);
-
-    if (!tenantId) {
-      // 未提供租户ID时，使用默认租户ID
-      TenantContext.run({ tenantId: TenantContext.SUPER_TENANT_ID }, () => {
-        next();
-      });
-      return;
-    }
-
-    this.logger.debug(`Request tenant: ${tenantId}`);
-
-    // 设置租户上下文并继续处理请求
-    TenantContext.run({ tenantId }, () => {
-      next();
-    });
+/**
+ * 添加租户过滤条件
+ */
+export function addTenantFilter(model: string, args: any): any {
+  if (!hasTenantField(model)) {
+    return args;
   }
 
-  /**
-   * 从请求中提取租户ID
-   * 支持多种方式：header、query、subdomain
-   */
-  private extractTenantId(req: Request): string | undefined {
-    // 1. 从 header 获取 (优先级最高)
-    // Soybean 前端使用 'tenant-id' header
-    const headerTenantId = req.headers['tenant-id'] as string;
-    if (headerTenantId) {
-      return headerTenantId;
-    }
-
-    // 2. 从 query 参数获取
-    const queryTenantId = req.query['tenantId'] as string;
-    if (queryTenantId) {
-      return queryTenantId;
-    }
-
-    // 3. 从子域名获取 (可选，用于 SaaS 场景)
-    // 例如: tenant1.example.com -> tenant1
-    const host = req.headers.host;
-    if (host) {
-      const subdomain = this.extractSubdomain(host);
-      if (subdomain && subdomain !== 'www' && subdomain !== 'api') {
-        // 需要查询数据库将域名映射为租户ID，这里简化处理
-        // 实际项目中可以缓存这个映射关系
-        return undefined;
-      }
-    }
-
-    return undefined;
+  if (TenantContext.isIgnoreTenant() || TenantContext.isSuperTenant()) {
+    return args;
   }
 
-  /**
-   * 从 host 中提取子域名
-   */
-  private extractSubdomain(host: string): string | undefined {
-    const parts = host.split('.');
-    if (parts.length >= 3) {
-      return parts[0];
-    }
-    return undefined;
+  const tenantId = TenantContext.getTenantId();
+  if (!tenantId) {
+    return args;
   }
+
+  args = args || {};
+  args.where = args.where || {};
+
+  // 处理复杂的 where 条件
+  if (args.where.AND) {
+    args.where.AND.push({ tenantId });
+  } else if (args.where.OR) {
+    args.where = {
+      AND: [{ tenantId }, { OR: args.where.OR }],
+    };
+  } else {
+    args.where.tenantId = tenantId;
+  }
+
+  return args;
+}
+
+/**
+ * 创建时设置租户ID
+ */
+export function setTenantId(model: string, args: any): any {
+  if (!hasTenantField(model)) {
+    return args;
+  }
+
+  const tenantId = TenantContext.getTenantId();
+  if (!tenantId) {
+    return args;
+  }
+
+  args = args || {};
+  args.data = args.data || {};
+
+  if (!args.data.tenantId) {
+    args.data.tenantId = tenantId;
+  }
+
+  return args;
+}
+
+/**
+ * 批量创建时设置租户ID
+ */
+export function setTenantIdForMany(model: string, args: any): any {
+  if (!hasTenantField(model)) {
+    return args;
+  }
+
+  const tenantId = TenantContext.getTenantId();
+  if (!tenantId) {
+    return args;
+  }
+
+  args = args || {};
+  if (Array.isArray(args.data)) {
+    args.data = args.data.map((item: any) => ({
+      ...item,
+      tenantId: item.tenantId || tenantId,
+    }));
+  }
+
+  return args;
+}
+
+/**
+ * upsert 时设置租户ID
+ */
+export function setTenantIdForUpsert(model: string, args: any): any {
+  if (!hasTenantField(model)) {
+    return args;
+  }
+
+  const tenantId = TenantContext.getTenantId();
+  if (!tenantId) {
+    return args;
+  }
+
+  args = args || {};
+
+  // 设置 create 数据的租户ID
+  if (args.create && !args.create.tenantId) {
+    args.create.tenantId = tenantId;
+  }
+
+  // 添加 where 条件的租户过滤
+  args = addTenantFilter(model, args);
+
+  return args;
+}
+
+/**
+ * 验证查询结果是否属于当前租户 (用于 findUnique)
+ */
+export function validateTenantOwnership(model: string, result: any): any {
+  if (!result || !hasTenantField(model)) {
+    return result;
+  }
+
+  if (TenantContext.isIgnoreTenant() || TenantContext.isSuperTenant()) {
+    return result;
+  }
+
+  const currentTenantId = TenantContext.getTenantId();
+  if (!currentTenantId) {
+    return result;
+  }
+
+  if (result.tenantId && result.tenantId !== currentTenantId) {
+    return null;
+  }
+
+  return result;
+}
+
+/**
+ * 需要添加租户过滤的查询操作
+ */
+const FILTER_ACTIONS = [
+  'findMany',
+  'findFirst',
+  'findFirstOrThrow',
+  'count',
+  'aggregate',
+  'groupBy',
+  'updateMany',
+  'deleteMany',
+];
+
+/**
+ * 需要添加租户过滤的更新/删除操作
+ */
+const MODIFY_ACTIONS = ['update', 'delete'];
+
+/**
+ * 需要设置租户ID的创建操作
+ */
+const CREATE_ACTIONS = ['create'];
+
+/**
+ * 创建 Prisma 租户中间件
+ *
+ * 该中间件会自动为需要租户隔离的模型添加租户过滤条件，
+ * 并在创建数据时自动设置租户ID。
+ *
+ * @returns Prisma 中间件
+ */
+export function createTenantMiddleware(): Prisma.Middleware {
+  return async (
+    params: Prisma.MiddlewareParams,
+    next: (params: Prisma.MiddlewareParams) => Promise<unknown>,
+  ) => {
+    const { model, action, args } = params;
+
+    if (!model) {
+      return next(params);
+    }
+
+    // 查询操作：添加租户过滤
+    if (FILTER_ACTIONS.includes(action)) {
+      params.args = addTenantFilter(model, args);
+    }
+    // 更新/删除操作：添加租户过滤
+    else if (MODIFY_ACTIONS.includes(action)) {
+      params.args = addTenantFilter(model, args);
+    }
+    // 创建操作：设置租户ID
+    else if (CREATE_ACTIONS.includes(action)) {
+      params.args = setTenantId(model, args);
+    }
+    // 批量创建：设置租户ID
+    else if (action === 'createMany') {
+      params.args = setTenantIdForMany(model, args);
+    }
+    // upsert：设置租户ID并添加过滤
+    else if (action === 'upsert') {
+      params.args = setTenantIdForUpsert(model, args);
+    }
+    // findUnique：执行后验证租户归属
+    else if (action === 'findUnique') {
+      const result = await next(params);
+      return validateTenantOwnership(model, result);
+    }
+
+    return next(params);
+  };
 }
