@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoginlogRepository } from './loginlog.repository';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 describe('LoginlogRepository', () => {
   let repository: LoginlogRepository;

@@ -17,8 +17,8 @@
  */
 
 import { TestHelper } from '../helpers/test-helper';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { DelFlagEnum } from 'src/common/enum/index';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { DelFlagEnum } from 'src/shared/enums/index';
 
 describe('Tenant E2E Tests', () => {
   let helper: TestHelper;

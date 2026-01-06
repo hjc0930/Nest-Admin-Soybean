@@ -2,16 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { UploadService } from 'src/module/upload/upload.service';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 
 // Mock decorators
-jest.mock('src/common/decorators/operlog.decorator', () => ({
+jest.mock('src/core/decorators/operlog.decorator', () => ({
   Operlog: () => () => {},
 }));
-jest.mock('src/common/decorators/require-premission.decorator', () => ({
+jest.mock('src/core/decorators/require-premission.decorator', () => ({
   RequirePermission: () => () => {},
 }));
-jest.mock('src/common/decorators/require-role.decorator', () => ({
+jest.mock('src/core/decorators/require-role.decorator', () => ({
   RequireRole: () => () => {},
 }));
 

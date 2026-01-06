@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DelFlagEnum, StatusEnum } from 'src/common/enum/index';
+import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { Prisma, SysMenu } from '@prisma/client';
-import { BaseRepository } from '../../../common/repository/base.repository';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { BaseRepository } from 'src/infrastructure/repository';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 /**
  * 菜单仓储层

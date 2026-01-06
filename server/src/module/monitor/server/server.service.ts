@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 import os, { networkInterfaces } from 'os';
 import path from 'path';
 import * as nodeDiskInfo from 'node-disk-info';

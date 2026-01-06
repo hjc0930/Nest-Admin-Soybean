@@ -11,11 +11,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { RoleService } from 'src/module/system/role/role.service';
 import { UserService } from 'src/module/system/user/user.service';
 import { MenuService } from 'src/module/system/menu/menu.service';
-import { DelFlagEnum, StatusEnum } from 'src/common/enum/index';
+import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import * as bcrypt from 'bcryptjs';
 
 describe('Role Integration Tests', () => {

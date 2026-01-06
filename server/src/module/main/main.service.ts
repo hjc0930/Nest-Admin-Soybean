@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Result } from 'src/common/response';
-import { SUCCESS_CODE } from 'src/common/response';
+import { Result } from 'src/shared/response';
+import { SUCCESS_CODE } from 'src/shared/response';
 import { UserService } from '../system/user/user.service';
 import { LoginlogService } from '../monitor/loginlog/loginlog.service';
 import { AxiosService } from 'src/module/common/axios/axios.service';
 import { RegisterDto, LoginDto } from './dto/index';
 import { MenuService } from '../system/menu/menu.service';
-import { ClientInfoDto } from 'src/common/decorators/common.decorator';
-import { StatusEnum } from 'src/common/enum/index';
-import { MetricsService } from 'src/common/metrics';
+import { ClientInfoDto } from 'src/core/decorators/common.decorator';
+import { StatusEnum } from 'src/shared/enums/index';
+import { MetricsService } from 'src/observability/metrics';
 @Injectable()
 export class MainService {
   constructor(

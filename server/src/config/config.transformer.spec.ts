@@ -1,3 +1,7 @@
+/**
+ * @deprecated This test file has been moved to test/unit/config/config.transformer.spec.ts
+ * Please update your test references.
+ */
 import { ConfigTransformer } from './config.transformer';
 
 // Mock the Configuration class

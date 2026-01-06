@@ -7,19 +7,15 @@ import configuration from './config/index';
 import { validate } from './config/env.validation';
 import { AppConfigModule } from './config/app-config.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { JwtAuthGuard } from 'src/common/guards/auth.guard';
-import { PermissionGuard } from 'src/common/guards/permission.guard';
-import { RolesGuard } from './common/guards/roles.guard';
-import { CustomThrottlerGuard } from './common/guards/throttle.guard';
-import { TenantMiddleware, TenantGuard, TenantModule } from './common/tenant';
-import { CryptoModule, DecryptInterceptor } from './common/crypto';
-import { LoggerModule } from './common/logger';
-import { ClsModule } from './common/cls';
-import { TransactionalInterceptor } from './common/interceptors/transactional.interceptor';
-import { MetricsModule, MetricsInterceptor } from './common/metrics';
-import { AuditModule } from './common/audit';
-import { LoginSecurityModule } from './common/security';
-import { DataLoaderModule } from './common/dataloader';
+import { JwtAuthGuard, PermissionGuard, RolesGuard, CustomThrottlerGuard } from './core/guards';
+import { TenantGuard, TenantModule, ClsModule } from './tenant';
+import { CryptoModule, DecryptInterceptor } from './security/crypto';
+import { LoggerModule } from './infrastructure/logging';
+import { TransactionalInterceptor } from './core/interceptors/transactional.interceptor';
+import { MetricsModule, MetricsInterceptor } from './observability/metrics';
+import { AuditModule } from './observability/audit';
+import { LoginSecurityModule } from './security/login';
+import { DataLoaderModule } from './infrastructure/dataloader';
 
 import { MainModule } from './module/main/main.module';
 import { UploadModule } from './module/upload/upload.module';
@@ -27,7 +23,7 @@ import { SystemModule } from './module/system/system.module';
 import { CommonModule } from './module/common/common.module';
 import { MonitorModule } from './module/monitor/monitor.module';
 import { ResourceModule } from './module/resource/resource.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { PrismaModule } from './infrastructure/prisma';
 
 @Global()
 @Module({
@@ -147,7 +143,8 @@ import { PrismaModule } from './prisma/prisma.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // 租户中间件应用于所有路由
-    consumer.apply(TenantMiddleware).forRoutes('*');
+    // Note: Tenant middleware is now handled at the Prisma level
+    // via createTenantMiddleware() in PrismaService
+    // No HTTP middleware needed here
   }
 }

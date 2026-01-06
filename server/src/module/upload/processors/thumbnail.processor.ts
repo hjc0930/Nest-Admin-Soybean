@@ -2,8 +2,8 @@ import { Process, Processor, OnQueueCompleted, OnQueueFailed, OnQueueActive } fr
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
 import { AppConfigService } from 'src/config/app-config.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { MetricsService } from 'src/common/metrics/metrics.service';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { MetricsService } from 'src/observability/metrics/metrics.service';
 import sharp from 'sharp';
 import ffmpeg from 'fluent-ffmpeg';
 import * as path from 'path';

@@ -1,6 +1,6 @@
 import { IsString, Length, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsStrongPassword } from 'src/common/validators/password.validator';
+import { IsStrongPassword } from 'src/shared/validators/password.validator';
 
 /**
  * 重置密码 DTO

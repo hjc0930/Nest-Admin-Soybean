@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { DeepClone } from 'src/common/utils/index';
-import { Result } from 'src/common/response';
+import { DeepClone } from 'src/shared/utils/index';
+import { Result } from 'src/shared/response';
 
 @Injectable()
 export class CacheService {

@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CacheController } from './cache.controller';
 import { CacheService } from './cache.service';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 // Mock the Operlog decorator
-jest.mock('src/common/decorators/operlog.decorator', () => ({
+jest.mock('src/core/decorators/operlog.decorator', () => ({
   Operlog: () => () => {},
 }));
 

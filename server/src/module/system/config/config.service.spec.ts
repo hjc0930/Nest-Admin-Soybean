@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from './config.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { ConfigRepository } from './config.repository';
 import { SystemConfigService } from '../system-config/system-config.service';
-import { DelFlagEnum } from 'src/common/enum/index';
-import { ResponseCode } from 'src/common/response';
-import { BusinessException } from 'src/common/exceptions';
+import { DelFlagEnum } from 'src/shared/enums/index';
+import { ResponseCode } from 'src/shared/response';
+import { BusinessException } from 'src/shared/exceptions';
 
 describe('ConfigService', () => {
   let service: ConfigService;

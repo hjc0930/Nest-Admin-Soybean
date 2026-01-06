@@ -1,19 +1,19 @@
 import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { Result, ResponseCode } from 'src/common/response';
-import { DelFlagEnum, StatusEnum } from 'src/common/enum/index';
-import { SYS_USER_TYPE } from 'src/common/constant/index';
-import { BusinessException } from 'src/common/exceptions';
-import { ExportTable } from 'src/common/utils/export';
-import { FormatDateFields } from 'src/common/utils/index';
+import { Result, ResponseCode } from 'src/shared/response';
+import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
+import { SYS_USER_TYPE } from 'src/shared/constants/index';
+import { BusinessException } from 'src/shared/exceptions';
+import { ExportTable } from 'src/shared/utils/export';
+import { FormatDateFields } from 'src/shared/utils/index';
 import { Response } from 'express';
 import { CreateTenantDto, UpdateTenantDto, ListTenantDto, SyncTenantPackageDto } from './dto/index';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { IgnoreTenant } from 'src/common/tenant/tenant.decorator';
-import { TenantContext } from 'src/common/tenant/tenant.context';
-import { Transactional } from 'src/common/decorators/transactional.decorator';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
+import { TenantContext } from 'src/tenant/context/tenant.context';
+import { Transactional } from 'src/core/decorators/transactional.decorator';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { CacheEnum } from 'src/common/enum/cache.enum';
+import { CacheEnum } from 'src/shared/enums/cache.enum';
 import { hashSync } from 'bcryptjs';
 
 /**

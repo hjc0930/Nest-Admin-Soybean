@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Response } from 'express';
-import { Result } from 'src/common/response';
-import { ListToTree, FormatDateFields } from 'src/common/utils/index';
-import { ExportTable } from 'src/common/utils/export';
+import { Result } from 'src/shared/response';
+import { ListToTree, FormatDateFields } from 'src/shared/utils/index';
+import { ExportTable } from 'src/shared/utils/export';
 
-import { DataScopeEnum, DelFlagEnum, StatusEnum } from 'src/common/enum/index';
-import { Transactional } from 'src/common/decorators/transactional.decorator';
+import { DataScopeEnum, DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
+import { Transactional } from 'src/core/decorators/transactional.decorator';
 import { MenuService } from '../menu/menu.service';
 import { CreateRoleDto, UpdateRoleDto, ListRoleDto, ChangeRoleStatusDto } from './dto/index';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { RoleRepository } from './role.repository';
-import { Uniq } from 'src/common/utils/index';
+import { Uniq } from 'src/shared/utils/index';
 
 /**
  * 角色管理服务

@@ -1,13 +1,13 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { Result } from 'src/common/response';
-import { DelFlagEnum, StatusEnum, CacheEnum } from 'src/common/enum/index';
-import { Cacheable } from 'src/common/decorators/redis.decorator';
+import { Result } from 'src/shared/response';
+import { DelFlagEnum, StatusEnum, CacheEnum } from 'src/shared/enums/index';
+import { Cacheable } from 'src/core/decorators/redis.decorator';
 import { CreateMenuDto, UpdateMenuDto, ListMenuDto } from './dto/index';
-import { ListToTree, Uniq } from 'src/common/utils/index';
+import { ListToTree, Uniq } from 'src/shared/utils/index';
 import { UserService } from '../user/user.service';
 import { buildMenus } from './utils';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { MenuRepository } from './menu.repository';
 
 @Injectable()

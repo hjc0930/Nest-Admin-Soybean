@@ -1,18 +1,18 @@
 import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { BusinessException } from 'src/common/exceptions';
+import { BusinessException } from 'src/shared/exceptions';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { Prisma, SysDept, SysPost, SysRole, SysUser } from '@prisma/client';
-import { GetNowDate, GenerateUUID, Uniq, FormatDate, FormatDateFields } from 'src/common/utils/index';
-import { ExportTable } from 'src/common/utils/export';
-import { PaginationHelper } from 'src/common/utils/pagination.helper';
+import { GetNowDate, GenerateUUID, Uniq, FormatDate, FormatDateFields } from 'src/shared/utils/index';
+import { ExportTable } from 'src/shared/utils/export';
+import { PaginationHelper } from 'src/shared/utils/pagination.helper';
 
-import { CacheEnum, DelFlagEnum, StatusEnum, DataScopeEnum } from 'src/common/enum/index';
-import { Transactional } from 'src/common/decorators/transactional.decorator';
-import { LOGIN_TOKEN_EXPIRESIN, SYS_USER_TYPE } from 'src/common/constant/index';
-import { Result, ResponseCode } from 'src/common/response';
+import { CacheEnum, DelFlagEnum, StatusEnum, DataScopeEnum } from 'src/shared/enums/index';
+import { Transactional } from 'src/core/decorators/transactional.decorator';
+import { LOGIN_TOKEN_EXPIRESIN, SYS_USER_TYPE } from 'src/shared/constants/index';
+import { Result, ResponseCode } from 'src/shared/response';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -35,10 +35,10 @@ import { DeptService } from '../dept/dept.service';
 
 import { ConfigService } from '../config/config.service';
 import { UserType } from './dto/user';
-import { ClientInfoDto } from 'src/common/decorators/common.decorator';
-import { Cacheable, CacheEvict } from 'src/common/decorators/redis.decorator';
-import { Captcha } from 'src/common/decorators/captcha.decorator';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { ClientInfoDto } from 'src/core/decorators/common.decorator';
+import { Cacheable, CacheEvict } from 'src/core/decorators/redis.decorator';
+import { Captcha } from 'src/core/decorators/captcha.decorator';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from './user.repository';
 
 // 导入子服务

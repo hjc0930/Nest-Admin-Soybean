@@ -28,7 +28,7 @@
  * ```
  */
 
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import * as bcrypt from 'bcryptjs';
 
 /**

@@ -1,6 +1,6 @@
 import { IsString, IsEnum, Length, IsOptional, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema } from 'src/common/enum';
+import { StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 export class CreatePostDto {
   @ApiProperty({ required: false, description: '部门ID' })

@@ -11,8 +11,8 @@ import {
   ArrayMinSize,
   ArrayMaxSize,
 } from 'class-validator';
-import { StatusEnum, StatusEnumSchema, SexEnum, SexEnumSchema } from 'src/common/enum';
-import { IsStrongPassword } from 'src/common/validators/password.validator';
+import { StatusEnum, StatusEnumSchema, SexEnum, SexEnumSchema } from 'src/shared/enums';
+import { IsStrongPassword } from 'src/shared/validators/password.validator';
 
 /**
  * 批量创建用户项 DTO

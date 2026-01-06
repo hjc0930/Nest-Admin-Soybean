@@ -3,7 +3,7 @@ import { ConfigService } from './config.service';
 import { ConfigController } from './config.controller';
 import { ConfigRepository } from './config.repository';
 import { SystemConfigService } from '../system-config/system-config.service';
-import { SystemPrismaService } from 'src/common/prisma/system-prisma.service';
+import { SystemPrismaService } from 'src/infrastructure/prisma';
 
 @Global()
 @Module({

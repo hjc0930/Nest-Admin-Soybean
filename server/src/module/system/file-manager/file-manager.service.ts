@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Result, ResponseCode } from 'src/common/response';
-import { DelFlagEnum, StatusEnum } from 'src/common/enum/index';
-import { BusinessException } from 'src/common/exceptions';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { Result, ResponseCode } from 'src/shared/response';
+import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
+import { BusinessException } from 'src/shared/exceptions';
 import {
   CreateFolderDto,
   UpdateFolderDto,
@@ -13,10 +13,10 @@ import {
   CreateShareDto,
   GetShareDto,
 } from './dto';
-import { TenantContext } from 'src/common/tenant/tenant.context';
-import { PaginationHelper } from 'src/common/utils/pagination.helper';
+import { TenantContext } from 'src/tenant/context/tenant.context';
+import { PaginationHelper } from 'src/shared/utils/pagination.helper';
 import { Prisma, SysFileFolder } from '@prisma/client';
-import { GenerateUUID } from 'src/common/utils';
+import { GenerateUUID } from 'src/shared/utils';
 import * as crypto from 'crypto';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -25,7 +25,7 @@ import { Response } from 'express';
 import { FileAccessService } from './services/file-access.service';
 import { VersionService } from '../../upload/services/version.service';
 import { AppConfigService } from 'src/config/app-config.service';
-import { Transactional } from 'src/common/decorators/transactional.decorator';
+import { Transactional } from 'src/core/decorators/transactional.decorator';
 
 /**
  * 文件夹树节点类型

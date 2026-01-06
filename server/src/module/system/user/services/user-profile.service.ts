@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
-import { BusinessException } from 'src/common/exceptions';
+import { BusinessException } from 'src/shared/exceptions';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { CacheEnum } from 'src/common/enum/index';
-import { ResponseCode, Result } from 'src/common/response';
+import { CacheEnum } from 'src/shared/enums/index';
+import { ResponseCode, Result } from 'src/shared/response';
 import { UserType } from '../dto/user';
 import { UpdateProfileDto, UpdatePwdDto, ResetPwdDto } from '../dto/index';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from '../user.repository';
-import { TokenBlacklistService } from 'src/common/security/token-blacklist.service';
+import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
 
 /**
  * 用户个人资料服务

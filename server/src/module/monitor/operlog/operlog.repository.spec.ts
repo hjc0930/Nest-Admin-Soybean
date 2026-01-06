@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OperlogRepository } from './operlog.repository';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 describe('OperlogRepository', () => {
   let repository: OperlogRepository;

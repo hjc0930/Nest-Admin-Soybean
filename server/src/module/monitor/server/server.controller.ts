@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ServerService } from './server.service';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { Api } from 'src/common/decorators/api.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
 import { ServerInfoVo } from 'src/module/monitor/vo/monitor.vo';
 
 @ApiTags('系统监控-服务监控')

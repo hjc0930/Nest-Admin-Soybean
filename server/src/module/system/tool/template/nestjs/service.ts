@@ -1,5 +1,5 @@
 import * as Lodash from 'lodash';
-import { GenConstants } from 'src/common/constant/gen.constant';
+import { GenConstants } from 'src/shared/constants/gen.constant';
 
 export const serviceTem = (options) => {
   const { BusinessName, primaryKey, businessName, className } = options;
@@ -12,10 +12,10 @@ export const serviceTem = (options) => {
   return `
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { Result } from 'src/common/response';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Result } from 'src/shared/response';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { Create${Lodash.upperFirst(BusinessName)}Dto, Update${Lodash.upperFirst(BusinessName)}Dto, Query${Lodash.upperFirst(BusinessName)}Dto } from './dto/${businessName}.dto';
-import { isEmpty } from 'src/common/utils';
+import { isEmpty } from 'src/shared/utils';
 
 @Injectable()
 export class ${Lodash.upperFirst(BusinessName)}Service {

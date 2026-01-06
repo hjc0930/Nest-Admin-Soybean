@@ -6,12 +6,12 @@ export const controllerTem = (options) => {
   return `
 import { Controller, Get, Post, Put, Body, Query, Param, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { ${serviceName} } from './${businessName}.service';
 import { Create${Lodash.upperFirst(BusinessName)}Dto, Base${Lodash.upperFirst(BusinessName)}Dto, Update${Lodash.upperFirst(BusinessName)}Dto, Query${Lodash.upperFirst(
     BusinessName,
   )}Dto, List${Lodash.upperFirst(BusinessName)}Dto } from './dto/${businessName}.dto';
-import { ApiDataResponse } from 'src/common/decorators/api.decorator';
+import { ApiDataResponse } from 'src/core/decorators/api.decorator';
 
 @ApiTags('${functionName}')
 @Controller('${moduleName}/${businessName}')

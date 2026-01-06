@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpException } from '@nestjs/common';
 import { TenantService } from './tenant.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { DelFlagEnum, StatusEnum } from 'src/common/enum/index';
-import { ResponseCode } from 'src/common/response';
-import { BusinessException } from 'src/common/exceptions';
+import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
+import { ResponseCode } from 'src/shared/response';
+import { BusinessException } from 'src/shared/exceptions';
 
 describe('TenantService', () => {
   let service: TenantService;

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { DeptTreeNodeVo } from 'src/common/dto/dept-tree-node.vo';
+import { DeptTreeNodeVo } from 'src/shared/dto/dept-tree-node.vo';
 
 /**
  * 部门基础信息

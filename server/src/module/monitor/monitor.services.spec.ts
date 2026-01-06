@@ -7,12 +7,12 @@ import { OnlineService } from './online/online.service';
 import { OperlogService } from './operlog/operlog.service';
 import { ServerService } from './server/server.service';
 import { createPrismaMock, PrismaMock } from 'src/test-utils/prisma-mock';
-import { Result } from 'src/common/response';
-import { ExportTable } from 'src/common/utils/export';
+import { Result } from 'src/shared/response';
+import { ExportTable } from 'src/shared/utils/export';
 import { ModuleRef } from '@nestjs/core';
 import * as nodeDiskInfo from 'node-disk-info';
 
-jest.mock('src/common/utils/export', () => ({
+jest.mock('src/shared/utils/export', () => ({
   ExportTable: jest.fn(),
 }));
 

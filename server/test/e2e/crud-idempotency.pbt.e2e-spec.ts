@@ -12,9 +12,9 @@
 
 import * as fc from 'fast-check';
 import { TestHelper } from '../helpers/test-helper';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { CacheEnum } from 'src/common/enum/index';
+import { CacheEnum } from 'src/shared/enums/index';
 
 describe('Property 5: CRUD Idempotency for Read Operations', () => {
   let helper: TestHelper;

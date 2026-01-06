@@ -12,11 +12,11 @@ import {
   AuthUserSelectAllDto,
 } from './dto/index';
 import { AllocatedListDto } from '../user/dto/index';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
-import { Api } from 'src/common/decorators/api.decorator';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
 import { RoleVo, RoleListVo, RoleDeptTreeVo, AllocatedUserListVo } from './vo/role.vo';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 
 import { UserService } from '../user/user.service';
 import { User, UserDto, UserTool, UserToolType } from 'src/module/system/user/user.decorator';

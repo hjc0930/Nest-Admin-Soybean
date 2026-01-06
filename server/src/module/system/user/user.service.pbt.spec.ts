@@ -13,7 +13,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as fc from 'fast-check';
 import { UserService } from './user.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from './user.repository';
 import { RoleService } from '../role/role.service';
 import { DeptService } from '../dept/dept.service';
@@ -24,7 +24,7 @@ import { UserAuthService } from './services/user-auth.service';
 import { UserProfileService } from './services/user-profile.service';
 import { UserRoleService } from './services/user-role.service';
 import { UserExportService } from './services/user-export.service';
-import { DelFlagEnum, StatusEnum, DataScopeEnum } from 'src/common/enum/index';
+import { DelFlagEnum, StatusEnum, DataScopeEnum } from 'src/shared/enums/index';
 
 describe('UserService Property-Based Tests', () => {
   let service: UserService;

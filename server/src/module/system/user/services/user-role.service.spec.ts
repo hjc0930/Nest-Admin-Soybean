@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserRoleService } from './user-role.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from '../user.repository';
 import { RoleService } from '../../role/role.service';
-import { BusinessException } from 'src/common/exceptions';
+import { BusinessException } from 'src/shared/exceptions';
 
 describe('UserRoleService', () => {
   let service: UserRoleService;

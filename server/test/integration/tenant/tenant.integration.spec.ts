@@ -12,10 +12,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { TenantService } from 'src/module/system/tenant/tenant.service';
 import { TenantPackageService } from 'src/module/system/tenant-package/tenant-package.service';
-import { DelFlagEnum, StatusEnum } from 'src/common/enum/index';
+import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { ListTenantDto } from 'src/module/system/tenant/dto/list-tenant.dto';
 import { ListTenantPackageDto } from 'src/module/system/tenant-package/dto/list-tenant-package.dto';
 

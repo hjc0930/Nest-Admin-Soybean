@@ -1,12 +1,12 @@
 import { Controller, Get, Delete, Query, Post, Res, Body } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JobLogService } from './job-log.service';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { ListJobLogDto } from './dto/create-job.dto';
 import { Response } from 'express';
-import { Api } from 'src/common/decorators/api.decorator';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { Api } from 'src/core/decorators/api.decorator';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 
 @ApiTags('定时任务日志管理')
 @Controller('monitor/jobLog')

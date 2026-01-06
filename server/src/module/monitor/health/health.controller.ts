@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { HealthCheckService, HealthCheck, MemoryHealthIndicator, DiskHealthIndicator } from '@nestjs/terminus';
-import { PrismaHealthIndicator } from 'src/common/health/prisma.health';
-import { RedisHealthIndicator } from 'src/common/health/redis.health';
+import { PrismaHealthIndicator } from 'src/observability/health/prisma.health';
+import { RedisHealthIndicator } from 'src/observability/health/redis.health';
 import { NotRequireAuth } from 'src/module/system/user/user.decorator';
 import { InfoService } from './info.service';
 

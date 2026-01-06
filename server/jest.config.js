@@ -12,8 +12,8 @@ module.exports = {
   // 根目录
   rootDir: '.',
 
-  // 测试文件匹配模式 - 支持单元测试和属性基测试
-  testRegex: 'src/.*\\.(spec|pbt\\.spec)\\.ts$',
+  // 测试文件匹配模式 - 支持 src/ 和 test/unit/ 目录下的测试
+  testRegex: '(src|test/unit)/.*\\.(spec|pbt\\.spec)\\.ts$',
 
   // 转换器配置
   transform: {
@@ -27,6 +27,7 @@ module.exports = {
 
   // 模块路径映射
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
     '^src/(.*)$': '<rootDir>/src/$1',
     '^test/(.*)$': '<rootDir>/test/$1',
   },
@@ -57,6 +58,7 @@ module.exports = {
 
   // 测试环境
   testEnvironment: 'node',
+
 
   // 覆盖率阈值配置
   // 基于当前测试覆盖率设置合理阈值

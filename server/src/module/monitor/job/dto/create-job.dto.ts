@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString, Length } from 'class-validator';
-import { PageQueryDto } from 'src/common/dto/index';
+import { PageQueryDto } from 'src/shared/dto/index';
 
 export class CreateJobDto {
   @ApiProperty({ description: '任务名称' })

@@ -2,14 +2,14 @@ import { Injectable, Inject, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
-import { Result } from 'src/common/response';
-import { FormatDateFields } from 'src/common/utils/index';
+import { Result } from 'src/shared/response';
+import { FormatDateFields } from 'src/shared/utils/index';
 import { AxiosService } from 'src/module/common/axios/axios.service';
 import { QueryOperLogDto } from './dto/operLog.dto';
-import { ExportTable } from 'src/common/utils/export';
+import { ExportTable } from 'src/shared/utils/export';
 import { DictService } from 'src/module/system/dict/dict.service';
-import { isEmpty } from 'src/common/utils';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { isEmpty } from 'src/shared/utils';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 /**
  * 登录用户信息类型

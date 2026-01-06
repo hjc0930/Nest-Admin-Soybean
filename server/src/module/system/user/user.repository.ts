@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DelFlagEnum } from 'src/common/enum/index';
+import { DelFlagEnum } from 'src/shared/enums/index';
 import { Prisma, SysUser, SysDept } from '@prisma/client';
-import { SoftDeleteRepository } from '../../../common/repository';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { SoftDeleteRepository } from 'src/infrastructure/repository';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 /**
  * 用户带部门信息类型

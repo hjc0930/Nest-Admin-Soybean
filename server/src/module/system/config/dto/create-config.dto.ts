@@ -1,6 +1,6 @@
 import { IsString, IsEnum, Length, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema, ConfigTypeEnum, ConfigTypeEnumSchema } from 'src/common/enum';
+import { StatusEnum, StatusEnumSchema, ConfigTypeEnum, ConfigTypeEnumSchema } from 'src/shared/enums';
 
 export class CreateConfigDto {
   @ApiProperty({ required: true, description: '参数名称' })

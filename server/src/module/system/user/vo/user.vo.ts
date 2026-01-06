@@ -6,7 +6,7 @@ import {
   SexEnumSchema,
   DataScopeEnum,
   DataScopeEnumSchema,
-} from 'src/common/enum';
+} from 'src/shared/enums';
 
 /**
  * 岗位信息

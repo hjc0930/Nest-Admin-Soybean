@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ListJobLogDto } from './dto/create-job.dto';
-import { Result } from 'src/common/response';
-import { ExportTable } from 'src/common/utils/export';
-import { FormatDateFields } from 'src/common/utils/index';
+import { Result } from 'src/shared/response';
+import { ExportTable } from 'src/shared/utils/export';
+import { FormatDateFields } from 'src/shared/utils/index';
 import { Response } from 'express';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 @Injectable()
 export class JobLogService {

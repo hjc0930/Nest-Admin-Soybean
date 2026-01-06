@@ -1,6 +1,6 @@
 import { IsString, IsEnum, Min, Length, IsOptional, IsNumber, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema } from 'src/common/enum';
+import { StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 export class CreateDeptDto {
   @ApiProperty({

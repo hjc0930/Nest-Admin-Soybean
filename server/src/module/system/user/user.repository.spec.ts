@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserRepository } from './user.repository';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { createPrismaMock, PrismaMock } from 'src/test-utils/prisma-mock';
-import { DelFlagEnum } from 'src/common/enum/index';
+import { DelFlagEnum } from 'src/shared/enums/index';
 import { SysUser } from '@prisma/client';
 
 // Test data factory functions

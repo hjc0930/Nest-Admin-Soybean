@@ -11,11 +11,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { FileManagerService } from 'src/module/system/file-manager/file-manager.service';
 import { UploadService } from 'src/module/upload/upload.service';
-import { TenantContext } from 'src/common/tenant/tenant.context';
-import { DelFlagEnum } from 'src/common/enum/index';
+import { TenantContext } from 'src/tenant/context/tenant.context';
+import { DelFlagEnum } from 'src/shared/enums/index';
 
 describe('File Integration Tests', () => {
   let app: INestApplication;

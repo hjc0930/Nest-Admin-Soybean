@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsStrongPassword } from 'src/common/validators/password.validator';
-import { TenantContext } from 'src/common/tenant/tenant.context';
+import { IsStrongPassword } from 'src/shared/validators/password.validator';
+import { TenantContext } from 'src/tenant/context/tenant.context';
 
 /**
  * 登录请求 DTO - 匹配 Soybean 前端

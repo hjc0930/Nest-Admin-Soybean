@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, SysTenantPackage } from '@prisma/client';
-import { SoftDeleteRepository } from 'src/common/repository';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { SoftDeleteRepository } from 'src/infrastructure/repository';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 /**
  * 租户套餐仓储层

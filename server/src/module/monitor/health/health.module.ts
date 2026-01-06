@@ -3,8 +3,8 @@ import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 import { HealthController } from './health.controller';
 import { InfoController } from './info.controller';
-import { PrismaHealthIndicator } from 'src/common/health/prisma.health';
-import { RedisHealthIndicator } from 'src/common/health/redis.health';
+import { PrismaHealthIndicator } from 'src/observability/health/prisma.health';
+import { RedisHealthIndicator } from 'src/observability/health/redis.health';
 import { InfoService } from './info.service';
 
 /**

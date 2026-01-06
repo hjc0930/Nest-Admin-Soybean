@@ -3,7 +3,7 @@ import { MainController } from './main.controller';
 import { MainService } from './main.service';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { ConfigService } from 'src/module/system/config/config.service';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 
 describe('MainController', () => {
   let controller: MainController;

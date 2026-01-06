@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FileManagerService } from './file-manager.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { AppConfigService } from 'src/config/app-config.service';
 import { FileAccessService } from './services/file-access.service';
 import { VersionService } from '../../upload/services/version.service';
 import { createConfigMock, ConfigMock } from 'src/test-utils/config-mock';
-import { TenantContext } from 'src/common/tenant/tenant.context';
-import { BusinessException } from 'src/common/exceptions';
+import { TenantContext } from 'src/tenant/context/tenant.context';
+import { BusinessException } from 'src/shared/exceptions';
 
 // 创建简单的 Prisma Mock
 const createSimplePrismaMock = () => ({
@@ -47,14 +47,14 @@ const createSimplePrismaMock = () => ({
 });
 
 // Mock TenantContext
-jest.mock('src/common/tenant/tenant.context', () => ({
+jest.mock('src/tenant/context/tenant.context', () => ({
   TenantContext: {
     getTenantId: jest.fn().mockReturnValue('000001'),
   },
 }));
 
 // Mock GenerateUUID
-jest.mock('src/common/utils', () => ({
+jest.mock('src/shared/utils', () => ({
   GenerateUUID: jest.fn().mockReturnValue('test-uuid-123'),
 }));
 

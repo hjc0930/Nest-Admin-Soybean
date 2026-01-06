@@ -15,8 +15,8 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { Response } from 'express';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
-import { RequireRole } from 'src/common/decorators/require-role.decorator';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
+import { RequireRole } from 'src/core/decorators/require-role.decorator';
 import { UploadService } from 'src/module/upload/upload.service';
 import {
   CreateUserDto,
@@ -31,13 +31,13 @@ import {
   BatchResultDto,
 } from './dto/index';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 import { User, UserDto, UserTool, UserToolType } from 'src/module/system/user/user.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { Api } from 'src/common/decorators/api.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
 import { UserVo, UserListVo, UserDetailVo, UserProfileVo, UserAvatarVo, AuthRoleVo } from './vo/user.vo';
-import { DeptTreeNodeVo } from 'src/common/dto/dept-tree-node.vo';
+import { DeptTreeNodeVo } from 'src/shared/dto/dept-tree-node.vo';
 
 @ApiTags('用户管理')
 @Controller('system/user')

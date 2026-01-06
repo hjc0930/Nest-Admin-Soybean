@@ -1,14 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { Result, ResponseCode } from 'src/common/response';
-import { BusinessException } from 'src/common/exceptions';
+import { Result, ResponseCode } from 'src/shared/response';
+import { BusinessException } from 'src/shared/exceptions';
 import { CreateDeptDto, UpdateDeptDto, ListDeptDto } from './dto/index';
-import { FormatDateFields, ListToTree } from 'src/common/utils/index';
-import { CacheEnum, DataScopeEnum, DelFlagEnum, StatusEnum } from 'src/common/enum/index';
-import { Cacheable, CacheEvict } from 'src/common/decorators/redis.decorator';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { FormatDateFields, ListToTree } from 'src/shared/utils/index';
+import { CacheEnum, DataScopeEnum, DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
+import { Cacheable, CacheEvict } from 'src/core/decorators/redis.decorator';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { DeptRepository } from './dept.repository';
-import { Transactional } from 'src/common/decorators/transactional.decorator';
+import { Transactional } from 'src/core/decorators/transactional.decorator';
 
 @Injectable()
 export class DeptService {

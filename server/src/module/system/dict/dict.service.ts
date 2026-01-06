@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { Prisma } from '@prisma/client';
-import { Result } from 'src/common/response';
-import { CacheEnum, DelFlagEnum } from 'src/common/enum/index';
-import { Cacheable } from 'src/common/decorators/redis.decorator';
-import { ExportTable } from 'src/common/utils/export';
-import { FormatDateFields } from 'src/common/utils/index';
+import { Result } from 'src/shared/response';
+import { CacheEnum, DelFlagEnum } from 'src/shared/enums/index';
+import { Cacheable } from 'src/core/decorators/redis.decorator';
+import { ExportTable } from 'src/shared/utils/export';
+import { FormatDateFields } from 'src/shared/utils/index';
 import {
   CreateDictTypeDto,
   UpdateDictTypeDto,
@@ -15,7 +15,7 @@ import {
   ListDictData,
 } from './dto/index';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { DictTypeRepository, DictDataRepository } from './dict.repository';
 
 @Injectable()

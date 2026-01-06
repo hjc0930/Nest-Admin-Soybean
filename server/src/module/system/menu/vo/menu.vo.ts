@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema, MenuTypeEnum, MenuTypeEnumSchema } from 'src/common/enum';
+import { StatusEnum, StatusEnumSchema, MenuTypeEnum, MenuTypeEnumSchema } from 'src/shared/enums';
 
 /**
  * 菜单基础信息

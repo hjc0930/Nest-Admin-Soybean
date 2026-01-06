@@ -3,15 +3,15 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { Prisma } from '@prisma/client';
 import { CreateJobDto, ListJobDto } from './dto/create-job.dto';
-import { Result, ResponseCode } from 'src/common/response';
-import { BusinessException } from 'src/common/exceptions';
-import { FormatDateFields } from 'src/common/utils/index';
+import { Result, ResponseCode } from 'src/shared/response';
+import { BusinessException } from 'src/shared/exceptions';
+import { FormatDateFields } from 'src/shared/utils/index';
 import { TaskService } from './task.service';
-import { ExportTable } from 'src/common/utils/export';
-import { StatusEnum } from 'src/common/enum/index';
+import { ExportTable } from 'src/shared/utils/export';
+import { StatusEnum } from 'src/shared/enums/index';
 import { Response } from 'express';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Transactional } from 'src/common/decorators/transactional.decorator';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { Transactional } from 'src/core/decorators/transactional.decorator';
 
 @Injectable()
 export class JobService {

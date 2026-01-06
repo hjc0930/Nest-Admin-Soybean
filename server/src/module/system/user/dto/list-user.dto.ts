@@ -1,7 +1,7 @@
 import { IsString, IsEnum, Length, IsOptional, IsNumberString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { PageQueryDto } from 'src/common/dto';
-import { StatusEnum, StatusEnumSchema } from 'src/common/enum';
+import { PageQueryDto } from 'src/shared/dto';
+import { StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 /**
  * 用户列表查询 DTO

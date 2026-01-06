@@ -3,10 +3,10 @@ import { Response } from 'express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JobService } from './job.service';
 import { CreateJobDto, ListJobDto } from './dto/create-job.dto';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
-import { Api } from 'src/common/decorators/api.decorator';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 import { User } from 'src/module/system/user/user.decorator';
 
 @ApiTags('定时任务管理')

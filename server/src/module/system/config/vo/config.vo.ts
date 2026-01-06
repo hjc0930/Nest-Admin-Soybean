@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ConfigTypeEnum, ConfigTypeEnumSchema } from 'src/common/enum';
+import { ConfigTypeEnum, ConfigTypeEnumSchema } from 'src/shared/enums';
 
 /**
  * 系统配置基础信息

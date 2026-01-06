@@ -1,5 +1,5 @@
 import * as Lodash from 'lodash';
-import { GenConstants } from 'src/common/constant/gen.constant';
+import { GenConstants } from 'src/shared/constants/gen.constant';
 export const dtoTem = (options) => {
   const { BusinessName } = options;
   const insertExclude = getExcludeClounmByType(options, 'isInsert');
@@ -11,8 +11,8 @@ export const dtoTem = (options) => {
   return `
 import { IsString, IsNumber, IsBoolean, IsDate, IsOptional, IsEnum, IsArray } from 'class-validator';
 import { ApiProperty, OmitType, IntersectionType } from '@nestjs/swagger';
-import { PageQueryDto } from 'src/common/dto/index';
-import { CharEnum } from 'src/common/enum/index';
+import { PageQueryDto } from 'src/shared/dto/index';
+import { CharEnum } from 'src/shared/enums/index';
 import { Type } from 'class-transformer';
 
 

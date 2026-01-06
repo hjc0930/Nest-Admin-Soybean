@@ -1,6 +1,6 @@
 import { IsString, IsEnum, IsArray, Length, IsOptional, IsBoolean, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema } from 'src/common/enum';
+import { StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 /**
  * 创建角色 DTO

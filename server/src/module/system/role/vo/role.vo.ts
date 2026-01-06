@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema, DataScopeEnum, DataScopeEnumSchema } from 'src/common/enum';
-import { DeptTreeNodeVo } from 'src/common/dto/dept-tree-node.vo';
+import { StatusEnum, StatusEnumSchema, DataScopeEnum, DataScopeEnumSchema } from 'src/shared/enums';
+import { DeptTreeNodeVo } from 'src/shared/dto/dept-tree-node.vo';
 
 /**
  * 角色基础信息

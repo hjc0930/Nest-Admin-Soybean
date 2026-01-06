@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CacheEnum, DelFlagEnum, StatusEnum } from 'src/common/enum/index';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { CacheEnum, DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 
 /**
  * 缓存预热配置

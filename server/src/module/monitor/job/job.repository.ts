@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, SysJob } from '@prisma/client';
-import { BaseRepository } from 'src/common/repository/base.repository';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { StatusEnum } from 'src/common/enum';
+import { BaseRepository } from 'src/infrastructure/repository';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { StatusEnum } from 'src/shared/enums';
 
 /**
  * 定时任务仓储层

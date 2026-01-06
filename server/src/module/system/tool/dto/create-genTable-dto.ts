@@ -12,7 +12,7 @@ import {
   IsNumberString,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { PageQueryDto } from 'src/common/dto/index';
+import { PageQueryDto } from 'src/shared/dto/index';
 import { genTableCloumnUpdate } from './create-genTableCloumn-dto';
 export class CreateGenTableDto {
   @ApiProperty({ type: String, description: '表名称' })

@@ -1,3 +1,7 @@
+/**
+ * @deprecated This test file has been moved to test/unit/config/env.validation.spec.ts
+ * Please update your test references.
+ */
 import 'reflect-metadata';
 import { validate } from './env.validation';
 

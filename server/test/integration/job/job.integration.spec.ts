@@ -11,11 +11,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { JobService } from 'src/module/monitor/job/job.service';
 import { JobLogService } from 'src/module/monitor/job/job-log.service';
 import { TaskService } from 'src/module/monitor/job/task.service';
-import { StatusEnum } from 'src/common/enum/index';
+import { StatusEnum } from 'src/shared/enums/index';
 
 describe('Job Integration Tests', () => {
   let app: INestApplication;

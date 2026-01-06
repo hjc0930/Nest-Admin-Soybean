@@ -2,13 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RoleController } from './role.controller';
 import { RoleService } from './role.service';
 import { UserService } from '../user/user.service';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 
 // Mock decorators
-jest.mock('src/common/decorators/operlog.decorator', () => ({
+jest.mock('src/core/decorators/operlog.decorator', () => ({
   Operlog: () => () => {},
 }));
-jest.mock('src/common/decorators/require-premission.decorator', () => ({
+jest.mock('src/core/decorators/require-premission.decorator', () => ({
   RequirePermission: () => () => {},
 }));
 

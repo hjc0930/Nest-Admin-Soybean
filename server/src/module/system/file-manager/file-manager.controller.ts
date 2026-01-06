@@ -13,10 +13,10 @@ import {
   GetShareDto,
 } from './dto';
 import { User, NotRequireAuth } from 'src/module/system/user/user.decorator';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
-import { Api } from 'src/common/decorators/api.decorator';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 
 @ApiTags('系统-文件管理')
 @ApiBearerAuth('Authorization')

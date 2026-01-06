@@ -4,9 +4,9 @@ import { ToolService } from './tool.service';
 import { TableName, GenDbTableList, GenTableList, GenTableUpdate } from './dto/create-genTable-dto';
 import { Response } from 'express';
 import { User, UserDto } from 'src/module/system/user/user.decorator';
-import { Api } from 'src/common/decorators/api.decorator';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { Api } from 'src/core/decorators/api.decorator';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 
 @ApiTags('系统工具')
 @Controller('tool')

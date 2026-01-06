@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DelFlagEnum } from 'src/common/enum/index';
+import { DelFlagEnum } from 'src/shared/enums/index';
 import { Prisma, SysRole } from '@prisma/client';
-import { SoftDeleteRepository } from '../../../common/repository';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { SoftDeleteRepository } from 'src/infrastructure/repository';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 /**
  * 角色仓储层

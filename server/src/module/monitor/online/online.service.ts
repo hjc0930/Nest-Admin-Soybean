@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { CacheEnum } from 'src/common/enum/index';
-import { FormatDateFields, Paginate } from 'src/common/utils/index';
+import { CacheEnum } from 'src/shared/enums/index';
+import { FormatDateFields, Paginate } from 'src/shared/utils/index';
 
 @Injectable()
 export class OnlineService {

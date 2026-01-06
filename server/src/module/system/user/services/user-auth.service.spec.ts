@@ -1,13 +1,13 @@
-import { BusinessException } from 'src/common/exceptions';
+import { BusinessException } from 'src/shared/exceptions';
 import * as bcrypt from 'bcryptjs';
 
 // Mock 装饰器 - 必须在导入 UserAuthService 之前
-jest.mock('src/common/decorators/redis.decorator', () => ({
+jest.mock('src/core/decorators/redis.decorator', () => ({
   CacheEvict: () => () => {},
   Cacheable: () => () => {},
 }));
 
-jest.mock('src/common/decorators/captcha.decorator', () => ({
+jest.mock('src/core/decorators/captcha.decorator', () => ({
   Captcha: () => () => {},
 }));
 
@@ -19,7 +19,7 @@ jest.mock('bcryptjs', () => ({
 }));
 
 // Mock GenerateUUID
-jest.mock('src/common/utils/index', () => ({
+jest.mock('src/shared/utils/index', () => ({
   GenerateUUID: jest.fn().mockReturnValue('test-uuid-123'),
   Uniq: jest.fn((arr) => [...new Set(arr)]),
 }));
@@ -27,13 +27,13 @@ jest.mock('src/common/utils/index', () => ({
 // 现在导入服务
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserAuthService } from './user-auth.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from '../user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { RoleService } from '../../role/role.service';
-import { LoginSecurityService } from 'src/common/security/login-security.service';
-import { TokenBlacklistService } from 'src/common/security/token-blacklist.service';
+import { LoginSecurityService } from 'src/security/login/login-security.service';
+import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
 
 describe('UserAuthService', () => {
   let service: UserAuthService;

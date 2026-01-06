@@ -10,10 +10,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { DictService } from 'src/module/system/dict/dict.service';
-import { CacheEnum } from 'src/common/enum/index';
+import { CacheEnum } from 'src/shared/enums/index';
 
 describe('Dict Integration Tests', () => {
   let app: INestApplication;

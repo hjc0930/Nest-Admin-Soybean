@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UploadService } from './upload.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { AppConfigService } from 'src/config/app-config.service';
 import { VersionService } from './services/version.service';
 import { createConfigMock, ConfigMock } from 'src/test-utils/config-mock';
 import { getQueueToken } from '@nestjs/bull';
 import { BadRequestException } from '@nestjs/common';
-import { TenantContext } from 'src/common/tenant/tenant.context';
+import { TenantContext } from 'src/tenant/context/tenant.context';
 import * as fs from 'fs';
 import * as path from 'path';
 
 // Mock TenantContext
-jest.mock('src/common/tenant/tenant.context', () => ({
+jest.mock('src/tenant/context/tenant.context', () => ({
   TenantContext: {
     getTenantId: jest.fn().mockReturnValue('000001'),
   },
@@ -33,7 +33,7 @@ jest.mock('fs', () => ({
 }));
 
 // Mock GenerateUUID
-jest.mock('src/common/utils/index', () => ({
+jest.mock('src/shared/utils/index', () => ({
   GenerateUUID: jest.fn().mockReturnValue('test-uuid-123'),
 }));
 

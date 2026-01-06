@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MenuService } from './menu.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { MenuRepository } from './menu.repository';
 import { UserService } from '../user/user.service';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { StatusEnum, DelFlagEnum } from 'src/common/enum/index';
-import { ResponseCode } from 'src/common/response';
+import { StatusEnum, DelFlagEnum } from 'src/shared/enums/index';
+import { ResponseCode } from 'src/shared/response';
 
 describe('MenuService', () => {
   let service: MenuService;

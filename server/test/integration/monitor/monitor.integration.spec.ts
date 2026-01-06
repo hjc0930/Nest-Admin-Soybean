@@ -11,13 +11,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { OperlogService } from 'src/module/monitor/operlog/operlog.service';
 import { LoginlogService } from 'src/module/monitor/loginlog/loginlog.service';
 import { OnlineService } from 'src/module/monitor/online/online.service';
 import { CacheService } from 'src/module/monitor/cache/cache.service';
-import { CacheEnum } from 'src/common/enum/index';
+import { CacheEnum } from 'src/shared/enums/index';
 
 describe('Monitor Integration Tests', () => {
   let app: INestApplication;

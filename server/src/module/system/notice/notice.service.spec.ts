@@ -14,7 +14,7 @@
 
 import { NoticeService } from './notice.service';
 import { createPrismaMock, PrismaMock } from 'src/test-utils/prisma-mock';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 
 describe('NoticeService', () => {
   let prisma: PrismaMock;

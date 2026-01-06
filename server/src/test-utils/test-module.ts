@@ -1,6 +1,6 @@
 import { ModuleMetadata, Type } from '@nestjs/common';
 import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { AppConfigService } from 'src/config/app-config.service';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { createPrismaMock, PrismaMock } from './prisma-mock';

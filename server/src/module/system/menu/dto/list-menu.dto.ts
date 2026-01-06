@@ -1,6 +1,6 @@
 import { IsString, IsEnum, IsOptional, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum } from 'src/common/enum';
+import { StatusEnum } from 'src/shared/enums';
 import { Type } from 'class-transformer';
 
 export class ListMenuDto {

@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserProfileService } from './user-profile.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from '../user.repository';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { TokenBlacklistService } from 'src/common/security/token-blacklist.service';
-import { ResponseCode } from 'src/common/response';
+import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
+import { ResponseCode } from 'src/shared/response';
 import * as bcrypt from 'bcryptjs';
 
 jest.mock('bcryptjs');

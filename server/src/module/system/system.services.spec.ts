@@ -8,12 +8,12 @@ import { RoleService } from './role/role.service';
 import { ToolService } from './tool/tool.service';
 import { UserService } from './user/user.service';
 import { createPrismaMock, PrismaMock } from 'src/test-utils/prisma-mock';
-import { Result } from 'src/common/response';
-import { ExportTable } from 'src/common/utils/export';
-import { CacheEnum, DataScopeEnum } from 'src/common/enum/index';
+import { Result } from 'src/shared/response';
+import { ExportTable } from 'src/shared/utils/export';
+import { CacheEnum, DataScopeEnum } from 'src/shared/enums/index';
 import { JwtService } from '@nestjs/jwt';
 
-jest.mock('src/common/utils/export', () => ({
+jest.mock('src/shared/utils/export', () => ({
   ExportTable: jest.fn(),
 }));
 

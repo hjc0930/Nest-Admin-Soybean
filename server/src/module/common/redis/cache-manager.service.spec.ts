@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CacheManagerService } from './cache-manager.service';
 import { RedisService } from './redis.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 describe('CacheManagerService', () => {
   let service: CacheManagerService;

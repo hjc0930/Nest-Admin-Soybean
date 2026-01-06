@@ -2,18 +2,18 @@ import { Injectable, Inject, BadRequestException, Logger } from '@nestjs/common'
 import { AppConfigService } from 'src/config/app-config.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { Result, ResponseCode } from 'src/common/response';
-import { StatusEnum } from 'src/common/enum/index';
+import { Result, ResponseCode } from 'src/shared/response';
+import { StatusEnum } from 'src/shared/enums/index';
 import { ChunkFileDto, ChunkMergeFileDto } from './dto/index';
-import { GenerateUUID } from 'src/common/utils/index';
+import { GenerateUUID } from 'src/shared/utils/index';
 import fs from 'fs';
 import path from 'path';
 import * as crypto from 'crypto';
 import iconv from 'iconv-lite';
 import COS from 'cos-nodejs-sdk-v5';
 import Mime from 'mime-types';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { TenantContext } from 'src/common/tenant/tenant.context';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { TenantContext } from 'src/tenant/context/tenant.context';
 import { VersionService } from './services/version.service';
 import type { ThumbnailJobData } from './processors/thumbnail.processor';
 

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantPackageService } from './tenant-package.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { BusinessException } from 'src/common/exceptions';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { BusinessException } from 'src/shared/exceptions';
 import { ListTenantPackageDto } from './dto/list-tenant-package.dto';
 
 // Helper to create DTO instance

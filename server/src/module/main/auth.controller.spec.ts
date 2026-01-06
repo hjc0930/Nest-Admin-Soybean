@@ -4,9 +4,9 @@ import { MainService } from './main.service';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { ConfigService as SysConfigService } from 'src/module/system/config/config.service';
 import { AppConfigService } from 'src/config/app-config.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { TokenBlacklistService } from 'src/common/security/token-blacklist.service';
-import { Result, ResponseCode } from 'src/common/response';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
+import { Result, ResponseCode } from 'src/shared/response';
 
 describe('AuthController', () => {
   let controller: AuthController;

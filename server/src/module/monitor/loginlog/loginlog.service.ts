@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { Prisma } from '@prisma/client';
-import { Result } from 'src/common/response';
-import { DelFlagEnum } from 'src/common/enum/index';
-import { ExportTable } from 'src/common/utils/export';
-import { FormatDateFields } from 'src/common/utils/index';
+import { Result } from 'src/shared/response';
+import { DelFlagEnum } from 'src/shared/enums/index';
+import { ExportTable } from 'src/shared/utils/export';
+import { FormatDateFields } from 'src/shared/utils/index';
 import { CreateLoginlogDto, ListLoginlogDto } from './dto/index';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 @Injectable()
 export class LoginlogService {

@@ -2,12 +2,12 @@ import { Controller, Get, Post, Body, Put, Param, Delete, Res, Query } from '@ne
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { TenantService } from './tenant.service';
 import { CreateTenantDto, UpdateTenantDto, ListTenantDto, SyncTenantPackageDto } from './dto/index';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Response } from 'express';
-import { Api } from 'src/common/decorators/api.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
 import { TenantVo, TenantListVo } from './vo/tenant.vo';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 
 @ApiTags('租户管理')
 @Controller('system/tenant')

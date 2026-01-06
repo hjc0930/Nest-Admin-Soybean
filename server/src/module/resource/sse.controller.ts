@@ -3,7 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { SseService } from './sse.service';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 import { v4 as uuidv4 } from 'uuid';
 
 // 跳过认证的装饰器

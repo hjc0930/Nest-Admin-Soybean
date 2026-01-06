@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
-import { ExportTable } from 'src/common/utils/export';
+import { ExportTable } from 'src/shared/utils/export';
 import { ListUserDto } from '../dto/index';
 import { UserType } from '../dto/user';
 

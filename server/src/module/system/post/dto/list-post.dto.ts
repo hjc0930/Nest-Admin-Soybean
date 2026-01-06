@@ -1,7 +1,7 @@
 import { IsString, IsEnum, Length, IsOptional, IsNumberString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { PageQueryDto } from 'src/common/dto/index';
-import { StatusEnum, StatusEnumSchema } from 'src/common/enum';
+import { PageQueryDto } from 'src/shared/dto/index';
+import { StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 export class ListPostDto extends PageQueryDto {
   @ApiProperty({ required: false, description: '岗位名称' })

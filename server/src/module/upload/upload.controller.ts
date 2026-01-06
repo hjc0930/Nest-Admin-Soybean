@@ -3,10 +3,10 @@ import { UploadService } from './upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ChunkFileDto, ChunkMergeFileDto, FileUploadDto, uploadIdDto } from './dto/index';
-import { Result } from 'src/common/response';
-import { Api } from 'src/common/decorators/api.decorator';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { Result } from 'src/shared/response';
+import { Api } from 'src/core/decorators/api.decorator';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 
 @ApiTags('通用-文件上传')
 @Controller('common/upload')

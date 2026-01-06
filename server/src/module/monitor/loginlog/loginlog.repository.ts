@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, SysLogininfor } from '@prisma/client';
-import { BaseRepository } from 'src/common/repository/base.repository';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { BaseRepository } from 'src/infrastructure/repository';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 /**
  * 登录日志仓储层

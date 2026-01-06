@@ -2,12 +2,12 @@ import { Controller, Get, Post, Body, Put, Param, Query, Delete, HttpCode } from
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { DeptService } from './dept.service';
 import { CreateDeptDto, UpdateDeptDto, ListDeptDto } from './dto/index';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
-import { Api } from 'src/common/decorators/api.decorator';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
 import { DeptVo } from './vo/dept.vo';
-import { DeptTreeNodeVo } from 'src/common/dto/dept-tree-node.vo';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { DeptTreeNodeVo } from 'src/shared/dto/dept-tree-node.vo';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../user/user.decorator';
 
 @ApiTags('部门管理')

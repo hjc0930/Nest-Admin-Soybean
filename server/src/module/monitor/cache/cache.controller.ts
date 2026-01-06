@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CacheService } from './cache.service';
-import { Api } from 'src/common/decorators/api.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
 import { CacheInfoVo, CacheKeyVo } from 'src/module/monitor/vo/monitor.vo';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 
 @ApiTags('缓存管理')
 @Controller('monitor/cache')

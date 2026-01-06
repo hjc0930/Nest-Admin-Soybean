@@ -13,7 +13,7 @@
  */
 
 import { TestHelper } from '../helpers/test-helper';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 describe('Notice E2E Tests', () => {
   let helper: TestHelper;

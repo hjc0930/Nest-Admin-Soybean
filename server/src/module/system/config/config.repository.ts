@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, SysConfig } from '@prisma/client';
-import { SoftDeleteRepository } from '../../../common/repository/soft-delete.repository';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { SoftDeleteRepository } from 'src/infrastructure/repository';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 /**
  * 配置仓储层

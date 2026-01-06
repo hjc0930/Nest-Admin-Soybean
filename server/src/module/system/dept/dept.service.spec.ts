@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeptService } from './dept.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { DeptRepository } from './dept.repository';
-import { DataScopeEnum } from 'src/common/enum';
+import { DataScopeEnum } from 'src/shared/enums';
 
 // Mock decorators
-jest.mock('src/common/decorators/redis.decorator', () => ({
+jest.mock('src/core/decorators/redis.decorator', () => ({
   Cacheable: () => () => {},
   CacheEvict: () => () => {},
 }));
-jest.mock('src/common/decorators/transactional.decorator', () => ({
+jest.mock('src/core/decorators/transactional.decorator', () => ({
   Transactional: () => () => {},
 }));
 

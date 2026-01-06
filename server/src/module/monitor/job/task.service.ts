@@ -1,13 +1,13 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { Task, TaskRegistry } from 'src/common/decorators/task.decorator';
+import { Task, TaskRegistry } from 'src/core/decorators/task.decorator';
 import { JobLogService } from './job-log.service';
-import { BusinessException } from 'src/common/exceptions/index';
-import { ResponseCode } from 'src/common/response';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { StatusEnum, DelFlagEnum } from 'src/common/enum/index';
-import { IgnoreTenant } from 'src/common/tenant/tenant.decorator';
-import { TenantContext } from 'src/common/tenant/tenant.context';
+import { BusinessException } from 'src/shared/exceptions/index';
+import { ResponseCode } from 'src/shared/response';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { StatusEnum, DelFlagEnum } from 'src/shared/enums/index';
+import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
+import { TenantContext } from 'src/tenant/context/tenant.context';
 import { NoticeService } from 'src/module/system/notice/notice.service';
 import { VersionService } from 'src/module/upload/services/version.service';
 

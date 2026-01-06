@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from './user.repository';
 import { RoleService } from '../role/role.service';
 import { DeptService } from '../dept/dept.service';
@@ -11,9 +11,9 @@ import { UserAuthService } from './services/user-auth.service';
 import { UserProfileService } from './services/user-profile.service';
 import { UserRoleService } from './services/user-role.service';
 import { UserExportService } from './services/user-export.service';
-import { DelFlagEnum, StatusEnum, DataScopeEnum } from 'src/common/enum/index';
+import { DelFlagEnum, StatusEnum, DataScopeEnum } from 'src/shared/enums/index';
 import * as bcrypt from 'bcryptjs';
-import { BusinessException } from 'src/common/exceptions';
+import { BusinessException } from 'src/shared/exceptions';
 
 describe('UserService', () => {
   let service: UserService;

@@ -12,7 +12,7 @@
 
 import { DictService } from './dict.service';
 import { createPrismaMock, PrismaMock } from 'src/test-utils/prisma-mock';
-import { CacheEnum, DelFlagEnum } from 'src/common/enum/index';
+import { CacheEnum, DelFlagEnum } from 'src/shared/enums/index';
 
 describe('DictService', () => {
   let prisma: PrismaMock;

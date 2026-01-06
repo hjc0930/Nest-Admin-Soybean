@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HealthController } from './health.controller';
 import { HealthCheckService, MemoryHealthIndicator, DiskHealthIndicator } from '@nestjs/terminus';
-import { PrismaHealthIndicator } from 'src/common/health/prisma.health';
-import { RedisHealthIndicator } from 'src/common/health/redis.health';
+import { PrismaHealthIndicator } from 'src/observability/health/prisma.health';
+import { RedisHealthIndicator } from 'src/observability/health/redis.health';
 import { InfoService } from './info.service';
 
 describe('HealthController', () => {

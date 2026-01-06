@@ -4,20 +4,20 @@ import { AppConfigService } from 'src/config/app-config.service';
 import { MainService } from './main.service';
 import { AuthLoginDto, AuthRegisterDto, SocialLoginDto } from './dto/auth.dto';
 import { LoginTokenVo, CaptchaCodeVo, LoginTenantVo, UserInfoVo } from './vo/auth.vo';
-import { createMath } from 'src/common/utils/captcha';
-import { Result, ResponseCode } from 'src/common/response';
-import { GenerateUUID } from 'src/common/utils/index';
+import { createMath } from 'src/shared/utils/captcha';
+import { Result, ResponseCode } from 'src/shared/response';
+import { GenerateUUID } from 'src/shared/utils/index';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { StatusEnum } from 'src/common/enum/index';
-import { CacheEnum } from 'src/common/enum/index';
+import { StatusEnum } from 'src/shared/enums/index';
+import { CacheEnum } from 'src/shared/enums/index';
 import { ConfigService as SysConfigService } from 'src/module/system/config/config.service';
-import { ClientInfo, ClientInfoDto } from 'src/common/decorators/common.decorator';
+import { ClientInfo, ClientInfoDto } from 'src/core/decorators/common.decorator';
 import { NotRequireAuth, User, UserDto } from 'src/module/system/user/user.decorator';
-import { Api } from 'src/common/decorators/api.decorator';
-import { TenantContext, IgnoreTenant } from 'src/common/tenant';
-import { SkipDecrypt } from 'src/common/crypto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { TokenBlacklistService } from 'src/common/security/token-blacklist.service';
+import { Api } from 'src/core/decorators/api.decorator';
+import { TenantContext, IgnoreTenant } from 'src/tenant';
+import { SkipDecrypt } from 'src/security/crypto';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
 
 /**
  * 认证控制器 - 匹配 Soybean 前端 API

@@ -36,10 +36,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { ClsService } from 'nestjs-cls';
-import { GlobalExceptionFilter } from 'src/common/filters/global-exception.filter';
-import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { GlobalExceptionFilter } from 'src/core/filters/global-exception.filter';
+import { ResponseInterceptor } from 'src/core/interceptors/response.interceptor';
 
 /**
  * 测试配置接口

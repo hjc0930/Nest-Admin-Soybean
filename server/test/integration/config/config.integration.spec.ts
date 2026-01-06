@@ -6,10 +6,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { ConfigService } from 'src/module/system/config/config.service';
-import { CacheEnum, DelFlagEnum } from 'src/common/enum/index';
+import { CacheEnum, DelFlagEnum } from 'src/shared/enums/index';
 
 describe('Config Integration Tests', () => {
   let app: INestApplication;

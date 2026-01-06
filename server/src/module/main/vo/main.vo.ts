@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema, SexEnum, SexEnumSchema } from 'src/common/enum';
+import { StatusEnum, StatusEnumSchema, SexEnum, SexEnumSchema } from 'src/shared/enums';
 
 /**
  * 角色简要信息

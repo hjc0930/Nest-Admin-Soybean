@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, GenTable, GenTableColumn } from '@prisma/client';
-import { SoftDeleteRepository } from 'src/common/repository';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { SoftDeleteRepository } from 'src/infrastructure/repository';
+import { PrismaService } from 'src/infrastructure/prisma';
 
 /**
  * 生成表带列信息类型

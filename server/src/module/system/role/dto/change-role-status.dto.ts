@@ -1,6 +1,6 @@
 import { IsString, IsEnum, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema } from 'src/common/enum';
+import { StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 /**
  * 修改角色状态 DTO

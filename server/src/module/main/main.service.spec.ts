@@ -1,5 +1,5 @@
 import { MainService } from './main.service';
-import { Result } from 'src/common/response';
+import { Result } from 'src/shared/response';
 
 describe('MainService', () => {
   let service: MainService;

@@ -1,7 +1,7 @@
 import { IsString, IsEnum, Length, IsOptional, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { SexEnum, SexEnumSchema } from 'src/common/enum';
-import { IsStrongPassword } from 'src/common/validators/password.validator';
+import { SexEnum, SexEnumSchema } from 'src/shared/enums';
+import { IsStrongPassword } from 'src/shared/validators/password.validator';
 
 /**
  * 更新个人资料 DTO

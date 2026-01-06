@@ -2,12 +2,12 @@ import { Controller, Get, Post, Body, Query, Put, Param, Delete } from '@nestjs/
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MenuService } from './menu.service';
 import { CreateMenuDto, UpdateMenuDto, ListMenuDto } from './dto/index';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
-import { Api } from 'src/common/decorators/api.decorator';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
 import { MenuVo, MenuTreeVo, RoleMenuTreeSelectVo } from './vo/menu.vo';
 import { User, UserDto } from 'src/module/system/user/user.decorator';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../user/user.decorator';
 
 @ApiTags('菜单管理')

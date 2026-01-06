@@ -1,6 +1,6 @@
 import { IsString, IsEnum, Length, IsOptional, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, MenuTypeEnum, MenuTypeEnumSchema } from 'src/common/enum';
+import { StatusEnum, MenuTypeEnum, MenuTypeEnumSchema } from 'src/shared/enums';
 
 export class CreateMenuDto {
   @ApiProperty({ required: true, description: '菜单名称' })

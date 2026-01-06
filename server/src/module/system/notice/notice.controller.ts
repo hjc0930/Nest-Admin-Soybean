@@ -2,12 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Query, Request, Put, Delete 
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { NoticeService } from './notice.service';
 import { CreateNoticeDto, UpdateNoticeDto, ListNoticeDto } from './dto/index';
-import { RequirePermission } from 'src/common/decorators/require-premission.decorator';
-import { GetNowDate } from 'src/common/utils';
-import { Api } from 'src/common/decorators/api.decorator';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
+import { GetNowDate } from 'src/shared/utils';
+import { Api } from 'src/core/decorators/api.decorator';
 import { NoticeVo, NoticeListVo } from './vo/notice.vo';
-import { Operlog } from 'src/common/decorators/operlog.decorator';
-import { BusinessType } from 'src/common/constant/business.constant';
+import { Operlog } from 'src/core/decorators/operlog.decorator';
+import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../user/user.decorator';
 
 @ApiTags('通知公告')
