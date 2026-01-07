@@ -5,9 +5,10 @@ import { CreateTenantDto, UpdateTenantDto, ListTenantDto, SyncTenantPackageDto }
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Response } from 'express';
 import { Api } from 'src/core/decorators/api.decorator';
-import { TenantVo, TenantListVo } from './vo/tenant.vo';
+import { TenantVo, TenantListVo, TenantSwitchVo, TenantRestoreVo, TenantSelectListVo } from './vo/tenant.vo';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
+import { User, UserDto } from 'src/module/system/user/user.decorator';
 
 @ApiTags('租户管理')
 @Controller('system/tenant')
@@ -114,5 +115,50 @@ export class TenantController {
   @Post('/export')
   export(@Res() res: Response, @Body() body: ListTenantDto) {
     return this.tenantService.export(res, body);
+  }
+
+  @Api({
+    summary: '租户管理-可切换租户列表',
+    description: '获取可切换的租户列表（仅超级管理员可用）',
+    type: TenantSelectListVo,
+  })
+  @RequirePermission('system:tenant:switch')
+  @Get('/select-list')
+  getSelectList(@User() user: UserDto) {
+    return this.tenantService.getSelectList(user);
+  }
+
+  @Api({
+    summary: '租户管理-切换租户',
+    description: '切换到指定租户（仅超级管理员可用）',
+    type: TenantSwitchVo,
+    params: [{ name: 'tenantId', description: '目标租户ID', type: 'string' }],
+  })
+  @RequirePermission('system:tenant:switch')
+  @Operlog({ businessType: BusinessType.UPDATE })
+  @Get('/dynamic/:tenantId')
+  switchTenant(@Param('tenantId') tenantId: string, @User() user: UserDto) {
+    return this.tenantService.switchTenant(tenantId, user);
+  }
+
+  @Api({
+    summary: '租户管理-恢复原租户',
+    description: '清除租户切换状态，恢复到原租户',
+    type: TenantRestoreVo,
+  })
+  @RequirePermission('system:tenant:switch')
+  @Operlog({ businessType: BusinessType.UPDATE })
+  @Get('/dynamic/clear')
+  restoreTenant(@User() user: UserDto) {
+    return this.tenantService.restoreTenant(user);
+  }
+
+  @Api({
+    summary: '租户管理-获取切换状态',
+    description: '获取当前租户切换状态',
+  })
+  @Get('/switch-status')
+  getSwitchStatus(@User() user: UserDto) {
+    return this.tenantService.getSwitchStatus(user);
   }
 }

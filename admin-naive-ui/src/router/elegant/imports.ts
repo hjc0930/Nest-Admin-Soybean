@@ -45,6 +45,17 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   'system_tenant-package': () => import('@/views/system/tenant-package/index.vue'),
   system_tenant: () => import('@/views/system/tenant/index.vue'),
   system_user: () => import('@/views/system/user/index.vue'),
+  // SMS Management
+  'system_sms-channel': () => import('@/views/system/sms/channel/index.vue'),
+  'system_sms-template': () => import('@/views/system/sms/template/index.vue'),
+  'system_sms-log': () => import('@/views/system/sms/log/index.vue'),
+  // Notify Management
+  'system_notify-template': () => import('@/views/system/notify/template/index.vue'),
+  'system_notify-message': () => import('@/views/system/notify/message/index.vue'),
+  // Tenant Enhancement
+  'system_tenant-dashboard': () => import('@/views/system/tenant-dashboard/index.vue'),
+  'system_tenant-quota': () => import('@/views/system/tenant-quota/index.vue'),
+  'system_tenant-audit': () => import('@/views/system/tenant-audit/index.vue'),
   tool_build: () => import('@/views/tool/build/index.vue'),
   tool_gen: () => import('@/views/tool/gen/index.vue'),
   tool_swagger: () => import('@/views/tool/swagger/index.vue'),

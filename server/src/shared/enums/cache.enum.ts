@@ -43,4 +43,7 @@ export enum CacheEnum {
 
   /** 用户 Token 版本 redis key (需求 4.9) */
   USER_TOKEN_VERSION_KEY = 'user_token_version:',
+
+  /** 租户切换原租户ID redis key */
+  TENANT_SWITCH_ORIGINAL_KEY = 'tenant_switch_original:',
 }

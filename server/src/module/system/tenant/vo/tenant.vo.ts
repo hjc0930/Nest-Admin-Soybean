@@ -66,3 +66,56 @@ export class TenantListVo {
   @ApiProperty({ description: '总数' })
   total: number;
 }
+
+/**
+ * 租户切换响应VO
+ */
+export class TenantSwitchVo {
+  @ApiProperty({ description: '是否成功' })
+  success: boolean;
+
+  @ApiProperty({ description: '目标租户ID' })
+  tenantId: string;
+
+  @ApiProperty({ description: '企业名称' })
+  companyName: string;
+
+  @ApiProperty({ description: '原租户ID', required: false })
+  originalTenantId?: string;
+}
+
+/**
+ * 租户恢复响应VO
+ */
+export class TenantRestoreVo {
+  @ApiProperty({ description: '是否成功' })
+  success: boolean;
+
+  @ApiProperty({ description: '原租户ID' })
+  originalTenantId: string;
+
+  @ApiProperty({ description: '原企业名称' })
+  originalCompanyName: string;
+}
+
+/**
+ * 可切换租户列表项VO
+ */
+export class TenantSelectItemVo {
+  @ApiProperty({ description: '租户ID' })
+  tenantId: string;
+
+  @ApiProperty({ description: '企业名称' })
+  companyName: string;
+
+  @ApiProperty({ description: '状态' })
+  status: string;
+}
+
+/**
+ * 可切换租户列表响应VO
+ */
+export class TenantSelectListVo {
+  @ApiProperty({ type: [TenantSelectItemVo], description: '可切换租户列表' })
+  list: TenantSelectItemVo[];
+}

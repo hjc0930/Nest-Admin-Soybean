@@ -305,6 +305,78 @@ export const generatedRoutes: GeneratedRoute[] = [
         },
       },
       {
+        name: 'system_tenant-dashboard',
+        path: '/system/tenant-dashboard',
+        component: 'view.system_tenant-dashboard',
+        meta: {
+          title: 'system_tenant-dashboard',
+          i18nKey: 'route.system_tenant-dashboard',
+        },
+      },
+      {
+        name: 'system_tenant-quota',
+        path: '/system/tenant-quota',
+        component: 'view.system_tenant-quota',
+        meta: {
+          title: 'system_tenant-quota',
+          i18nKey: 'route.system_tenant-quota',
+        },
+      },
+      {
+        name: 'system_tenant-audit',
+        path: '/system/tenant-audit',
+        component: 'view.system_tenant-audit',
+        meta: {
+          title: 'system_tenant-audit',
+          i18nKey: 'route.system_tenant-audit',
+        },
+      },
+      {
+        name: 'system_sms-channel',
+        path: '/system/sms-channel',
+        component: 'view.system_sms-channel',
+        meta: {
+          title: 'system_sms-channel',
+          i18nKey: 'route.system_sms-channel',
+        },
+      },
+      {
+        name: 'system_sms-template',
+        path: '/system/sms-template',
+        component: 'view.system_sms-template',
+        meta: {
+          title: 'system_sms-template',
+          i18nKey: 'route.system_sms-template',
+        },
+      },
+      {
+        name: 'system_sms-log',
+        path: '/system/sms-log',
+        component: 'view.system_sms-log',
+        meta: {
+          title: 'system_sms-log',
+          i18nKey: 'route.system_sms-log',
+        },
+      },
+      {
+        name: 'system_notify-template',
+        path: '/system/notify-template',
+        component: 'view.system_notify-template',
+        meta: {
+          title: 'system_notify-template',
+          i18nKey: 'route.system_notify-template',
+        },
+      },
+      {
+        name: 'system_notify-message',
+        path: '/system/notify-message',
+        component: 'view.system_notify-message',
+        meta: {
+          title: 'system_notify-message',
+          i18nKey: 'route.system_notify-message',
+        },
+      },
+      {
         name: 'system_user',
         path: '/system/user',
         component: 'view.system_user',

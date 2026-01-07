@@ -51,6 +51,14 @@ declare module "@elegant-router/types" {
     "system_role": "/system/role";
     "system_tenant": "/system/tenant";
     "system_tenant-package": "/system/tenant-package";
+    "system_tenant-dashboard": "/system/tenant-dashboard";
+    "system_tenant-quota": "/system/tenant-quota";
+    "system_tenant-audit": "/system/tenant-audit";
+    "system_sms-channel": "/system/sms-channel";
+    "system_sms-template": "/system/sms-template";
+    "system_sms-log": "/system/sms-log";
+    "system_notify-template": "/system/notify-template";
+    "system_notify-message": "/system/notify-message";
     "system_user": "/system/user";
     "tool": "/tool";
     "tool_build": "/tool/build";
@@ -149,6 +157,14 @@ declare module "@elegant-router/types" {
     | "system_role"
     | "system_tenant-package"
     | "system_tenant"
+    | "system_tenant-dashboard"
+    | "system_tenant-quota"
+    | "system_tenant-audit"
+    | "system_sms-channel"
+    | "system_sms-template"
+    | "system_sms-log"
+    | "system_notify-template"
+    | "system_notify-message"
     | "system_user"
     | "tool_build"
     | "tool_gen"

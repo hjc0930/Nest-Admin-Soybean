@@ -1082,5 +1082,270 @@ declare namespace Api {
       /** 分享列表 */
       type ShareList = Api.System.ShareList;
     }
+
+    // ==================== 短信管理类型 ====================
+
+    /** 短信渠道编码 */
+    type SmsChannelCode = 'aliyun' | 'tencent' | 'huawei' | 'qiniu' | 'yunpian';
+
+    /** 短信渠道 */
+    type SmsChannel = Common.CommonRecord<{
+      /** 渠道ID */
+      id: CommonType.IdType;
+      /** 渠道编码 */
+      code: SmsChannelCode;
+      /** 渠道名称 */
+      name: string;
+      /** 短信签名 */
+      signature: string;
+      /** API Key */
+      apiKey: string;
+      /** API Secret */
+      apiSecret: string;
+      /** 回调地址 */
+      callbackUrl?: string;
+      /** 状态（0正常 1停用） */
+      status: Common.EnableStatus;
+      /** 备注 */
+      remark?: string;
+    }>;
+
+    /** 短信渠道搜索参数 */
+    type SmsChannelSearchParams = CommonType.RecordNullable<
+      Pick<SmsChannel, 'name' | 'code' | 'status'> & Common.CommonSearchParams
+    >;
+
+    /** 短信渠道操作参数 */
+    type SmsChannelOperateParams = CommonType.RecordNullable<
+      Pick<SmsChannel, 'id' | 'code' | 'name' | 'signature' | 'apiKey' | 'apiSecret' | 'callbackUrl' | 'status' | 'remark'>
+    >;
+
+    /** 短信渠道列表 */
+    type SmsChannelList = Common.PaginatingQueryRecord<SmsChannel>;
+
+    /** 短信模板类型 */
+    type SmsTemplateType = 1 | 2 | 3; // 1-验证码 2-通知 3-营销
+
+    /** 短信模板 */
+    type SmsTemplate = Common.CommonRecord<{
+      /** 模板ID */
+      id: CommonType.IdType;
+      /** 渠道ID */
+      channelId: CommonType.IdType;
+      /** 渠道编码 */
+      channelCode: string;
+      /** 模板编码 */
+      code: string;
+      /** 模板名称 */
+      name: string;
+      /** 模板内容 */
+      content: string;
+      /** 参数列表 */
+      params?: string[];
+      /** 第三方模板ID */
+      apiTemplateId: string;
+      /** 模板类型 */
+      type: SmsTemplateType;
+      /** 状态（0正常 1停用） */
+      status: Common.EnableStatus;
+      /** 备注 */
+      remark?: string;
+    }>;
+
+    /** 短信模板搜索参数 */
+    type SmsTemplateSearchParams = CommonType.RecordNullable<
+      Pick<SmsTemplate, 'name' | 'code' | 'channelId' | 'type' | 'status'> & Common.CommonSearchParams
+    >;
+
+    /** 短信模板操作参数 */
+    type SmsTemplateOperateParams = CommonType.RecordNullable<
+      Pick<
+        SmsTemplate,
+        'id' | 'channelId' | 'code' | 'name' | 'content' | 'params' | 'apiTemplateId' | 'type' | 'status' | 'remark'
+      >
+    >;
+
+    /** 短信模板列表 */
+    type SmsTemplateList = Common.PaginatingQueryRecord<SmsTemplate>;
+
+    /** 短信发送状态 */
+    type SmsSendStatus = 0 | 1 | 2; // 0-发送中 1-成功 2-失败
+
+    /** 短信接收状态 */
+    type SmsReceiveStatus = 0 | 1; // 0-未接收 1-已接收
+
+    /** 短信日志 */
+    type SmsLog = Common.CommonRecord<{
+      /** 日志ID */
+      id: CommonType.IdType;
+      /** 渠道ID */
+      channelId: CommonType.IdType;
+      /** 渠道编码 */
+      channelCode: string;
+      /** 模板ID */
+      templateId: CommonType.IdType;
+      /** 模板编码 */
+      templateCode: string;
+      /** 手机号 */
+      mobile: string;
+      /** 短信内容 */
+      content: string;
+      /** 参数 */
+      params?: Record<string, string>;
+      /** 发送状态 */
+      sendStatus: SmsSendStatus;
+      /** 发送时间 */
+      sendTime: string;
+      /** 接收状态 */
+      receiveStatus?: SmsReceiveStatus;
+      /** 接收时间 */
+      receiveTime?: string;
+      /** 第三方发送编码 */
+      apiSendCode?: string;
+      /** 第三方接收编码 */
+      apiReceiveCode?: string;
+      /** 错误信息 */
+      errorMsg?: string;
+    }>;
+
+    /** 短信日志搜索参数 */
+    type SmsLogSearchParams = CommonType.RecordNullable<
+      Pick<SmsLog, 'mobile' | 'channelId' | 'templateId' | 'sendStatus'> & {
+        sendTimeStart?: string;
+        sendTimeEnd?: string;
+      } & Common.CommonSearchParams
+    >;
+
+    /** 短信日志列表 */
+    type SmsLogList = Common.PaginatingQueryRecord<SmsLog>;
+
+    /** 发送短信参数 */
+    type SendSmsParams = {
+      /** 手机号 */
+      mobile: string;
+      /** 模板编码 */
+      templateCode: string;
+      /** 参数 */
+      params?: Record<string, string>;
+    };
+
+    /** 批量发送短信参数 */
+    type BatchSendSmsParams = {
+      /** 手机号列表 */
+      mobiles: string[];
+      /** 模板编码 */
+      templateCode: string;
+      /** 参数 */
+      params?: Record<string, string>;
+    };
+
+    // ==================== 站内信管理类型 ====================
+
+    /** 站内信模板类型 */
+    type NotifyTemplateType = 1 | 2; // 1-系统通知 2-业务通知
+
+    /** 站内信模板 */
+    type NotifyTemplate = Common.CommonRecord<{
+      /** 模板ID */
+      id: CommonType.IdType;
+      /** 模板名称 */
+      name: string;
+      /** 模板编码 */
+      code: string;
+      /** 发送人名称 */
+      nickname: string;
+      /** 模板内容 */
+      content: string;
+      /** 参数列表（JSON数组字符串） */
+      params?: string;
+      /** 类型（1-系统通知 2-业务通知） */
+      type: NotifyTemplateType;
+      /** 状态（0正常 1停用） */
+      status: Common.EnableStatus;
+      /** 备注 */
+      remark?: string;
+    }>;
+
+    /** 站内信模板搜索参数 */
+    type NotifyTemplateSearchParams = CommonType.RecordNullable<
+      Pick<NotifyTemplate, 'name' | 'code' | 'type' | 'status'> & Common.CommonSearchParams
+    >;
+
+    /** 站内信模板操作参数 */
+    type NotifyTemplateOperateParams = CommonType.RecordNullable<
+      Pick<NotifyTemplate, 'id' | 'name' | 'code' | 'nickname' | 'content' | 'params' | 'type' | 'status' | 'remark'>
+    >;
+
+    /** 站内信模板列表 */
+    type NotifyTemplateList = Common.PaginatingQueryRecord<NotifyTemplate>;
+
+    /** 站内信模板下拉选择项 */
+    type NotifyTemplateSelect = {
+      id: CommonType.IdType;
+      name: string;
+      code: string;
+    };
+
+    /** 站内信消息 */
+    type NotifyMessage = Common.CommonRecord<{
+      /** 消息ID */
+      id: string;
+      /** 租户ID */
+      tenantId: string;
+      /** 用户ID */
+      userId: CommonType.IdType;
+      /** 用户类型 */
+      userType: number;
+      /** 模板ID */
+      templateId: CommonType.IdType;
+      /** 模板编码 */
+      templateCode: string;
+      /** 发送人名称 */
+      templateNickname: string;
+      /** 消息内容 */
+      templateContent: string;
+      /** 模板参数（JSON字符串） */
+      templateParams?: string;
+      /** 已读状态 */
+      readStatus: boolean;
+      /** 已读时间 */
+      readTime?: string;
+    }>;
+
+    /** 站内信消息搜索参数（管理员） */
+    type NotifyMessageSearchParams = CommonType.RecordNullable<
+      Pick<NotifyMessage, 'userId' | 'templateCode' | 'readStatus'> & Common.CommonSearchParams
+    >;
+
+    /** 我的站内信搜索参数 */
+    type MyNotifyMessageSearchParams = CommonType.RecordNullable<
+      Pick<NotifyMessage, 'readStatus'> & Common.CommonSearchParams
+    >;
+
+    /** 站内信消息列表 */
+    type NotifyMessageList = Common.PaginatingQueryRecord<NotifyMessage>;
+
+    /** 未读数量响应 */
+    type UnreadCountResponse = {
+      count: number;
+    };
+
+    /** 发送站内信参数（单发/群发） */
+    type SendNotifyMessageParams = {
+      /** 接收用户ID列表 */
+      userIds: CommonType.IdType[];
+      /** 模板编码 */
+      templateCode: string;
+      /** 模板参数 */
+      params?: Record<string, string>;
+    };
+
+    /** 发送站内信给所有用户参数 */
+    type SendNotifyAllParams = {
+      /** 模板编码 */
+      templateCode: string;
+      /** 模板参数 */
+      params?: Record<string, string>;
+    };
   }
 }

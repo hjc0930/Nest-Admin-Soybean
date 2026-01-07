@@ -7,3 +7,5 @@ export * from './role';
 export * from './post';
 export * from './social';
 export * from './file-manager';
+export * from './sms';
+export * from './notify';

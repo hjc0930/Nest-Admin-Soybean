@@ -15,6 +15,16 @@ import { Transactional } from 'src/core/decorators/transactional.decorator';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { CacheEnum } from 'src/shared/enums/cache.enum';
 import { hashSync } from 'bcryptjs';
+import { UserType } from 'src/module/system/user/dto/user';
+
+/**
+ * 租户切换原始信息
+ */
+interface TenantSwitchOriginal {
+  originalTenantId: string;
+  originalCompanyName: string;
+  switchedAt: Date;
+}
 
 /**
  * 租户管理服务
@@ -26,6 +36,7 @@ import { hashSync } from 'bcryptjs';
  * - 租户套餐管理
  * - 租户配置同步
  * - 租户数据导出
+ * - 租户切换功能
  *
  * @class TenantService
  * @description 多租户架构的核心服务类，实现租户隔离和管理功能
@@ -611,5 +622,178 @@ export class TenantService {
       ],
     };
     return await ExportTable(options, res);
+  }
+
+  /**
+   * 获取可切换的租户列表
+   *
+   * 仅超级管理员可用，返回所有正常状态的租户列表
+   *
+   * @param user - 当前登录用户
+   * @returns 可切换租户列表
+   * @throws {BusinessException} 当非超级管理员调用时抛出异常
+   */
+  @IgnoreTenant()
+  async getSelectList(user: UserType) {
+    // 验证是否为超级管理员
+    if (user.user.tenantId !== TenantContext.SUPER_TENANT_ID) {
+      throw new BusinessException(ResponseCode.FORBIDDEN, '仅超级管理员可切换租户');
+    }
+
+    const tenants = await this.prisma.sysTenant.findMany({
+      where: {
+        status: StatusEnum.NORMAL,
+        delFlag: DelFlagEnum.NORMAL,
+      },
+      select: {
+        tenantId: true,
+        companyName: true,
+        status: true,
+      },
+      orderBy: { createTime: 'desc' },
+    });
+
+    return Result.ok({
+      list: tenants,
+    });
+  }
+
+  /**
+   * 切换到指定租户
+   *
+   * 仅超级管理员可用，切换后会将原租户信息存储到Redis
+   *
+   * @param targetTenantId - 目标租户ID
+   * @param user - 当前登录用户
+   * @returns 切换结果
+   * @throws {BusinessException} 当非超级管理员调用或目标租户不存在时抛出异常
+   */
+  @IgnoreTenant()
+  async switchTenant(targetTenantId: string, user: UserType) {
+    // 验证是否为超级管理员
+    if (user.user.tenantId !== TenantContext.SUPER_TENANT_ID) {
+      throw new BusinessException(ResponseCode.FORBIDDEN, '仅超级管理员可切换租户');
+    }
+
+    // 验证目标租户是否存在且正常
+    const targetTenant = await this.prisma.sysTenant.findFirst({
+      where: {
+        tenantId: targetTenantId,
+        status: StatusEnum.NORMAL,
+        delFlag: DelFlagEnum.NORMAL,
+      },
+    });
+
+    if (!targetTenant) {
+      throw new BusinessException(ResponseCode.NOT_FOUND, '目标租户不存在或已停用');
+    }
+
+    // 获取当前用户的原租户信息
+    const originalTenantId = user.user.tenantId;
+    const originalTenant = await this.prisma.sysTenant.findFirst({
+      where: { tenantId: originalTenantId },
+    });
+
+    // 存储原租户信息到Redis（用于恢复）
+    const switchOriginal: TenantSwitchOriginal = {
+      originalTenantId,
+      originalCompanyName: originalTenant?.companyName || '超级管理员',
+      switchedAt: new Date(),
+    };
+
+    const redisKey = `${CacheEnum.TENANT_SWITCH_ORIGINAL_KEY}${user.token}`;
+    await this.redisService.set(redisKey, switchOriginal, 24 * 60 * 60); // 24小时过期
+
+    // 更新Redis中的用户信息，切换租户上下文
+    const loginKey = `${CacheEnum.LOGIN_TOKEN_KEY}${user.token}`;
+    const userData = await this.redisService.get(loginKey);
+    if (userData) {
+      userData.user.tenantId = targetTenantId;
+      userData.switchedTenantId = targetTenantId;
+      userData.switchedCompanyName = targetTenant.companyName;
+      await this.redisService.set(loginKey, userData);
+    }
+
+    this.logger.log(`用户 ${user.userName} 从租户 ${originalTenantId} 切换到租户 ${targetTenantId}`);
+
+    return Result.ok({
+      success: true,
+      tenantId: targetTenantId,
+      companyName: targetTenant.companyName,
+      originalTenantId,
+    });
+  }
+
+  /**
+   * 恢复到原租户
+   *
+   * 清除租户切换状态，恢复到原租户上下文
+   *
+   * @param user - 当前登录用户
+   * @returns 恢复结果
+   * @throws {BusinessException} 当没有切换记录时抛出异常
+   */
+  @IgnoreTenant()
+  async restoreTenant(user: UserType) {
+    // 获取原租户信息
+    const redisKey = `${CacheEnum.TENANT_SWITCH_ORIGINAL_KEY}${user.token}`;
+    const switchOriginal = (await this.redisService.get(redisKey)) as TenantSwitchOriginal | null;
+
+    if (!switchOriginal) {
+      throw new BusinessException(ResponseCode.BAD_REQUEST, '没有租户切换记录');
+    }
+
+    // 更新Redis中的用户信息，恢复原租户上下文
+    const loginKey = `${CacheEnum.LOGIN_TOKEN_KEY}${user.token}`;
+    const userData = await this.redisService.get(loginKey);
+    if (userData) {
+      userData.user.tenantId = switchOriginal.originalTenantId;
+      delete userData.switchedTenantId;
+      delete userData.switchedCompanyName;
+      await this.redisService.set(loginKey, userData);
+    }
+
+    // 删除切换记录
+    await this.redisService.del(redisKey);
+
+    this.logger.log(`用户 ${user.userName} 恢复到原租户 ${switchOriginal.originalTenantId}`);
+
+    return Result.ok({
+      success: true,
+      originalTenantId: switchOriginal.originalTenantId,
+      originalCompanyName: switchOriginal.originalCompanyName,
+    });
+  }
+
+  /**
+   * 获取当前租户切换状态
+   *
+   * @param user - 当前登录用户
+   * @returns 切换状态信息
+   */
+  @IgnoreTenant()
+  async getSwitchStatus(user: UserType) {
+    const redisKey = `${CacheEnum.TENANT_SWITCH_ORIGINAL_KEY}${user.token}`;
+    const switchOriginal = (await this.redisService.get(redisKey)) as TenantSwitchOriginal | null;
+
+    if (!switchOriginal) {
+      return Result.ok({
+        isSwitched: false,
+        currentTenantId: user.user.tenantId,
+      });
+    }
+
+    // 获取当前切换到的租户信息
+    const loginKey = `${CacheEnum.LOGIN_TOKEN_KEY}${user.token}`;
+    const userData = await this.redisService.get(loginKey);
+
+    return Result.ok({
+      isSwitched: true,
+      currentTenantId: userData?.user?.tenantId || user.user.tenantId,
+      currentCompanyName: userData?.switchedCompanyName,
+      originalTenantId: switchOriginal.originalTenantId,
+      originalCompanyName: switchOriginal.originalCompanyName,
+      switchedAt: switchOriginal.switchedAt,
+    });
   }
 }
