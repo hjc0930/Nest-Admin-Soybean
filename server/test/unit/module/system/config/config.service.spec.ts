@@ -263,7 +263,17 @@ describe('ConfigService', () => {
       const result = await service.findOne(1);
 
       expect(result.code).toBe(ResponseCode.SUCCESS);
-      expect(result.data).toEqual(mockConfig);
+      // After DTO refactor, sensitive fields (tenantId, createBy, updateBy, delFlag) are excluded
+      expect(result.data).toEqual(
+        expect.objectContaining({
+          configId: 1,
+          configKey: 'sys.index.skinName',
+          configName: '主框架页-默认皮肤样式名称',
+          configValue: 'skin-blue',
+          configType: 'Y',
+          remark: '蓝色 skin-blue、绿色 skin-green',
+        }),
+      );
     });
   });
 

@@ -85,10 +85,12 @@ describe('Monitor Integration Tests', () => {
 
       const result = await loginlogService.create(logData);
       expect(result).toBeDefined();
-      expect(result.infoId).toBeDefined();
-      expect(result.userName).toBe(logData.userName);
-      expect(result.ipaddr).toBe(logData.ipaddr);
-      createdLogId = result.infoId;
+      expect(result.code).toBe(200);
+      expect(result.data).toBeDefined();
+      expect(result.data.infoId).toBeDefined();
+      expect(result.data.userName).toBe(logData.userName);
+      expect(result.data.ipaddr).toBe(logData.ipaddr);
+      createdLogId = result.data.infoId;
     });
 
     it('should query login logs with pagination', async () => {

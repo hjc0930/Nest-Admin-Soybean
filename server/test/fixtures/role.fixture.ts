@@ -1,11 +1,74 @@
 import { SysRole, SysRoleMenu, SysRoleDept } from '@prisma/client';
+import { faker } from '@faker-js/faker';
 
 /**
  * 角色测试数据工厂
  *
  * @description
  * 提供创建测试角色数据的工厂方法
+ * 使用 faker 生成真实的测试数据
  */
+
+/**
+ * 角色 Fixture 配置选项
+ */
+export interface RoleFixtureOptions {
+  roleName?: string;
+  roleKey?: string;
+  roleSort?: number;
+  dataScope?: '1' | '2' | '3' | '4' | '5';
+  status?: '0' | '1';
+  tenantId?: string;
+}
+
+/**
+ * 使用 faker 创建随机角色数据
+ */
+export const createRoleFixture = (options: RoleFixtureOptions = {}): SysRole => {
+  const roleId = faker.number.int({ min: 100, max: 99999 });
+  return {
+    roleId,
+    tenantId: options.tenantId ?? '000000',
+    roleName: options.roleName ?? faker.person.jobTitle(),
+    roleKey: options.roleKey ?? faker.helpers.slugify(faker.person.jobType()).toLowerCase(),
+    roleSort: options.roleSort ?? faker.number.int({ min: 1, max: 100 }),
+    dataScope: options.dataScope ?? '1',
+    menuCheckStrictly: faker.datatype.boolean(),
+    deptCheckStrictly: faker.datatype.boolean(),
+    status: options.status ?? '0',
+    delFlag: '0',
+    createBy: 'admin',
+    createTime: faker.date.past(),
+    updateBy: 'admin',
+    updateTime: faker.date.recent(),
+    remark: faker.lorem.sentence(),
+  };
+};
+
+/**
+ * 创建管理员角色
+ */
+export const createAdminRole = (options: Partial<RoleFixtureOptions> = {}): SysRole => {
+  return createRoleFixture({
+    roleName: '超级管理员',
+    roleKey: 'admin',
+    dataScope: '1',
+    roleSort: 1,
+    ...options,
+  });
+};
+
+/**
+ * 批量创建角色测试数据
+ */
+export const createBatchRoles = (count: number, options: RoleFixtureOptions = {}): SysRole[] => {
+  return Array.from({ length: count }, (_, index) =>
+    createRoleFixture({
+      ...options,
+      roleSort: options.roleSort ? options.roleSort + index : index + 1,
+    }),
+  );
+};
 
 /**
  * 默认角色数据

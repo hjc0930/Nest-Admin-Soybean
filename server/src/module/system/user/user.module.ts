@@ -8,6 +8,9 @@ import { UserAuthService } from './services/user-auth.service';
 import { UserProfileService } from './services/user-profile.service';
 import { UserRoleService } from './services/user-role.service';
 import { UserExportService } from './services/user-export.service';
+import { UserCrudService } from './services/user-crud.service';
+import { UserBatchService } from './services/user-batch.service';
+import { UserQueryService } from './services/user-query.service';
 
 @Global()
 @Module({
@@ -20,7 +23,25 @@ import { UserExportService } from './services/user-export.service';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, UserRepository, UserAuthService, UserProfileService, UserRoleService, UserExportService],
-  exports: [UserService, UserAuthService, UserProfileService, UserRoleService],
+  providers: [
+    UserService,
+    UserRepository,
+    UserAuthService,
+    UserProfileService,
+    UserRoleService,
+    UserExportService,
+    UserCrudService,
+    UserBatchService,
+    UserQueryService,
+  ],
+  exports: [
+    UserService,
+    UserAuthService,
+    UserProfileService,
+    UserRoleService,
+    UserCrudService,
+    UserBatchService,
+    UserQueryService,
+  ],
 })
 export class UserModule {}

@@ -26,6 +26,9 @@ import { UserAuthService } from '@/module/system/user/services/user-auth.service
 import { UserProfileService } from '@/module/system/user/services/user-profile.service';
 import { UserRoleService } from '@/module/system/user/services/user-role.service';
 import { UserExportService } from '@/module/system/user/services/user-export.service';
+import { UserCrudService } from '@/module/system/user/services/user-crud.service';
+import { UserBatchService } from '@/module/system/user/services/user-batch.service';
+import { UserQueryService } from '@/module/system/user/services/user-query.service';
 import { DelFlagEnum, StatusEnum, DataScopeEnum } from '@/shared/enums/index';
 
 
@@ -229,6 +232,33 @@ describe('UserService Property-Based Tests', () => {
           provide: UserExportService,
           useValue: {
             export: jest.fn(),
+          },
+        },
+        {
+          provide: UserCrudService,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findOne: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
+            changeStatus: jest.fn(),
+            clearCacheByUserId: jest.fn(),
+          },
+        },
+        {
+          provide: UserBatchService,
+          useValue: {
+            batchCreate: jest.fn(),
+            batchDelete: jest.fn(),
+          },
+        },
+        {
+          provide: UserQueryService,
+          useValue: {
+            findAll: jest.fn(),
+            attachDeptInfo: jest.fn(),
+            buildDataScopeConditions: jest.fn().mockResolvedValue([]),
           },
         },
       ],

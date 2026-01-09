@@ -1,0 +1,296 @@
+# Nest-Admin-Soybean Prometheus 告警规则
+# 
+# 使用说明:
+# 1. 将此文件放置到 Prometheus 的 rules 目录
+# 2. 在 prometheus.yml 中添加: rule_files: ["alerts/nest-admin-alerts.yml"]
+# 3. 重新加载 Prometheus 配置
+
+groups:
+  # HTTP 请求相关告警
+  - name: nest_admin_http_alerts
+    rules:
+      # 高错误率告警
+      - alert: HighHttpErrorRate
+        expr: |
+          (
+            sum(rate(nest_admin_http_requests_total{status_code=~"5.."}[5m]))
+            /
+            sum(rate(nest_admin_http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: nest-admin
+        annotations:
+          summary: "HTTP 错误率过高"
+          description: "HTTP 5xx 错误率超过 5%，当前值: {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.example.com/runbooks/high-error-rate"
+
+      # 高延迟告警 (P95)
+      - alert: HighHttpLatencyP95
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(nest_admin_http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "HTTP 响应延迟过高 (P95)"
+          description: "HTTP P95 响应时间超过 1 秒，当前值: {{ $value | humanizeDuration }}"
+          runbook_url: "https://docs.example.com/runbooks/high-latency"
+
+      # 极高延迟告警 (P99)
+      - alert: HighHttpLatencyP99
+        expr: |
+          histogram_quantile(0.99, 
+            sum(rate(nest_admin_http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: critical
+          service: nest-admin
+        annotations:
+          summary: "HTTP 响应延迟极高 (P99)"
+          description: "HTTP P99 响应时间超过 2 秒，当前值: {{ $value | humanizeDuration }}"
+          runbook_url: "https://docs.example.com/runbooks/high-latency"
+
+      # 请求量突增告警
+      - alert: HttpRequestSpike
+        expr: |
+          (
+            sum(rate(nest_admin_http_requests_total[5m]))
+            /
+            sum(rate(nest_admin_http_requests_total[1h] offset 5m))
+          ) > 3
+        for: 5m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "HTTP 请求量突增"
+          description: "HTTP 请求量在 5 分钟内增长超过 3 倍"
+          runbook_url: "https://docs.example.com/runbooks/request-spike"
+
+      # 无请求告警 (服务可能宕机)
+      - alert: NoHttpRequests
+        expr: |
+          sum(rate(nest_admin_http_requests_total[5m])) == 0
+        for: 5m
+        labels:
+          severity: critical
+          service: nest-admin
+        annotations:
+          summary: "无 HTTP 请求"
+          description: "5 分钟内没有收到任何 HTTP 请求，服务可能已宕机"
+          runbook_url: "https://docs.example.com/runbooks/no-requests"
+
+  # 缓存相关告警
+  - name: nest_admin_cache_alerts
+    rules:
+      # 缓存命中率过低
+      - alert: LowCacheHitRate
+        expr: |
+          avg(nest_admin_cache_hit_rate) < 0.7
+        for: 10m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "缓存命中率过低"
+          description: "缓存命中率低于 70%，当前值: {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.example.com/runbooks/low-cache-hit-rate"
+
+      # 缓存命中率极低
+      - alert: VerylowCacheHitRate
+        expr: |
+          avg(nest_admin_cache_hit_rate) < 0.5
+        for: 5m
+        labels:
+          severity: critical
+          service: nest-admin
+        annotations:
+          summary: "缓存命中率极低"
+          description: "缓存命中率低于 50%，当前值: {{ $value | humanizePercentage }}，可能存在缓存配置问题"
+          runbook_url: "https://docs.example.com/runbooks/low-cache-hit-rate"
+
+  # 登录安全相关告警
+  - name: nest_admin_security_alerts
+    rules:
+      # 登录失败率过高
+      - alert: HighLoginFailureRate
+        expr: |
+          (
+            sum(rate(nest_admin_login_attempts_total{status="failure"}[5m]))
+            /
+            sum(rate(nest_admin_login_attempts_total[5m]))
+          ) > 0.3
+        for: 5m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "登录失败率过高"
+          description: "登录失败率超过 30%，当前值: {{ $value | humanizePercentage }}，可能存在暴力破解攻击"
+          runbook_url: "https://docs.example.com/runbooks/high-login-failure"
+
+      # 登录失败次数突增
+      - alert: LoginFailureSpike
+        expr: |
+          sum(rate(nest_admin_login_attempts_total{status="failure"}[5m])) > 10
+        for: 5m
+        labels:
+          severity: critical
+          service: nest-admin
+        annotations:
+          summary: "登录失败次数突增"
+          description: "每秒登录失败次数超过 10 次，可能正在遭受暴力破解攻击"
+          runbook_url: "https://docs.example.com/runbooks/login-attack"
+
+  # 系统资源相关告警
+  - name: nest_admin_resource_alerts
+    rules:
+      # 内存使用过高
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            nest_admin_nodejs_heap_size_used_bytes
+            /
+            nest_admin_nodejs_heap_size_total_bytes
+          ) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "Node.js 堆内存使用过高"
+          description: "堆内存使用率超过 85%，当前值: {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.example.com/runbooks/high-memory"
+
+      # 内存使用极高
+      - alert: CriticalMemoryUsage
+        expr: |
+          (
+            nest_admin_nodejs_heap_size_used_bytes
+            /
+            nest_admin_nodejs_heap_size_total_bytes
+          ) > 0.95
+        for: 2m
+        labels:
+          severity: critical
+          service: nest-admin
+        annotations:
+          summary: "Node.js 堆内存使用极高"
+          description: "堆内存使用率超过 95%，当前值: {{ $value | humanizePercentage }}，可能即将 OOM"
+          runbook_url: "https://docs.example.com/runbooks/high-memory"
+
+      # 事件循环延迟过高
+      - alert: HighEventLoopLag
+        expr: |
+          nest_admin_nodejs_eventloop_lag_seconds > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "事件循环延迟过高"
+          description: "Node.js 事件循环延迟超过 100ms，当前值: {{ $value | humanizeDuration }}"
+          runbook_url: "https://docs.example.com/runbooks/event-loop-lag"
+
+      # 事件循环延迟极高
+      - alert: CriticalEventLoopLag
+        expr: |
+          nest_admin_nodejs_eventloop_lag_seconds > 0.5
+        for: 2m
+        labels:
+          severity: critical
+          service: nest-admin
+        annotations:
+          summary: "事件循环延迟极高"
+          description: "Node.js 事件循环延迟超过 500ms，当前值: {{ $value | humanizeDuration }}，服务响应严重受阻"
+          runbook_url: "https://docs.example.com/runbooks/event-loop-lag"
+
+  # 队列任务相关告警
+  - name: nest_admin_queue_alerts
+    rules:
+      # 队列任务失败率过高
+      - alert: HighQueueFailureRate
+        expr: |
+          (
+            sum(rate(nest_admin_queue_jobs_total{status="failed"}[5m]))
+            /
+            sum(rate(nest_admin_queue_jobs_total[5m]))
+          ) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "队列任务失败率过高"
+          description: "队列任务失败率超过 10%，当前值: {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.example.com/runbooks/queue-failures"
+
+  # 租户相关告警
+  - name: nest_admin_tenant_alerts
+    rules:
+      # 单租户 API 调用量过高
+      - alert: TenantHighApiUsage
+        expr: |
+          sum(rate(nest_admin_api_calls_by_tenant_total[5m])) by (tenant_id) > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "租户 API 调用量过高"
+          description: "租户 {{ $labels.tenant_id }} 的 API 调用量超过 100 次/秒"
+          runbook_url: "https://docs.example.com/runbooks/tenant-api-limit"
+
+  # 数据库相关告警
+  - name: nest_admin_database_alerts
+    rules:
+      # 慢查询过多
+      - alert: HighSlowQueryRate
+        expr: |
+          sum(rate(nest_admin_db_slow_query_total[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "慢查询过多"
+          description: "每秒慢查询数超过 1 次，当前值: {{ $value }}"
+          runbook_url: "https://docs.example.com/runbooks/slow-queries"
+
+      # 数据库查询延迟过高 (P95)
+      - alert: HighDbQueryLatencyP95
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(nest_admin_db_query_duration_seconds_bucket[5m])) by (le)
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          service: nest-admin
+        annotations:
+          summary: "数据库查询延迟过高 (P95)"
+          description: "数据库 P95 查询延迟超过 500ms，当前值: {{ $value | humanizeDuration }}"
+          runbook_url: "https://docs.example.com/runbooks/db-latency"
+
+      # 数据库查询错误率过高
+      - alert: HighDbQueryErrorRate
+        expr: |
+          (
+            sum(rate(nest_admin_db_query_total{status="error"}[5m]))
+            /
+            sum(rate(nest_admin_db_query_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: nest-admin
+        annotations:
+          summary: "数据库查询错误率过高"
+          description: "数据库查询错误率超过 5%，当前值: {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.example.com/runbooks/db-errors"

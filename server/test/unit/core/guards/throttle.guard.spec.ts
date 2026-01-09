@@ -16,12 +16,22 @@ describe('CustomThrottlerGuard', () => {
   describe('getTracker', () => {
     it('should return user-based tracker when user is authenticated', async () => {
       const req = {
+        user: { userId: 123, tenantId: 'tenant-001' },
+        ip: '127.0.0.1',
+      };
+
+      const tracker = await (guard as any).getTracker(req);
+      expect(tracker).toBe('user-tenant-001-123');
+    });
+
+    it('should return user-based tracker with default tenant when tenantId is not provided', async () => {
+      const req = {
         user: { userId: 123 },
         ip: '127.0.0.1',
       };
 
       const tracker = await (guard as any).getTracker(req);
-      expect(tracker).toBe('user-123');
+      expect(tracker).toBe('user-default-123');
     });
 
     it('should return ip-based tracker when user is not authenticated', async () => {
@@ -40,6 +50,15 @@ describe('CustomThrottlerGuard', () => {
 
       const tracker = await (guard as any).getTracker(req);
       expect(tracker).toBe('ip-10.0.0.1');
+    });
+
+    it('should use x-real-ip header as fallback', async () => {
+      const req = {
+        headers: { 'x-real-ip': '10.0.0.2' },
+      };
+
+      const tracker = await (guard as any).getTracker(req);
+      expect(tracker).toBe('ip-10.0.0.2');
     });
 
     it('should use socket remoteAddress as fallback', async () => {
@@ -65,6 +84,18 @@ describe('CustomThrottlerGuard', () => {
 
       await expect((guard as any).throwThrottlingException(context)).rejects.toThrow(ThrottlerException);
       await expect((guard as any).throwThrottlingException(context)).rejects.toThrow('请求过于频繁，请稍后再试');
+    });
+
+    it('should include retry time in message when throttlerLimitDetail is provided', async () => {
+      const context = {} as ExecutionContext;
+      const throttlerLimitDetail = {
+        timeToExpire: 30000, // 30 seconds
+        timeToBlockExpire: 60000, // 60 seconds
+      };
+
+      await expect((guard as any).throwThrottlingException(context, throttlerLimitDetail)).rejects.toThrow(
+        '请求过于频繁，请 60 秒后再试',
+      );
     });
   });
 });

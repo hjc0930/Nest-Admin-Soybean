@@ -1,6 +1,11 @@
-export * from './create-menu.dto';
-export * from './update-menu.dto';
-export * from './list-menu.dto';
+// 请求 DTO
+export * from './requests';
 
-// 保持向后兼容，ListDeptDto 是 ListMenuDto 的别名
-export { ListMenuDto as ListDeptDto } from './list-menu.dto';
+// 响应 DTO
+export * from './responses';
+
+// 保持向后兼容
+export { CreateMenuRequestDto as CreateMenuDto } from './requests';
+export { UpdateMenuRequestDto as UpdateMenuDto } from './requests';
+export { ListMenuRequestDto as ListMenuDto } from './requests';
+export { ListMenuRequestDto as ListDeptDto } from './requests';

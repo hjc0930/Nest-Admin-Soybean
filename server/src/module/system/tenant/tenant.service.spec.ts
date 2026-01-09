@@ -314,7 +314,17 @@ describe('TenantService', () => {
       const result = await service.findOne(1);
 
       expect(result.code).toBe(ResponseCode.SUCCESS);
-      expect(result.data).toEqual(mockTenant);
+      // DTO 会过滤掉敏感字段 (delFlag, createBy, updateBy)
+      expect(result.data.id).toBe(mockTenant.id);
+      expect(result.data.tenantId).toBe(mockTenant.tenantId);
+      expect(result.data.companyName).toBe(mockTenant.companyName);
+      expect(result.data.contactUserName).toBe(mockTenant.contactUserName);
+      expect(result.data.contactPhone).toBe(mockTenant.contactPhone);
+      expect(result.data.status).toBe(mockTenant.status);
+      // 敏感字段应该被过滤
+      expect(result.data.delFlag).toBeUndefined();
+      expect(result.data.createBy).toBeUndefined();
+      expect(result.data.updateBy).toBeUndefined();
     });
 
     it('should throw error when tenant not found', async () => {

@@ -1,22 +1,34 @@
 import { Controller, Get, Post, Put, Delete, Body, Query, Param, Res } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { FileManagerService } from './file-manager.service';
 import {
-  CreateFolderDto,
-  UpdateFolderDto,
-  ListFolderDto,
-  ListFileDto,
-  MoveFileDto,
-  RenameFileDto,
-  CreateShareDto,
-  GetShareDto,
-} from './dto';
+  CreateFolderRequestDto,
+  UpdateFolderRequestDto,
+  ListFolderRequestDto,
+  ListFileRequestDto,
+  MoveFileRequestDto,
+  RenameFileRequestDto,
+  CreateShareRequestDto,
+} from './dto/requests';
 import { User, NotRequireAuth } from 'src/module/system/user/user.decorator';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
+import {
+  FolderResponseDto,
+  FolderTreeNodeResponseDto,
+  FileListResponseDto,
+  FileResponseDto,
+  FileVersionListResponseDto,
+  RestoreVersionResultResponseDto,
+  CreateShareResultResponseDto,
+  ShareInfoResponseDto,
+  ShareListResponseDto,
+  StorageStatsResponseDto,
+  AccessTokenResponseDto,
+} from './dto/responses';
 
 @ApiTags('系统-文件管理')
 @ApiBearerAuth('Authorization')
@@ -26,19 +38,19 @@ export class FileManagerController {
 
   // ==================== 文件夹管理 ====================
 
-  @Api({ summary: '创建文件夹' })
+  @Api({ summary: '创建文件夹', type: FolderResponseDto })
   @RequirePermission('system:file:add')
   @Operlog({ businessType: BusinessType.INSERT })
   @Post('folder')
-  createFolder(@Body() createFolderDto: CreateFolderDto, @User('userName') username: string) {
+  createFolder(@Body() createFolderDto: CreateFolderRequestDto, @User('userName') username: string) {
     return this.fileManagerService.createFolder(createFolderDto, username);
   }
 
-  @Api({ summary: '更新文件夹' })
+  @Api({ summary: '更新文件夹', type: FolderResponseDto })
   @RequirePermission('system:file:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Put('folder')
-  updateFolder(@Body() updateFolderDto: UpdateFolderDto, @User('userName') username: string) {
+  updateFolder(@Body() updateFolderDto: UpdateFolderRequestDto, @User('userName') username: string) {
     return this.fileManagerService.updateFolder(updateFolderDto, username);
   }
 
@@ -50,14 +62,14 @@ export class FileManagerController {
     return this.fileManagerService.deleteFolder(+folderId, username);
   }
 
-  @Api({ summary: '获取文件夹列表' })
+  @Api({ summary: '获取文件夹列表', type: FolderResponseDto, isArray: true })
   @RequirePermission('system:file:list')
   @Get('folder/list')
-  listFolders(@Query() query: ListFolderDto) {
+  listFolders(@Query() query: ListFolderRequestDto) {
     return this.fileManagerService.listFolders(query);
   }
 
-  @Api({ summary: '获取文件夹树' })
+  @Api({ summary: '获取文件夹树', type: FolderTreeNodeResponseDto, isArray: true })
   @RequirePermission('system:file:list')
   @Get('folder/tree')
   getFolderTree() {
@@ -66,10 +78,10 @@ export class FileManagerController {
 
   // ==================== 文件管理 ====================
 
-  @Api({ summary: '获取文件列表' })
+  @Api({ summary: '获取文件列表', type: FileListResponseDto })
   @RequirePermission('system:file:list')
   @Get('file/list')
-  listFiles(@Query() query: ListFileDto) {
+  listFiles(@Query() query: ListFileRequestDto) {
     return this.fileManagerService.listFiles(query);
   }
 
@@ -77,15 +89,15 @@ export class FileManagerController {
   @RequirePermission('system:file:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Post('file/move')
-  moveFiles(@Body() moveFileDto: MoveFileDto, @User('userName') username: string) {
+  moveFiles(@Body() moveFileDto: MoveFileRequestDto, @User('userName') username: string) {
     return this.fileManagerService.moveFiles(moveFileDto, username);
   }
 
-  @Api({ summary: '重命名文件' })
+  @Api({ summary: '重命名文件', type: FileResponseDto })
   @RequirePermission('system:file:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Post('file/rename')
-  renameFile(@Body() renameFileDto: RenameFileDto, @User('userName') username: string) {
+  renameFile(@Body() renameFileDto: RenameFileRequestDto, @User('userName') username: string) {
     return this.fileManagerService.renameFile(renameFileDto, username);
   }
 
@@ -97,7 +109,7 @@ export class FileManagerController {
     return this.fileManagerService.deleteFiles(uploadIds, username);
   }
 
-  @Api({ summary: '获取文件详情' })
+  @Api({ summary: '获取文件详情', type: FileResponseDto })
   @RequirePermission('system:file:query')
   @Get('file/:uploadId')
   getFileDetail(@Param('uploadId') uploadId: string) {
@@ -106,15 +118,15 @@ export class FileManagerController {
 
   // ==================== 文件分享 ====================
 
-  @Api({ summary: '创建分享链接' })
+  @Api({ summary: '创建分享链接', type: CreateShareResultResponseDto })
   @RequirePermission('system:file:share')
   @Operlog({ businessType: BusinessType.OTHER })
   @Post('share')
-  createShare(@Body() createShareDto: CreateShareDto, @User('userName') username: string) {
+  createShare(@Body() createShareDto: CreateShareRequestDto, @User('userName') username: string) {
     return this.fileManagerService.createShare(createShareDto, username);
   }
 
-  @Api({ summary: '获取分享信息（无需登录）' })
+  @Api({ summary: '获取分享信息（无需登录）', type: ShareInfoResponseDto })
   @NotRequireAuth()
   @Get('share/:shareId')
   getShare(@Param('shareId') shareId: string, @Query('shareCode') shareCode?: string) {
@@ -135,7 +147,7 @@ export class FileManagerController {
     return this.fileManagerService.cancelShare(shareId, username);
   }
 
-  @Api({ summary: '我的分享列表' })
+  @Api({ summary: '我的分享列表', type: ShareListResponseDto })
   @RequirePermission('system:file:share')
   @Get('share/my/list')
   myShares(@User('userName') username: string) {
@@ -144,10 +156,10 @@ export class FileManagerController {
 
   // ==================== 回收站管理 ====================
 
-  @Api({ summary: '获取回收站文件列表' })
+  @Api({ summary: '获取回收站文件列表', type: FileListResponseDto })
   @RequirePermission('system:file:recycle:list')
   @Get('recycle/list')
-  getRecycleList(@Query() query: ListFileDto) {
+  getRecycleList(@Query() query: ListFileRequestDto) {
     return this.fileManagerService.getRecycleList(query);
   }
 
@@ -169,14 +181,14 @@ export class FileManagerController {
 
   // ==================== 文件版本管理 ====================
 
-  @Api({ summary: '获取文件版本历史' })
+  @Api({ summary: '获取文件版本历史', type: FileVersionListResponseDto })
   @RequirePermission('system:file:query')
   @Get('file/:uploadId/versions')
   getFileVersions(@Param('uploadId') uploadId: string) {
     return this.fileManagerService.getFileVersions(uploadId);
   }
 
-  @Api({ summary: '恢复到指定版本' })
+  @Api({ summary: '恢复到指定版本', type: RestoreVersionResultResponseDto })
   @RequirePermission('system:file:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Post('file/restore-version')
@@ -190,7 +202,7 @@ export class FileManagerController {
 
   // ==================== 文件下载 ====================
 
-  @Api({ summary: '获取文件访问令牌' })
+  @Api({ summary: '获取文件访问令牌', type: AccessTokenResponseDto })
   @RequirePermission('system:file:query')
   @Get('file/:uploadId/access-token')
   getAccessToken(@Param('uploadId') uploadId: string) {
@@ -213,7 +225,7 @@ export class FileManagerController {
 
   // ==================== 租户存储统计 ====================
 
-  @Api({ summary: '获取存储使用统计' })
+  @Api({ summary: '获取存储使用统计', type: StorageStatsResponseDto })
   @Get('storage/stats')
   getStorageStats() {
     return this.fileManagerService.getStorageStats();

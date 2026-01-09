@@ -11,7 +11,6 @@ import { createPrismaMock, PrismaMock } from 'src/test-utils/prisma-mock';
 import { Result } from 'src/shared/response';
 import { ExportTable } from 'src/shared/utils/export';
 import { CacheEnum, DataScopeEnum } from 'src/shared/enums/index';
-import { JwtService } from '@nestjs/jwt';
 
 jest.mock('src/shared/utils/export', () => ({
   ExportTable: jest.fn(),
@@ -362,26 +361,9 @@ describe('System module services', () => {
       findDeptIdsByDataScope: jest.fn(),
       deptTree: jest.fn(),
     };
-    const jwtService = {
-      sign: jest.fn().mockReturnValue('jwt-token'),
-      verify: jest.fn(),
-    } as unknown as JwtService;
-    const redisService = {
-      set: jest.fn(),
-      get: jest.fn().mockResolvedValue({}),
-    };
-    const configService = {
-      get: jest.fn(),
-    };
-    const userRepo = {
-      create: jest.fn(),
-      findByUserName: jest.fn(),
-      findById: jest.fn(),
-      updateLoginTime: jest.fn(),
-      softDeleteBatch: jest.fn(),
-      update: jest.fn(),
-    };
     let userAuthService: any;
+    let userCrudService: any;
+    let userBatchService: any;
 
     beforeEach(() => {
       prisma = createPrismaMock();
@@ -399,27 +381,36 @@ describe('System module services', () => {
       const userProfileService = {} as any;
       const userRoleService = {} as any;
       const userExportService = {} as any;
+      userCrudService = {
+        create: jest.fn(),
+        findAll: jest.fn(),
+        findOne: jest.fn(),
+        update: jest.fn(),
+        remove: jest.fn(),
+        changeStatus: jest.fn(),
+        clearCacheByUserId: jest.fn(),
+      } as any;
+      userBatchService = {
+        batchCreate: jest.fn(),
+        batchDelete: jest.fn(),
+      } as any;
       service = new UserService(
         prisma,
-        userRepo as any,
         roleService as any,
         deptService as any,
-        jwtService,
-        redisService as any,
-        configService as any,
         userAuthService,
         userProfileService,
         userRoleService,
         userExportService,
+        userCrudService,
+        userBatchService,
       );
     });
 
     it('should create user with posts and roles', async () => {
-      userRepo.create.mockResolvedValue({ userId: 10 } as any);
+      userCrudService.create.mockResolvedValue({ code: 200, data: { userId: 10 } });
       await service.create({ userName: 'admin', password: '123456', postIds: [1], roleIds: [2] } as any);
-      expect(userRepo.create).toHaveBeenCalled();
-      expect(prisma.sysUserPost.createMany).toHaveBeenCalled();
-      expect(prisma.sysUserRole.createMany).toHaveBeenCalled();
+      expect(userCrudService.create).toHaveBeenCalled();
     });
 
     it('should deduplicate role ids when querying relations', async () => {

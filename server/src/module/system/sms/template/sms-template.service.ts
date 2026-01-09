@@ -2,8 +2,8 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Result } from 'src/shared/response';
 import { DelFlagEnum } from 'src/shared/enums/index';
-import { FormatDateFields } from 'src/shared/utils/index';
-import { CreateSmsTemplateDto, UpdateSmsTemplateDto, ListSmsTemplateDto } from './dto/index';
+import { toDtoList } from 'src/shared/utils/index';
+import { CreateSmsTemplateDto, UpdateSmsTemplateDto, ListSmsTemplateDto, SmsTemplateResponseDto } from './dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { SmsTemplateRepository } from './sms-template.repository';
 import { SmsChannelRepository } from '../channel/sms-channel.repository';
@@ -87,7 +87,7 @@ export class SmsTemplateService {
     }));
 
     return Result.ok({
-      rows: FormatDateFields(rows),
+      rows: toDtoList(SmsTemplateResponseDto, rows),
       total,
     });
   }

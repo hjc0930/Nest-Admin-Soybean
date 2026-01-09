@@ -1,16 +1,48 @@
 /**
- * 测试辅助工具导出
+ * 测试辅助函数索引
  *
  * @description
- * 统一导出所有测试辅助类和工具函数
+ * 导出所有测试辅助函数，方便统一导入
  */
 
+// 测试应用辅助函数
 export {
-  TestHelper,
-  createTestHelper,
-  defaultTestConfig,
-  type TestConfig,
-  type TestContext,
-} from './test-helper';
+  createTestApp,
+  getAuthToken,
+  getAdminToken,
+  getUserToken,
+  createAuthenticatedRequest,
+  closeTestApp,
+  type TestAppOptions,
+  type LoginCredentials,
+} from './test-app.helper';
 
-export { TestFixtures, createTestFixtures } from './test-fixtures';
+// 断言辅助函数
+export {
+  expectSuccessResponse,
+  expectPageResponse,
+  expectErrorResponse,
+  expectUnauthorizedResponse,
+  expectForbiddenResponse,
+  expectParamInvalidResponse,
+  expectNotFoundResponse,
+  expectValidResponseStructure,
+  expectArrayResponse,
+  expectResponseHasFields,
+  expectNoSensitiveFields,
+  ResponseCode,
+  type ApiResponse,
+  type PaginatedData,
+} from './assertion.helper';
+
+// 数据清理辅助函数
+export {
+  cleanupTestData,
+  cleanupUserData,
+  cleanupRoleData,
+  cleanupTenantData,
+  resetDatabase,
+  createCleanupFunction,
+  TestDataTracker,
+  type CleanupOptions,
+} from './cleanup.helper';

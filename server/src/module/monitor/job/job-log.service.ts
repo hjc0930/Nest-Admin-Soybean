@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ListJobLogDto } from './dto/create-job.dto';
+import { JobLogResponseDto } from './dto/job.response.dto';
 import { Result } from 'src/shared/response';
 import { ExportTable } from 'src/shared/utils/export';
-import { FormatDateFields } from 'src/shared/utils/index';
+import { toDtoList } from 'src/shared/utils';
 import { Response } from 'express';
 import { PrismaService } from 'src/infrastructure/prisma';
 
@@ -46,7 +47,7 @@ export class JobLogService {
     ]);
 
     return Result.ok({
-      rows: FormatDateFields(list),
+      rows: toDtoList(JobLogResponseDto, list),
       total,
     });
   }
@@ -77,7 +78,7 @@ export class JobLogService {
     const list = await this.list(body);
     const options = {
       sheetName: '调度日志',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '日志编号', dataIndex: 'jobLogId' },
         { title: '任务名称', dataIndex: 'jobName' },

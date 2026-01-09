@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Result } from 'src/shared/response';
 import { DelFlagEnum } from 'src/shared/enums/index';
-import { FormatDateFields } from 'src/shared/utils/index';
+import { toDto, toDtoPage } from 'src/shared/utils/serialize.util';
 import { CreateNoticeDto, UpdateNoticeDto, ListNoticeDto } from './dto/index';
+import { NoticeResponseDto } from './dto/responses';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { NoticeRepository } from './notice.repository';
 import { Transactional } from 'src/core/decorators/transactional.decorator';
@@ -49,15 +50,17 @@ export class NoticeService {
 
     const { list, total } = await this.noticeRepo.findPageWithFilter(where, query.skip, query.take);
 
-    return Result.ok({
-      rows: FormatDateFields(list),
-      total,
-    });
+    return Result.ok(
+      toDtoPage(NoticeResponseDto, {
+        rows: list,
+        total,
+      }),
+    );
   }
 
   async findOne(noticeId: number) {
     const data = await this.noticeRepo.findById(noticeId);
-    return Result.ok(data);
+    return Result.ok(toDto(NoticeResponseDto, data));
   }
 
   async update(updateNoticeDto: UpdateNoticeDto) {

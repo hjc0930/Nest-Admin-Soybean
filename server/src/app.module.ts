@@ -12,6 +12,7 @@ import { TenantGuard, TenantModule, ClsModule } from './tenant';
 import { CryptoModule, DecryptInterceptor } from './security/crypto';
 import { LoggerModule } from './infrastructure/logging';
 import { TransactionalInterceptor } from './core/interceptors/transactional.interceptor';
+import { TransactionModule } from './core/transaction';
 import { MetricsModule, MetricsInterceptor } from './observability/metrics';
 import { AuditModule } from './observability/audit';
 import { LoginSecurityModule } from './security/login';
@@ -24,6 +25,7 @@ import { CommonModule } from './module/common/common.module';
 import { MonitorModule } from './module/monitor/monitor.module';
 import { ResourceModule } from './module/resource/resource.module';
 import { PrismaModule } from './infrastructure/prisma';
+import { ResilienceModule } from './resilience/circuit-breaker/resilience.module';
 
 @Global()
 @Module({
@@ -46,6 +48,8 @@ import { PrismaModule } from './infrastructure/prisma';
     LoggerModule,
     // CLS 上下文模块 (Request ID)
     ClsModule,
+    // 事务上下文模块 (事务传播行为支持)
+    TransactionModule,
     // Prometheus 指标收集模块
     MetricsModule,
     // 审计日志模块
@@ -60,6 +64,8 @@ import { PrismaModule } from './infrastructure/prisma';
     TenantModule,
     // 加解密模块
     CryptoModule,
+    // 弹性模块 (熔断器)
+    ResilienceModule,
     // API 限流模块
     ThrottlerModule.forRoot([
       {

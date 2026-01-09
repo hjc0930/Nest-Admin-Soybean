@@ -5,6 +5,7 @@ import { Reflector } from '@nestjs/core';
 import { of, throwError } from 'rxjs';
 import { TransactionalInterceptor } from '@/core/interceptors/transactional.interceptor';
 import { PrismaService } from '@/infrastructure/prisma';
+import { TransactionContextService } from '@/core/transaction/transaction-context.service';
 import { IsolationLevel, Propagation } from '@/core/decorators/transactional.decorator';
 
 /**
@@ -21,6 +22,7 @@ describe('TransactionalInterceptor Property-Based Tests', () => {
   let interceptor: TransactionalInterceptor;
   let reflector: Reflector;
   let mockPrismaService: any;
+  let mockTransactionContextService: any;
 
   // Track transaction state for property testing
   let transactionStarted: boolean;
@@ -56,6 +58,20 @@ describe('TransactionalInterceptor Property-Based Tests', () => {
       }),
     };
 
+    mockTransactionContextService = {
+      isInTransaction: jest.fn().mockReturnValue(false),
+      getCurrentTransaction: jest.fn().mockReturnValue(undefined),
+      setTransaction: jest.fn().mockReturnValue({
+        transactionId: 'tx_test',
+        client: {} as any,
+        startTime: Date.now(),
+        isNested: false,
+      }),
+      clearTransaction: jest.fn(),
+      suspendTransaction: jest.fn().mockReturnValue(undefined),
+      resumeTransaction: jest.fn().mockReturnValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TransactionalInterceptor,
@@ -68,6 +84,10 @@ describe('TransactionalInterceptor Property-Based Tests', () => {
         {
           provide: PrismaService,
           useValue: mockPrismaService,
+        },
+        {
+          provide: TransactionContextService,
+          useValue: mockTransactionContextService,
         },
       ],
     }).compile();
@@ -93,8 +113,8 @@ describe('TransactionalInterceptor Property-Based Tests', () => {
       fc.asyncProperty(
         // Generate random error messages
         fc.string({ minLength: 1, maxLength: 100 }),
-        // Generate random propagation types that require transactions
-        fc.constantFrom(Propagation.REQUIRED, Propagation.REQUIRES_NEW, Propagation.MANDATORY),
+        // Generate random propagation types that require transactions (excluding MANDATORY which requires existing tx)
+        fc.constantFrom(Propagation.REQUIRED, Propagation.REQUIRES_NEW),
         // Generate random isolation levels
         fc.constantFrom(
           IsolationLevel.ReadUncommitted,
@@ -160,8 +180,8 @@ describe('TransactionalInterceptor Property-Based Tests', () => {
           name: fc.string({ minLength: 1, maxLength: 50 }),
           success: fc.constant(true),
         }),
-        // Generate random propagation types that require transactions
-        fc.constantFrom(Propagation.REQUIRED, Propagation.REQUIRES_NEW, Propagation.MANDATORY),
+        // Generate random propagation types that require transactions (excluding MANDATORY which requires existing tx)
+        fc.constantFrom(Propagation.REQUIRED, Propagation.REQUIRES_NEW),
         async (resultData, propagation) => {
           // Reset state
           transactionStarted = false;

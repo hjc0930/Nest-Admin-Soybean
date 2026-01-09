@@ -4,8 +4,8 @@ import { Prisma } from '@prisma/client';
 import { Result } from 'src/shared/response';
 import { DelFlagEnum } from 'src/shared/enums/index';
 import { ExportTable } from 'src/shared/utils/export';
-import { FormatDateFields } from 'src/shared/utils/index';
-import { CreateLoginlogDto, ListLoginlogDto } from './dto/index';
+import { toDtoList } from 'src/shared/utils';
+import { CreateLoginlogDto, ListLoginlogDto, LoginLogResponseDto } from './dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class LoginlogService {
    * @returns
    */
   async create(createLoginlogDto: CreateLoginlogDto) {
-    return await this.prisma.sysLogininfor.create({
+    const data = await this.prisma.sysLogininfor.create({
       data: {
         ...createLoginlogDto,
         userName: createLoginlogDto.userName ?? '',
@@ -31,6 +31,7 @@ export class LoginlogService {
         delFlag: DelFlagEnum.NORMAL,
       },
     });
+    return Result.ok(data);
   }
 
   /**
@@ -79,7 +80,7 @@ export class LoginlogService {
     ]);
 
     // 使用 Result.page 便捷方法
-    return Result.page(FormatDateFields(list), total, query.pageNum, query.pageSize);
+    return Result.page(toDtoList(LoginLogResponseDto, list), total, query.pageNum, query.pageSize);
   }
 
   /**
@@ -133,7 +134,7 @@ export class LoginlogService {
     const list = await this.findAll(body);
     const options = {
       sheetName: '登录日志',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '序号', dataIndex: 'infoId' },
         { title: '用户账号', dataIndex: 'userName' },

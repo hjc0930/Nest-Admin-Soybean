@@ -4,9 +4,15 @@ import { Result, ResponseCode } from 'src/shared/response';
 import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { BusinessException } from 'src/shared/exceptions';
 import { ExportTable } from 'src/shared/utils/export';
-import { FormatDateFields } from 'src/shared/utils/index';
 import { Response } from 'express';
-import { CreateTenantPackageDto, UpdateTenantPackageDto, ListTenantPackageDto } from './dto/index';
+import {
+  CreateTenantPackageRequestDto,
+  UpdateTenantPackageRequestDto,
+  ListTenantPackageRequestDto,
+  TenantPackageResponseDto,
+  TenantPackageSelectResponseDto,
+} from './dto/index';
+import { toDto, toDtoList, toDtoPage } from 'src/shared/utils/serialize.util';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
 import { Transactional } from 'src/core/decorators/transactional.decorator';
@@ -22,7 +28,7 @@ export class TenantPackageService {
    */
   @IgnoreTenant()
   @Transactional()
-  async create(createTenantPackageDto: CreateTenantPackageDto) {
+  async create(createTenantPackageDto: CreateTenantPackageRequestDto) {
     // 检查套餐名称是否已存在
     const existPackage = await this.prisma.sysTenantPackage.findFirst({
       where: { packageName: createTenantPackageDto.packageName, delFlag: DelFlagEnum.NORMAL },
@@ -52,7 +58,7 @@ export class TenantPackageService {
    * 分页查询租户套餐列表
    */
   @IgnoreTenant()
-  async findAll(query: ListTenantPackageDto) {
+  async findAll(query: ListTenantPackageRequestDto) {
     const where: Prisma.SysTenantPackageWhereInput = {
       delFlag: DelFlagEnum.NORMAL,
     };
@@ -77,10 +83,10 @@ export class TenantPackageService {
       this.prisma.sysTenantPackage.count({ where }),
     ]);
 
-    return Result.ok({
-      rows: FormatDateFields(list),
+    return Result.ok(toDtoPage(TenantPackageResponseDto, {
+      rows: list,
       total,
-    });
+    }));
   }
 
   /**
@@ -100,7 +106,7 @@ export class TenantPackageService {
       orderBy: { createTime: 'desc' },
     });
 
-    return Result.ok(list);
+    return Result.ok(toDtoList(TenantPackageSelectResponseDto, list));
   }
 
   /**
@@ -116,7 +122,7 @@ export class TenantPackageService {
       throw new BusinessException(ResponseCode.NOT_FOUND, '租户套餐不存在');
     }
 
-    return Result.ok(tenantPackage);
+    return Result.ok(toDto(TenantPackageResponseDto, tenantPackage));
   }
 
   /**
@@ -124,7 +130,7 @@ export class TenantPackageService {
    */
   @IgnoreTenant()
   @Transactional()
-  async update(updateTenantPackageDto: UpdateTenantPackageDto) {
+  async update(updateTenantPackageDto: UpdateTenantPackageRequestDto) {
     const { packageId, menuIds, ...updateData } = updateTenantPackageDto;
 
     // 检查套餐是否存在
@@ -219,13 +225,13 @@ export class TenantPackageService {
    * 导出租户套餐数据
    */
   @IgnoreTenant()
-  async export(res: Response, body: ListTenantPackageDto) {
+  async export(res: Response, body: ListTenantPackageRequestDto) {
     delete body.pageNum;
     delete body.pageSize;
     const list = await this.findAll(body);
     const options = {
       sheetName: '租户套餐数据',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '套餐ID', dataIndex: 'packageId' },
         { title: '套餐名称', dataIndex: 'packageName' },

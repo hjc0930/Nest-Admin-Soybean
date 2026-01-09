@@ -1,3 +1,10 @@
-export * from './create-tenant-package.dto';
-export * from './update-tenant-package.dto';
-export * from './list-tenant-package.dto';
+// 请求 DTO
+export * from './requests';
+
+// 响应 DTO
+export * from './responses';
+
+// 兼容旧导出（后续可删除）
+export { CreateTenantPackageRequestDto as CreateTenantPackageDto } from './requests';
+export { UpdateTenantPackageRequestDto as UpdateTenantPackageDto } from './requests';
+export { ListTenantPackageRequestDto as ListTenantPackageDto } from './requests';

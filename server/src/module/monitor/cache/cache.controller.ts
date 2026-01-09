@@ -2,7 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CacheService } from './cache.service';
 import { Api } from 'src/core/decorators/api.decorator';
-import { CacheInfoVo, CacheKeyVo } from 'src/module/monitor/vo/monitor.vo';
+import {
+  CacheInfoResponseDto,
+  CacheKeyResponseDto,
+  CacheNamesResponseDto,
+  CacheKeysResponseDto,
+  ClearCacheResultResponseDto,
+} from 'src/module/monitor/dto/responses';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 
@@ -15,7 +21,7 @@ export class CacheController {
   @Api({
     summary: '缓存监控信息',
     description: '获取Redis缓存监控信息',
-    type: CacheInfoVo,
+    type: CacheInfoResponseDto,
   })
   @Get()
   getInfo() {
@@ -25,6 +31,7 @@ export class CacheController {
   @Api({
     summary: '缓存名称列表',
     description: '获取所有缓存分类名称',
+    type: CacheNamesResponseDto,
   })
   @Get('/getNames')
   getNames() {
@@ -35,6 +42,7 @@ export class CacheController {
     summary: '缓存键名列表',
     description: '根据缓存名称获取所有键名',
     params: [{ name: 'id', description: '缓存名称' }],
+    type: CacheKeysResponseDto,
   })
   @Get('/getKeys/:id')
   getKeys(@Param('id') id: string) {
@@ -44,7 +52,7 @@ export class CacheController {
   @Api({
     summary: '缓存内容',
     description: '获取指定缓存的内容',
-    type: CacheKeyVo,
+    type: CacheKeyResponseDto,
     params: [
       { name: 'cacheName', description: '缓存名称' },
       { name: 'cacheKey', description: '缓存键名' },
@@ -59,6 +67,7 @@ export class CacheController {
     summary: '清理缓存名称',
     description: '清除指定分类下的所有缓存',
     params: [{ name: 'cacheName', description: '缓存名称' }],
+    type: ClearCacheResultResponseDto,
   })
   @Operlog({ businessType: BusinessType.CLEAN })
   @Delete('/clearCacheName/:cacheName')
@@ -70,6 +79,7 @@ export class CacheController {
     summary: '清理缓存键名',
     description: '清除指定的缓存键',
     params: [{ name: 'cacheKey', description: '缓存键名' }],
+    type: ClearCacheResultResponseDto,
   })
   @Operlog({ businessType: BusinessType.CLEAN })
   @Delete('/clearCacheKey/:cacheKey')
@@ -80,6 +90,7 @@ export class CacheController {
   @Api({
     summary: '清理全部缓存',
     description: '清除所有缓存数据',
+    type: ClearCacheResultResponseDto,
   })
   @Operlog({ businessType: BusinessType.CLEAN })
   @Delete('/clearCacheAll')

@@ -7,7 +7,7 @@ import { CacheEnum, DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { LOGIN_TOKEN_EXPIRESIN } from 'src/shared/constants/index';
 import { ResponseCode, Result } from 'src/shared/response';
 import { GenerateUUID } from 'src/shared/utils/index';
-import { LoginDto, RegisterDto } from 'src/module/main/dto/index';
+import { LoginRequestDto, RegisterRequestDto } from 'src/module/main/dto/requests';
 import { UserType } from '../dto/user';
 import { ClientInfoDto } from 'src/core/decorators/common.decorator';
 import { CacheEvict, Cacheable } from 'src/core/decorators/redis.decorator';
@@ -46,7 +46,7 @@ export class UserAuthService {
    * 需求 4.3: 登录失败 5 次后锁定账户 15 分钟
    */
   @Captcha('user')
-  async login(user: LoginDto, clientInfo: ClientInfoDto) {
+  async login(user: LoginRequestDto, clientInfo: ClientInfoDto) {
     // 检查账户是否被锁定
     const lockStatus = await this.loginSecurityService.validateBeforeLogin(user.userName);
     if (lockStatus.locked) {
@@ -145,7 +145,7 @@ export class UserAuthService {
   /**
    * 用户注册
    */
-  async register(user: RegisterDto) {
+  async register(user: RegisterRequestDto) {
     const loginDate = new Date();
     const salt = bcrypt.genSaltSync(10);
     if (user.password) {

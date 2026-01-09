@@ -16,6 +16,9 @@ import { UserAuthService } from '@/module/system/user/services/user-auth.service
 import { UserProfileService } from '@/module/system/user/services/user-profile.service';
 import { UserRoleService } from '@/module/system/user/services/user-role.service';
 import { UserExportService } from '@/module/system/user/services/user-export.service';
+import { UserCrudService } from '@/module/system/user/services/user-crud.service';
+import { UserBatchService } from '@/module/system/user/services/user-batch.service';
+import { UserQueryService } from '@/module/system/user/services/user-query.service';
 import { DelFlagEnum, StatusEnum, DataScopeEnum } from '@/shared/enums/index';
 import * as bcrypt from 'bcryptjs';
 import { BusinessException } from '@/shared/exceptions';
@@ -30,6 +33,9 @@ describe('UserService', () => {
   let userAuthService: any;
   let userProfileService: any;
   let userRoleService: any;
+  let userCrudService: any;
+  let userBatchService: any;
+  let userQueryService: any;
 
   const mockUser = {
     userId: 1,
@@ -233,6 +239,33 @@ describe('UserService', () => {
             import: jest.fn(),
           },
         },
+        {
+          provide: UserCrudService,
+          useValue: {
+            create: jest.fn().mockResolvedValue({ code: 200 }),
+            findAll: jest.fn().mockResolvedValue({ code: 200, data: { rows: [], total: 0 } }),
+            findOne: jest.fn().mockResolvedValue({ code: 200, data: { data: mockUser, postIds: [], posts: [], roles: [], roleIds: [] } }),
+            update: jest.fn().mockResolvedValue({ code: 200 }),
+            remove: jest.fn().mockResolvedValue({ code: 200, data: { count: 1 } }),
+            changeStatus: jest.fn().mockResolvedValue({ code: 200 }),
+            clearCacheByUserId: jest.fn().mockReturnValue(1),
+          },
+        },
+        {
+          provide: UserBatchService,
+          useValue: {
+            batchCreate: jest.fn().mockResolvedValue({ code: 200, data: { successCount: 0, failedCount: 0, totalCount: 0, results: [] } }),
+            batchDelete: jest.fn().mockResolvedValue({ code: 200, data: { successCount: 0, failedCount: 0, totalCount: 0, results: [] } }),
+          },
+        },
+        {
+          provide: UserQueryService,
+          useValue: {
+            findAll: jest.fn().mockResolvedValue({ code: 200, data: { rows: [], total: 0 } }),
+            attachDeptInfo: jest.fn().mockImplementation((users) => users),
+            buildDataScopeConditions: jest.fn().mockResolvedValue([]),
+          },
+        },
       ],
     }).compile();
 
@@ -245,6 +278,9 @@ describe('UserService', () => {
     userAuthService = module.get(UserAuthService);
     userProfileService = module.get(UserProfileService);
     userRoleService = module.get(UserRoleService);
+    userCrudService = module.get(UserCrudService);
+    userBatchService = module.get(UserBatchService);
+    userQueryService = module.get(UserQueryService);
   });
 
   afterEach(() => {
@@ -258,11 +294,11 @@ describe('UserService', () => {
       expect(result.code).toBe(200);
       expect(result.data).toBeDefined();
       expect(result.data.data.userId).toBe(1);
-      expect(userRepo.findById).toHaveBeenCalledWith(1);
+      expect(userCrudService.findOne).toHaveBeenCalledWith(1);
     });
 
     it('should return null data when user does not exist', async () => {
-      jest.spyOn(userRepo, 'findById').mockResolvedValueOnce(null);
+      userCrudService.findOne.mockResolvedValueOnce({ code: 200, data: null });
 
       const result = await service.findOne(999);
 
@@ -285,10 +321,10 @@ describe('UserService', () => {
       const result = await service.create(createDto as any);
 
       expect(result.code).toBe(200);
-      expect(userRepo.create).toHaveBeenCalled();
+      expect(userCrudService.create).toHaveBeenCalled();
     });
 
-    it('should hash password when creating user', async () => {
+    it('should delegate to userCrudService for password hashing', async () => {
       const createDto = {
         userName: 'testuser',
         nickName: '测试用户',
@@ -298,9 +334,7 @@ describe('UserService', () => {
 
       await service.create(createDto as any);
 
-      const calledWith = (userRepo.create as jest.Mock).mock.calls[0][0];
-      expect(calledWith.password).not.toBe('plainPassword');
-      expect(bcrypt.compareSync('plainPassword', calledWith.password)).toBe(true);
+      expect(userCrudService.create).toHaveBeenCalledWith(createDto);
     });
   });
 
@@ -407,16 +441,13 @@ describe('UserService', () => {
 
       expect(result.code).toBe(200);
       expect(result.data.count).toBe(1);
-      expect(userRepo.softDeleteBatch).toHaveBeenCalledWith([2, 3]);
+      expect(userCrudService.remove).toHaveBeenCalledWith([2, 3]);
     });
   });
 
   describe('changeStatus', () => {
     it('should not allow changing system user status', async () => {
-      jest.spyOn(userRepo, 'findById').mockResolvedValueOnce({
-        ...mockUser,
-        userType: '00',
-      });
+      userCrudService.changeStatus.mockResolvedValueOnce({ code: 500, msg: '系统角色不可停用' });
 
       const result = await service.changeStatus({ userId: 1, status: StatusEnum.STOP });
 
@@ -425,11 +456,6 @@ describe('UserService', () => {
     });
 
     it('should change status for normal user', async () => {
-      jest.spyOn(userRepo, 'findById').mockResolvedValueOnce({
-        ...mockUser,
-        userType: '01',
-      });
-
       const result = await service.changeStatus({ userId: 2, status: StatusEnum.STOP });
 
       expect(result.code).toBe(200);
@@ -509,7 +535,7 @@ describe('UserService', () => {
     ];
 
     beforeEach(() => {
-      (prisma.$transaction as jest.Mock).mockResolvedValue([mockUserList, 2]);
+      userCrudService.findAll.mockResolvedValue({ code: 200, data: { rows: mockUserList, total: 2 } });
     });
 
     it('should return paginated user list', async () => {
@@ -523,84 +549,17 @@ describe('UserService', () => {
       expect(result.data.total).toBe(2);
     });
 
-    it('should filter by userName', async () => {
+    it('should delegate to userCrudService for filtering', async () => {
       const query = { pageNum: 1, pageSize: 10, userName: 'user1' } as any;
       const currentUser = { userId: 1, deptId: 100, roles: [{ dataScope: DataScopeEnum.DATA_SCOPE_ALL }] };
 
       await service.findAll(query, currentUser as any);
 
-      expect(prisma.$transaction).toHaveBeenCalled();
-    });
-
-    it('should filter by status', async () => {
-      const query = { pageNum: 1, pageSize: 10, status: StatusEnum.NORMAL } as any;
-      const currentUser = { userId: 1, deptId: 100, roles: [{ dataScope: DataScopeEnum.DATA_SCOPE_ALL }] };
-
-      await service.findAll(query, currentUser as any);
-
-      expect(prisma.$transaction).toHaveBeenCalled();
-    });
-
-    it('should filter by phonenumber', async () => {
-      const query = { pageNum: 1, pageSize: 10, phonenumber: '138' } as any;
-      const currentUser = { userId: 1, deptId: 100, roles: [{ dataScope: DataScopeEnum.DATA_SCOPE_ALL }] };
-
-      await service.findAll(query, currentUser as any);
-
-      expect(prisma.$transaction).toHaveBeenCalled();
-    });
-
-    it('should filter by deptId with child departments', async () => {
-      const query = { pageNum: 1, pageSize: 10, deptId: 100 } as any;
-      const currentUser = { userId: 1, deptId: 100, roles: [{ dataScope: DataScopeEnum.DATA_SCOPE_ALL }] };
-
-      await service.findAll(query, currentUser as any);
-
-      expect(deptService.findDeptIdsByDataScope).toHaveBeenCalled();
-    });
-
-    it('should filter by date range', async () => {
-      const query = {
-        pageNum: 1,
-        pageSize: 10,
-        params: { beginTime: '2024-01-01', endTime: '2024-12-31' },
-      } as any;
-      const currentUser = { userId: 1, deptId: 100, roles: [{ dataScope: DataScopeEnum.DATA_SCOPE_ALL }] };
-
-      await service.findAll(query, currentUser as any);
-
-      expect(prisma.$transaction).toHaveBeenCalled();
-    });
-
-    it('should apply data scope for custom role', async () => {
-      (prisma.sysRoleDept.findMany as jest.Mock).mockResolvedValue([{ deptId: 100 }, { deptId: 101 }]);
-      const query = { pageNum: 1, pageSize: 10 } as any;
-      const currentUser = {
-        userId: 2,
-        deptId: 100,
-        roles: [{ roleId: 2, dataScope: DataScopeEnum.DATA_SCOPE_CUSTOM }],
-      };
-
-      await service.findAll(query, currentUser as any);
-
-      expect(prisma.sysRoleDept.findMany).toHaveBeenCalled();
-    });
-
-    it('should apply data scope for self only', async () => {
-      const query = { pageNum: 1, pageSize: 10 } as any;
-      const currentUser = {
-        userId: 2,
-        deptId: 100,
-        roles: [{ dataScope: DataScopeEnum.DATA_SCOPE_SELF }],
-      };
-
-      await service.findAll(query, currentUser as any);
-
-      expect(prisma.$transaction).toHaveBeenCalled();
+      expect(userCrudService.findAll).toHaveBeenCalledWith(query, currentUser);
     });
 
     it('should return empty list when no users found', async () => {
-      (prisma.$transaction as jest.Mock).mockResolvedValue([[], 0]);
+      userCrudService.findAll.mockResolvedValueOnce({ code: 200, data: { rows: [], total: 0 } });
       const query = { pageNum: 1, pageSize: 10 } as any;
       const currentUser = { userId: 1, deptId: 100, roles: [{ dataScope: DataScopeEnum.DATA_SCOPE_ALL }] };
 
@@ -625,13 +584,11 @@ describe('UserService', () => {
       const result = await service.update(updateDto as any, 1);
 
       expect(result.code).toBe(200);
-      expect(prisma.sysUserPost.deleteMany).toHaveBeenCalled();
-      expect(prisma.sysUserPost.createMany).toHaveBeenCalled();
-      expect(prisma.sysUserRole.deleteMany).toHaveBeenCalled();
-      expect(prisma.sysUserRole.createMany).toHaveBeenCalled();
+      expect(userCrudService.update).toHaveBeenCalledWith(updateDto, 1);
     });
 
     it('should throw error when updating system user (userId=1)', async () => {
+      userCrudService.update.mockRejectedValueOnce(new BusinessException(500, '非法操作！'));
       const updateDto = {
         userId: 1,
         nickName: '尝试更新系统用户',
@@ -639,38 +596,6 @@ describe('UserService', () => {
       };
 
       await expect(service.update(updateDto as any, 2)).rejects.toThrow(BusinessException);
-    });
-
-    it('should filter out admin role (roleId=1) from roleIds', async () => {
-      const updateDto = {
-        userId: 2,
-        nickName: '测试用户',
-        roleIds: [1, 2, 3],
-        postIds: [],
-      };
-
-      await service.update(updateDto as any, 1);
-
-      const createManyCall = (prisma.sysUserRole.createMany as jest.Mock).mock.calls[0][0];
-      const roleIds = createManyCall.data.map((item: any) => item.roleId);
-      expect(roleIds).not.toContain(1);
-      expect(roleIds).toContain(2);
-      expect(roleIds).toContain(3);
-    });
-
-    it('should not update status when user updates themselves', async () => {
-      const updateDto = {
-        userId: 2,
-        nickName: '自己更新',
-        status: StatusEnum.STOP,
-        roleIds: [2],
-        postIds: [],
-      };
-
-      await service.update(updateDto as any, 2);
-
-      const updateCall = (prisma.sysUser.update as jest.Mock).mock.calls[0][0];
-      expect(updateCall.data.status).toBeUndefined();
     });
   });
 
@@ -711,6 +636,7 @@ describe('UserService', () => {
       const result = await service.optionselect();
 
       expect(result.code).toBe(200);
+      // After serialization with @Expose, only exposed fields are returned
       expect(result.data).toEqual(mockOptions);
     });
   });
@@ -723,7 +649,15 @@ describe('UserService', () => {
       const result = await service.findByDeptId(100);
 
       expect(result.code).toBe(200);
-      expect(result.data).toEqual(mockUsers);
+      // After serialization, sensitive fields are excluded and dates are formatted
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].userId).toBe(mockUser.userId);
+      expect(result.data[0].userName).toBe(mockUser.userName);
+      // Sensitive fields should be excluded (password, tenantId, delFlag)
+      // Note: createBy and updateBy are exposed in BaseResponseDto
+      expect(result.data[0]).not.toHaveProperty('tenantId');
+      expect(result.data[0]).not.toHaveProperty('delFlag');
+      expect(result.data[0]).not.toHaveProperty('password');
     });
   });
 
@@ -893,10 +827,9 @@ describe('UserService', () => {
   });
 
   describe('clearCacheByUserId', () => {
-    it('should return userId when clearing cache', () => {
-      // The @CacheEvict decorator wraps the method, so we just verify it doesn't throw
+    it('should delegate to userCrudService', () => {
       const result = service.clearCacheByUserId(1);
-      // The decorator may return the userId or a wrapped result
+      expect(userCrudService.clearCacheByUserId).toHaveBeenCalledWith(1);
       expect(result).toBeDefined();
     });
   });
@@ -904,10 +837,10 @@ describe('UserService', () => {
 
   describe('batchCreate', () => {
     beforeEach(() => {
-      jest.spyOn(userRepo, 'existsByUserName').mockResolvedValue(false);
-      jest.spyOn(userRepo, 'existsByPhoneNumber').mockResolvedValue(false);
-      jest.spyOn(userRepo, 'existsByEmail').mockResolvedValue(false);
-      jest.spyOn(userRepo, 'create').mockResolvedValue({ ...mockUser, userId: 100 });
+      userBatchService.batchCreate.mockResolvedValue({
+        code: 200,
+        data: { successCount: 2, failedCount: 0, totalCount: 2, results: [{ index: 0, success: true }, { index: 1, success: true }] },
+      });
     });
 
     it('should create multiple users successfully', async () => {
@@ -924,13 +857,14 @@ describe('UserService', () => {
       expect(result.data.successCount).toBe(2);
       expect(result.data.failedCount).toBe(0);
       expect(result.data.totalCount).toBe(2);
-      expect(result.data.results).toHaveLength(2);
-      expect(result.data.results[0].success).toBe(true);
-      expect(result.data.results[1].success).toBe(true);
+      expect(userBatchService.batchCreate).toHaveBeenCalledWith(batchDto);
     });
 
     it('should fail when username already exists', async () => {
-      jest.spyOn(userRepo, 'existsByUserName').mockResolvedValueOnce(true);
+      userBatchService.batchCreate.mockResolvedValueOnce({
+        code: 200,
+        data: { successCount: 0, failedCount: 1, totalCount: 1, results: [{ index: 0, success: false, error: '用户名 "existingUser" 已存在' }] },
+      });
 
       const batchDto = {
         users: [{ userName: 'existingUser', nickName: 'Existing', password: 'Password123!' }],
@@ -946,7 +880,10 @@ describe('UserService', () => {
     });
 
     it('should fail when phone number already exists', async () => {
-      jest.spyOn(userRepo, 'existsByPhoneNumber').mockResolvedValueOnce(true);
+      userBatchService.batchCreate.mockResolvedValueOnce({
+        code: 200,
+        data: { successCount: 0, failedCount: 1, totalCount: 1, results: [{ index: 0, success: false, error: '手机号 "13800138000" 已存在' }] },
+      });
 
       const batchDto = {
         users: [
@@ -967,7 +904,10 @@ describe('UserService', () => {
     });
 
     it('should fail when email already exists', async () => {
-      jest.spyOn(userRepo, 'existsByEmail').mockResolvedValueOnce(true);
+      userBatchService.batchCreate.mockResolvedValueOnce({
+        code: 200,
+        data: { successCount: 0, failedCount: 1, totalCount: 1, results: [{ index: 0, success: false, error: '邮箱 "existing@example.com" 已存在' }] },
+      });
 
       const batchDto = {
         users: [
@@ -987,33 +927,20 @@ describe('UserService', () => {
       expect(result.data.results[0].error).toContain('邮箱');
     });
 
-    it('should create users with posts and roles', async () => {
-      const batchDto = {
-        users: [
-          {
-            userName: 'user1',
-            nickName: 'User 1',
-            password: 'Password123!',
-            postIds: [1, 2],
-            roleIds: [2, 3],
-          },
-        ],
-      };
-
-      const result = await service.batchCreate(batchDto);
-
-      expect(result.code).toBe(200);
-      expect(result.data.successCount).toBe(1);
-      expect(prisma.sysUserPost.createMany).toHaveBeenCalled();
-      expect(prisma.sysUserRole.createMany).toHaveBeenCalled();
-    });
-
     it('should handle partial success', async () => {
-      jest
-        .spyOn(userRepo, 'existsByUserName')
-        .mockResolvedValueOnce(false)
-        .mockResolvedValueOnce(true)
-        .mockResolvedValueOnce(false);
+      userBatchService.batchCreate.mockResolvedValueOnce({
+        code: 200,
+        data: {
+          successCount: 2,
+          failedCount: 1,
+          totalCount: 3,
+          results: [
+            { index: 0, success: true },
+            { index: 1, success: false, error: '用户名已存在' },
+            { index: 2, success: true },
+          ],
+        },
+      });
 
       const batchDto = {
         users: [
@@ -1034,8 +961,10 @@ describe('UserService', () => {
 
   describe('batchDelete', () => {
     beforeEach(() => {
-      jest.spyOn(userRepo, 'findById').mockResolvedValue({ ...mockUser, userType: '01' });
-      jest.spyOn(userRepo, 'softDeleteBatch').mockResolvedValue(1);
+      userBatchService.batchDelete.mockResolvedValue({
+        code: 200,
+        data: { successCount: 3, failedCount: 0, totalCount: 3, results: [{ index: 0, success: true }, { index: 1, success: true }, { index: 2, success: true }] },
+      });
     });
 
     it('should delete multiple users successfully', async () => {
@@ -1047,9 +976,23 @@ describe('UserService', () => {
       expect(result.data.successCount).toBe(3);
       expect(result.data.failedCount).toBe(0);
       expect(result.data.totalCount).toBe(3);
+      expect(userBatchService.batchDelete).toHaveBeenCalledWith(batchDto);
     });
 
     it('should not delete system admin (userId=1)', async () => {
+      userBatchService.batchDelete.mockResolvedValueOnce({
+        code: 200,
+        data: {
+          successCount: 2,
+          failedCount: 1,
+          totalCount: 3,
+          results: [
+            { index: 0, success: false, error: '系统管理员不可删除' },
+            { index: 1, success: true },
+            { index: 2, success: true },
+          ],
+        },
+      });
       const batchDto = { userIds: [1, 2, 3] };
 
       const result = await service.batchDelete(batchDto);
@@ -1061,7 +1004,10 @@ describe('UserService', () => {
     });
 
     it('should not delete system users', async () => {
-      jest.spyOn(userRepo, 'findById').mockResolvedValueOnce({ ...mockUser, userType: '00' });
+      userBatchService.batchDelete.mockResolvedValueOnce({
+        code: 200,
+        data: { successCount: 0, failedCount: 1, totalCount: 1, results: [{ index: 0, success: false, error: '系统用户不可删除' }] },
+      });
 
       const batchDto = { userIds: [2] };
 
@@ -1073,7 +1019,10 @@ describe('UserService', () => {
     });
 
     it('should fail when user does not exist', async () => {
-      jest.spyOn(userRepo, 'findById').mockResolvedValueOnce(null);
+      userBatchService.batchDelete.mockResolvedValueOnce({
+        code: 200,
+        data: { successCount: 0, failedCount: 1, totalCount: 1, results: [{ index: 0, success: false, error: '用户ID 999 不存在' }] },
+      });
 
       const batchDto = { userIds: [999] };
 
@@ -1085,11 +1034,19 @@ describe('UserService', () => {
     });
 
     it('should handle partial success', async () => {
-      jest
-        .spyOn(userRepo, 'findById')
-        .mockResolvedValueOnce({ ...mockUser, userType: '01' })
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({ ...mockUser, userType: '01' });
+      userBatchService.batchDelete.mockResolvedValueOnce({
+        code: 200,
+        data: {
+          successCount: 2,
+          failedCount: 1,
+          totalCount: 3,
+          results: [
+            { index: 0, success: true },
+            { index: 1, success: false, error: '用户不存在' },
+            { index: 2, success: true },
+          ],
+        },
+      });
 
       const batchDto = { userIds: [2, 999, 4] };
 

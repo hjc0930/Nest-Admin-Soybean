@@ -1,9 +1,9 @@
 import { Logger } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { ClassConstructor } from 'class-transformer';
 import { Result } from 'src/shared/response';
-import { FormatDateFields } from 'src/shared/utils/index';
+import { toDto, toDtoList } from 'src/shared/utils/serialize.util';
 import { QueryBuilder } from 'src/shared/utils/query-builder.helper';
-import { PaginationHelper, PaginatedResult } from 'src/shared/utils/pagination.helper';
+import { PaginatedResult } from 'src/shared/utils/pagination.helper';
 import { SoftDeleteRepository } from './soft-delete.repository';
 import { PrismaDelegate } from './base.repository';
 
@@ -27,17 +27,21 @@ export interface ListQueryConfig {
  * 基础服务抽象类
  *
  * @description 提供通用的 CRUD 操作封装，减少 Service 层的样板代码
- * 子类只需要实现特定的业务逻辑
+ * 子类只需要实现特定的业务逻辑。使用泛型 ResponseDto 参数自动处理日期格式化。
+ *
+ * @typeParam T - 实体类型
+ * @typeParam R - 仓储类型
+ * @typeParam D - 响应 DTO 类型（可选，用于自动日期格式化）
  *
  * @example
  * ```typescript
  * @Injectable()
- * export class NoticeService extends BaseService<SysNotice, NoticeRepository> {
+ * export class NoticeService extends BaseService<SysNotice, NoticeRepository, NoticeResponseDto> {
  *   constructor(
  *     private readonly noticeRepo: NoticeRepository,
  *     private readonly prisma: PrismaService,
  *   ) {
- *     super(noticeRepo, {
+ *     super(noticeRepo, NoticeResponseDto, {
  *       containsFields: ['noticeTitle', 'createBy'],
  *       equalsFields: ['noticeType'],
  *       dateRangeField: 'createTime',
@@ -49,11 +53,13 @@ export interface ListQueryConfig {
 export abstract class BaseService<
   T,
   R extends SoftDeleteRepository<T, PrismaDelegate>,
+  D = T,
 > {
   protected readonly logger: Logger;
 
   constructor(
     protected readonly repository: R,
+    protected readonly responseDtoClass?: ClassConstructor<D>,
     protected readonly listQueryConfig?: ListQueryConfig,
   ) {
     this.logger = new Logger(this.constructor.name);
@@ -71,10 +77,10 @@ export abstract class BaseService<
   /**
    * 分页查询列表
    * @param query 查询参数
+   * @returns 分页结果，如果提供了 responseDtoClass 则自动格式化日期字段
    */
-  async findAll(query: Record<string, unknown>): Promise<Result<PaginatedResult<T>>> {
+  async findAll(query: Record<string, unknown>): Promise<Result<PaginatedResult<D>>> {
     const where = this.buildListWhere(query);
-    const { skip, take } = PaginationHelper.getPagination(query as { pageNum?: number; pageSize?: number });
     const orderBy = this.listQueryConfig?.defaultOrderBy || { createTime: 'desc' as const };
 
     const result = await this.repository.findPage({
@@ -85,8 +91,14 @@ export abstract class BaseService<
       order: Object.values(orderBy)[0],
     });
 
+    // 如果提供了 ResponseDto 类，使用 toDtoList 进行转换（自动触发 @DateFormat 装饰器）
+    // 否则直接返回原始数据
+    const rows = this.responseDtoClass
+      ? toDtoList(this.responseDtoClass, result.rows as object[])
+      : (result.rows as unknown as D[]);
+
     return Result.ok({
-      rows: FormatDateFields(result.rows),
+      rows,
       total: result.total,
     });
   }
@@ -94,11 +106,23 @@ export abstract class BaseService<
   /**
    * 根据 ID 查询详情
    * @param id 记录 ID
+   * @returns 记录详情，如果提供了 responseDtoClass 则自动格式化日期字段
    */
-  async findOne(id: number | string): Promise<Result<T | null>> {
+  async findOne(id: number | string): Promise<Result<D | null>> {
     const numId = typeof id === 'string' ? parseInt(id, 10) : id;
     const data = await this.repository.findById(numId);
-    return Result.ok(data ? FormatDateFields(data) : null);
+
+    if (!data) {
+      return Result.ok(null);
+    }
+
+    // 如果提供了 ResponseDto 类，使用 toDto 进行转换（自动触发 @DateFormat 装饰器）
+    // 否则直接返回原始数据
+    const result = this.responseDtoClass
+      ? toDto(this.responseDtoClass, data as object)
+      : (data as unknown as D);
+
+    return Result.ok(result);
   }
 
   /**

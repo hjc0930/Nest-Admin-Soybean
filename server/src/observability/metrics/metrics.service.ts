@@ -26,6 +26,11 @@ export class MetricsService implements OnModuleInit {
   public readonly activeConnections: Gauge<string>;
   public readonly queueJobsTotal: Counter<string>;
 
+  // 数据库指标
+  public readonly dbQueryTotal: Counter<string>;
+  public readonly dbQueryDuration: Histogram<string>;
+  public readonly dbSlowQueryTotal: Counter<string>;
+
   constructor() {
     this.registry = new Registry();
 
@@ -99,6 +104,31 @@ export class MetricsService implements OnModuleInit {
       name: 'nest_admin_queue_jobs_total',
       help: 'Total number of queue jobs',
       labelNames: ['queue_name', 'status'],
+      registers: [this.registry],
+    });
+
+    // 数据库查询计数器
+    this.dbQueryTotal = new Counter({
+      name: 'nest_admin_db_query_total',
+      help: 'Total number of database queries',
+      labelNames: ['model', 'action', 'status'],
+      registers: [this.registry],
+    });
+
+    // 数据库查询延迟直方图
+    this.dbQueryDuration = new Histogram({
+      name: 'nest_admin_db_query_duration_seconds',
+      help: 'Database query duration in seconds',
+      labelNames: ['model', 'action'],
+      buckets: [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],
+      registers: [this.registry],
+    });
+
+    // 慢查询计数器
+    this.dbSlowQueryTotal = new Counter({
+      name: 'nest_admin_db_slow_query_total',
+      help: 'Total number of slow database queries',
+      labelNames: ['model', 'action'],
       registers: [this.registry],
     });
   }
@@ -217,6 +247,22 @@ export class MetricsService implements OnModuleInit {
    */
   recordQueueJob(queueName: string, status: 'completed' | 'failed' | 'active'): void {
     this.queueJobsTotal.inc({ queue_name: queueName, status });
+  }
+
+  /**
+   * 记录数据库查询
+   */
+  recordDbQuery(model: string, action: string, durationSeconds: number, success: boolean): void {
+    const labels = { model: model || 'unknown', action: action || 'unknown' };
+    this.dbQueryTotal.inc({ ...labels, status: success ? 'success' : 'error' });
+    this.dbQueryDuration.observe(labels, durationSeconds);
+  }
+
+  /**
+   * 记录慢查询
+   */
+  recordSlowQuery(model: string, action: string): void {
+    this.dbSlowQueryTotal.inc({ model: model || 'unknown', action: action || 'unknown' });
   }
 
   /**

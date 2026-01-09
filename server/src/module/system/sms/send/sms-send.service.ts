@@ -5,6 +5,9 @@ import { SmsTemplateService } from '../template/sms-template.service';
 import { SmsClientFactory } from './sms-client.factory';
 import { SmsLogRepository } from '../log/sms-log.repository';
 import { SmsSendResult } from './sms-client.interface';
+import { Idempotent } from 'src/core/decorators/idempotent.decorator';
+import { CircuitBreaker } from 'src/core/decorators/circuit-breaker.decorator';
+import { CircuitBreakerService } from 'src/resilience/circuit-breaker/circuit-breaker.service';
 
 /**
  * 短信发送状态枚举
@@ -31,11 +34,22 @@ export class SmsSendService {
     private readonly smsTemplateService: SmsTemplateService,
     private readonly smsClientFactory: SmsClientFactory,
     private readonly smsLogRepo: SmsLogRepository,
+    private readonly circuitBreakerService: CircuitBreakerService,
   ) {}
 
   /**
    * 发送短信
    */
+  @Idempotent({
+    timeout: 10,
+    keyResolver: '{body.mobile}:{body.templateCode}',
+    message: '短信正在发送中，请勿重复提交',
+  })
+  @CircuitBreaker({
+    name: 'sms-send',
+    threshold: 3,
+    cooldownMs: 30000,
+  })
   async send(dto: SendSmsDto) {
     const { mobile, templateCode, params = {} } = dto;
 

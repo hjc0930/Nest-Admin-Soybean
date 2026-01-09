@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ServerService } from './server.service';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Api } from 'src/core/decorators/api.decorator';
-import { ServerInfoVo } from 'src/module/monitor/vo/monitor.vo';
+import { ServerInfoResponseDto } from 'src/module/monitor/dto/responses';
 
 @ApiTags('系统监控-服务监控')
 @ApiBearerAuth('Authorization')
@@ -13,7 +13,7 @@ export class ServerController {
   @Api({
     summary: '服务器信息',
     description: '获取服务器CPU、内存、系统等监控信息',
-    type: ServerInfoVo,
+    type: ServerInfoResponseDto,
   })
   @Get()
   getInfo() {

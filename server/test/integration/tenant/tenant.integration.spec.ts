@@ -16,17 +16,17 @@ import { PrismaService } from 'src/infrastructure/prisma';
 import { TenantService } from 'src/module/system/tenant/tenant.service';
 import { TenantPackageService } from 'src/module/system/tenant-package/tenant-package.service';
 import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
-import { ListTenantDto } from 'src/module/system/tenant/dto/list-tenant.dto';
-import { ListTenantPackageDto } from 'src/module/system/tenant-package/dto/list-tenant-package.dto';
+import { ListTenantRequestDto } from 'src/module/system/tenant/dto/index';
+import { ListTenantPackageRequestDto } from 'src/module/system/tenant-package/dto/index';
 
-function createListTenantDto(params: Partial<ListTenantDto> = {}): ListTenantDto {
-  const dto = new ListTenantDto();
+function createListTenantDto(params: Partial<ListTenantRequestDto> = {}): ListTenantRequestDto {
+  const dto = new ListTenantRequestDto();
   Object.assign(dto, params);
   return dto;
 }
 
-function createListTenantPackageDto(params: Partial<ListTenantPackageDto> = {}): ListTenantPackageDto {
-  const dto = new ListTenantPackageDto();
+function createListTenantPackageDto(params: Partial<ListTenantPackageRequestDto> = {}): ListTenantPackageRequestDto {
+  const dto = new ListTenantPackageRequestDto();
   Object.assign(dto, params);
   return dto;
 }

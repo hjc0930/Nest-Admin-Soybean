@@ -1,11 +1,66 @@
 import { SysTenant, SysTenantPackage } from '@prisma/client';
+import { faker } from '@faker-js/faker';
 
 /**
  * 租户测试数据工厂
  *
  * @description
  * 提供创建测试租户数据的工厂方法
+ * 使用 faker 生成真实的测试数据
  */
+
+/**
+ * 租户 Fixture 配置选项
+ */
+export interface TenantFixtureOptions {
+  tenantId?: string;
+  companyName?: string;
+  contactUserName?: string;
+  contactPhone?: string;
+  status?: '0' | '1';
+  packageId?: number;
+  accountCount?: number;
+  expireTime?: Date;
+}
+
+/**
+ * 使用 faker 创建随机租户数据
+ */
+export const createTenantFixture = (options: TenantFixtureOptions = {}): SysTenant => {
+  const id = faker.number.int({ min: 100, max: 99999 });
+  const tenantId = options.tenantId ?? String(id).padStart(6, '0');
+  return {
+    id,
+    tenantId,
+    contactUserName: options.contactUserName ?? faker.person.fullName(),
+    contactPhone: options.contactPhone ?? `1${faker.string.numeric(10)}`,
+    companyName: options.companyName ?? faker.company.name(),
+    licenseNumber: faker.string.alphanumeric(18).toUpperCase(),
+    address: faker.location.streetAddress(),
+    intro: faker.company.catchPhrase(),
+    domain: faker.internet.domainName(),
+    packageId: options.packageId ?? faker.number.int({ min: 1, max: 5 }),
+    expireTime: options.expireTime ?? faker.date.future({ years: 2 }),
+    accountCount: options.accountCount ?? faker.number.int({ min: 10, max: 1000 }),
+    storageQuota: faker.number.int({ min: 1024, max: 102400 }),
+    storageUsed: faker.number.int({ min: 0, max: 1024 }),
+    apiQuota: faker.number.int({ min: 1000, max: 100000 }),
+    status: options.status ?? '0',
+    delFlag: '0',
+    createBy: 'admin',
+    createTime: faker.date.past(),
+    updateBy: 'admin',
+    updateTime: faker.date.recent(),
+    remark: faker.lorem.sentence(),
+  };
+};
+
+/**
+ * 批量创建租户测试数据
+ */
+export const createBatchTenants = (count: number, options: TenantFixtureOptions = {}): SysTenant[] => {
+  return Array.from({ length: count }, () => createTenantFixture(options));
+};
 
 /**
  * 默认租户数据

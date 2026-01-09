@@ -2,13 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Response } from 'express';
 import { Result } from 'src/shared/response';
-import { ListToTree, FormatDateFields } from 'src/shared/utils/index';
+import { ListToTree } from 'src/shared/utils/index';
 import { ExportTable } from 'src/shared/utils/export';
+import { toDto, toDtoPage } from 'src/shared/utils/serialize.util';
 
 import { DataScopeEnum, DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { Transactional } from 'src/core/decorators/transactional.decorator';
 import { MenuService } from '../menu/menu.service';
-import { CreateRoleDto, UpdateRoleDto, ListRoleDto, ChangeRoleStatusDto } from './dto/index';
+import {
+  CreateRoleRequestDto,
+  UpdateRoleRequestDto,
+  ListRoleRequestDto,
+  ChangeRoleStatusRequestDto,
+  RoleResponseDto,
+} from './dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { RoleRepository } from './role.repository';
 import { Uniq } from 'src/shared/utils/index';
@@ -53,8 +60,8 @@ export class RoleService {
    * ```
    */
   @Transactional()
-  async create(createRoleDto: CreateRoleDto) {
-    const { menuIds = [], ...rolePayload } = createRoleDto as CreateRoleDto & { menuIds?: number[] };
+  async create(createRoleDto: CreateRoleRequestDto) {
+    const { menuIds = [], ...rolePayload } = createRoleDto as CreateRoleRequestDto & { menuIds?: number[] };
 
     const createdRole = await this.prisma.sysRole.create({
       data: {
@@ -72,7 +79,7 @@ export class RoleService {
       });
     }
 
-    return Result.ok(createdRole);
+    return Result.ok(toDto(RoleResponseDto, createdRole));
   }
 
   /**
@@ -93,7 +100,7 @@ export class RoleService {
    * });
    * ```
    */
-  async findAll(query: ListRoleDto) {
+  async findAll(query: ListRoleRequestDto) {
     const where: Prisma.SysRoleWhereInput = {
       delFlag: DelFlagEnum.NORMAL,
     };
@@ -129,9 +136,10 @@ export class RoleService {
       roleSort: 'asc',
     });
 
-    const formattedList = FormatDateFields(list);
-
-    return Result.page(formattedList, total);
+    return Result.page(
+      toDtoPage(RoleResponseDto, { rows: list, total }).rows,
+      total,
+    );
   }
 
   /**
@@ -142,7 +150,7 @@ export class RoleService {
    */
   async findOne(roleId: number) {
     const res = await this.roleRepo.findById(roleId);
-    return Result.ok(res);
+    return Result.ok(toDto(RoleResponseDto, res));
   }
 
   /**
@@ -164,8 +172,8 @@ export class RoleService {
    * ```
    */
   @Transactional()
-  async update(updateRoleDto: UpdateRoleDto) {
-    const { menuIds = [], ...rolePayload } = updateRoleDto as UpdateRoleDto & { menuIds?: number[] };
+  async update(updateRoleDto: UpdateRoleRequestDto) {
+    const { menuIds = [], ...rolePayload } = updateRoleDto as UpdateRoleRequestDto & { menuIds?: number[] };
 
     await this.prisma.sysRoleMenu.deleteMany({ where: { roleId: updateRoleDto.roleId } });
 
@@ -180,7 +188,7 @@ export class RoleService {
       data: rolePayload,
     });
 
-    return Result.ok(res);
+    return Result.ok(toDto(RoleResponseDto, res));
   }
 
   /**
@@ -197,8 +205,8 @@ export class RoleService {
    * @returns 更新后的角色信息
    */
   @Transactional()
-  async dataScope(updateRoleDto: UpdateRoleDto) {
-    const { deptIds = [], ...rolePayload } = updateRoleDto as UpdateRoleDto & { deptIds?: number[] };
+  async dataScope(updateRoleDto: UpdateRoleRequestDto) {
+    const { deptIds = [], ...rolePayload } = updateRoleDto as UpdateRoleRequestDto & { deptIds?: number[] };
 
     await this.prisma.sysRoleDept.deleteMany({ where: { roleId: updateRoleDto.roleId } });
 
@@ -213,7 +221,7 @@ export class RoleService {
       data: rolePayload,
     });
 
-    return Result.ok(res);
+    return Result.ok(toDto(RoleResponseDto, res));
   }
 
   /**
@@ -224,12 +232,12 @@ export class RoleService {
    * @param changeStatusDto - 包含roleId和status
    * @returns 更新后的角色信息
    */
-  async changeStatus(changeStatusDto: ChangeRoleStatusDto) {
+  async changeStatus(changeStatusDto: ChangeRoleStatusRequestDto) {
     const res = await this.prisma.sysRole.update({
       where: { roleId: changeStatusDto.roleId },
       data: { status: changeStatusDto.status },
     });
-    return Result.ok(res);
+    return Result.ok(toDto(RoleResponseDto, res));
   }
 
   /**
@@ -365,13 +373,13 @@ export class RoleService {
    * 导出角色管理数据为xlsx
    * @param res
    */
-  async export(res: Response, body: ListRoleDto) {
+  async export(res: Response, body: ListRoleRequestDto) {
     delete body.pageNum;
     delete body.pageSize;
     const list = await this.findAll(body);
     const options = {
       sheetName: '角色数据',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '角色编号', dataIndex: 'roleId' },
         { title: '角色名称', dataIndex: 'roleName', width: 15 },

@@ -1,0 +1,66 @@
+# Prometheus 配置示例
+# 
+# 使用说明:
+# 1. 根据实际环境修改 targets 地址
+# 2. 启动 Prometheus: prometheus --config.file=prometheus.yml
+
+global:
+  scrape_interval: 15s      # 默认抓取间隔
+  evaluation_interval: 15s  # 规则评估间隔
+  external_labels:
+    monitor: 'nest-admin-monitor'
+
+# 告警管理器配置
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# 告警规则文件
+rule_files:
+  - "alerts/nest-admin-alerts.yml"
+
+# 抓取配置
+scrape_configs:
+  # Prometheus 自身监控
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Nest-Admin 应用监控
+  - job_name: 'nest-admin'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['localhost:3000']
+        labels:
+          app: 'nest-admin'
+          env: 'development'
+    # 可选: 添加认证
+    # basic_auth:
+    #   username: 'prometheus'
+    #   password: 'secret'
+
+  # 生产环境配置示例
+  # - job_name: 'nest-admin-prod'
+  #   metrics_path: '/metrics'
+  #   static_configs:
+  #     - targets: ['nest-admin-prod-1:3000', 'nest-admin-prod-2:3000']
+  #       labels:
+  #         app: 'nest-admin'
+  #         env: 'production'
+
+  # Node Exporter (可选 - 系统级监控)
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['localhost:9100']
+
+  # Redis Exporter (可选 - Redis 监控)
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['localhost:9121']
+
+  # MySQL Exporter (可选 - MySQL 监控)
+  # - job_name: 'mysql'
+  #   static_configs:
+  #     - targets: ['localhost:9104']

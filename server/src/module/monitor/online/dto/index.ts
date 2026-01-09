@@ -37,3 +37,5 @@ export class OnlineListDto {
   @Length(0, 50)
   userName?: string;
 }
+
+export * from './online-user.response.dto';

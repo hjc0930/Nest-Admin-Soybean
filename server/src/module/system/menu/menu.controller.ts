@@ -1,10 +1,17 @@
 import { Controller, Get, Post, Body, Query, Put, Param, Delete } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MenuService } from './menu.service';
-import { CreateMenuDto, UpdateMenuDto, ListMenuDto } from './dto/index';
+import { CreateMenuRequestDto, UpdateMenuRequestDto, ListMenuRequestDto } from './dto/requests';
+import {
+  MenuResponseDto,
+  MenuTreeResponseDto,
+  RoleMenuTreeSelectResponseDto,
+  CreateMenuResultResponseDto,
+  UpdateMenuResultResponseDto,
+  DeleteMenuResultResponseDto,
+} from './dto/responses';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { MenuVo, MenuTreeVo, RoleMenuTreeSelectVo } from './vo/menu.vo';
 import { User, UserDto } from 'src/module/system/user/user.decorator';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
@@ -19,7 +26,7 @@ export class MenuController {
   @Api({
     summary: '菜单管理-获取路由',
     description: '获取当前用户的路由菜单',
-    type: MenuVo,
+    type: MenuResponseDto,
     isArray: true,
   })
   @Get('/getRouters')
@@ -31,31 +38,32 @@ export class MenuController {
   @Api({
     summary: '菜单管理-创建',
     description: '创建新菜单，支持目录、菜单、按钮三种类型',
-    body: CreateMenuDto,
+    body: CreateMenuRequestDto,
+    type: CreateMenuResultResponseDto,
   })
   @RequirePermission('system:menu:add')
   @Operlog({ businessType: BusinessType.INSERT })
   @Post()
-  create(@Body() createMenuDto: CreateMenuDto) {
+  create(@Body() createMenuDto: CreateMenuRequestDto) {
     return this.menuService.create(createMenuDto);
   }
 
   @Api({
     summary: '菜单管理-列表',
     description: '获取菜单列表，支持按名称和状态筛选',
-    type: MenuVo,
+    type: MenuResponseDto,
     isArray: true,
   })
   @RequirePermission('system:menu:list')
   @Get('/list')
-  findAll(@Query() query: ListMenuDto) {
+  findAll(@Query() query: ListMenuRequestDto) {
     return this.menuService.findAll(query);
   }
 
   @Api({
     summary: '菜单管理-树形选择',
     description: '获取菜单树形结构，用于下拉选择',
-    type: MenuTreeVo,
+    type: MenuTreeResponseDto,
     isArray: true,
   })
   @RequirePermission('system:menu:query')
@@ -67,7 +75,7 @@ export class MenuController {
   @Api({
     summary: '菜单管理-角色菜单树',
     description: '获取角色已分配的菜单树结构',
-    type: RoleMenuTreeSelectVo,
+    type: RoleMenuTreeSelectResponseDto,
     params: [{ name: 'roleId', description: '角色ID', type: 'number' }],
   })
   @RequirePermission('system:menu:query')
@@ -79,7 +87,7 @@ export class MenuController {
   @Api({
     summary: '菜单管理-租户套餐菜单树',
     description: '获取租户套餐已分配的菜单树结构',
-    type: RoleMenuTreeSelectVo,
+    type: RoleMenuTreeSelectResponseDto,
     params: [{ name: 'packageId', description: '套餐ID', type: 'number' }],
   })
   @Get('/tenantPackageMenuTreeselect/:packageId')
@@ -90,7 +98,7 @@ export class MenuController {
   @Api({
     summary: '菜单管理-详情',
     description: '根据菜单ID获取菜单详细信息',
-    type: MenuVo,
+    type: MenuResponseDto,
     params: [{ name: 'menuId', description: '菜单ID', type: 'number' }],
   })
   @RequirePermission('system:menu:query')
@@ -102,12 +110,13 @@ export class MenuController {
   @Api({
     summary: '菜单管理-修改',
     description: '修改菜单信息',
-    body: UpdateMenuDto,
+    body: UpdateMenuRequestDto,
+    type: UpdateMenuResultResponseDto,
   })
   @RequirePermission('system:menu:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Put()
-  update(@Body() updateMenuDto: UpdateMenuDto) {
+  update(@Body() updateMenuDto: UpdateMenuRequestDto) {
     return this.menuService.update(updateMenuDto);
   }
 
@@ -115,6 +124,7 @@ export class MenuController {
     summary: '菜单管理-级联删除',
     description: '级联删除菜单，多个ID用逗号分隔',
     params: [{ name: 'menuIds', description: '菜单ID，多个用逗号分隔' }],
+    type: DeleteMenuResultResponseDto,
   })
   @RequirePermission('system:menu:remove')
   @Operlog({ businessType: BusinessType.DELETE })
@@ -128,6 +138,7 @@ export class MenuController {
     summary: '菜单管理-删除',
     description: '删除菜单，会同时删除子菜单',
     params: [{ name: 'menuId', description: '菜单ID', type: 'number' }],
+    type: DeleteMenuResultResponseDto,
   })
   @RequirePermission('system:menu:remove')
   @Operlog({ businessType: BusinessType.DELETE })

@@ -2,8 +2,8 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Result } from 'src/shared/response';
 import { DelFlagEnum } from 'src/shared/enums/index';
-import { FormatDateFields } from 'src/shared/utils/index';
-import { CreateMailAccountDto, UpdateMailAccountDto, ListMailAccountDto } from './dto/index';
+import { toDtoList } from 'src/shared/utils/index';
+import { CreateMailAccountDto, UpdateMailAccountDto, ListMailAccountDto, MailAccountResponseDto } from './dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { MailAccountRepository } from './mail-account.repository';
 import { Transactional } from 'src/core/decorators/transactional.decorator';
@@ -113,7 +113,7 @@ export class MailAccountService {
     }));
 
     return Result.ok({
-      rows: FormatDateFields(safeList),
+      rows: toDtoList(MailAccountResponseDto, safeList),
       total,
     });
   }

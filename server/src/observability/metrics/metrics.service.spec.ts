@@ -33,6 +33,10 @@ describe('MetricsService', () => {
       expect(service.cacheMisses).toBeDefined();
       expect(service.activeConnections).toBeDefined();
       expect(service.queueJobsTotal).toBeDefined();
+      // 数据库指标
+      expect(service.dbQueryTotal).toBeDefined();
+      expect(service.dbQueryDuration).toBeDefined();
+      expect(service.dbSlowQueryTotal).toBeDefined();
     });
 
     it('should return registry', () => {
@@ -194,6 +198,49 @@ describe('MetricsService', () => {
 
       const metrics = await service.getMetrics();
       expect(metrics).toContain('status="failed"');
+    });
+  });
+
+  describe('database metrics', () => {
+    it('should record database query', async () => {
+      service.recordDbQuery('User', 'findMany', 0.05, true);
+
+      const metrics = await service.getMetrics();
+      expect(metrics).toContain('nest_admin_db_query_total');
+      expect(metrics).toContain('model="User"');
+      expect(metrics).toContain('action="findMany"');
+      expect(metrics).toContain('status="success"');
+    });
+
+    it('should record database query duration', async () => {
+      service.recordDbQuery('User', 'findUnique', 0.1, true);
+
+      const metrics = await service.getMetrics();
+      expect(metrics).toContain('nest_admin_db_query_duration_seconds');
+    });
+
+    it('should record failed database query', async () => {
+      service.recordDbQuery('User', 'create', 0.2, false);
+
+      const metrics = await service.getMetrics();
+      expect(metrics).toContain('status="error"');
+    });
+
+    it('should record slow query', async () => {
+      service.recordSlowQuery('User', 'findMany');
+
+      const metrics = await service.getMetrics();
+      expect(metrics).toContain('nest_admin_db_slow_query_total');
+      expect(metrics).toContain('model="User"');
+      expect(metrics).toContain('action="findMany"');
+    });
+
+    it('should handle unknown model and action', async () => {
+      service.recordDbQuery('', '', 0.1, true);
+
+      const metrics = await service.getMetrics();
+      expect(metrics).toContain('model="unknown"');
+      expect(metrics).toContain('action="unknown"');
     });
   });
 });

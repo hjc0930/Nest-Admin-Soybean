@@ -16,10 +16,10 @@ export class UserExportService {
   /**
    * 导出用户数据到Excel
    */
-  async export(res: Response, data: { rows: Record<string, unknown>[]; total: number }) {
+  async export(res: Response, data: { rows: unknown[]; total: number }) {
     const options = {
       sheetName: '用户数据',
-      data: data.rows,
+      data: data.rows as Record<string, unknown>[],
       header: [
         { title: '用户序号', dataIndex: 'userId' },
         { title: '登录名称', dataIndex: 'userName' },

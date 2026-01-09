@@ -9,6 +9,7 @@ import { UpdateProfileDto, UpdatePwdDto, ResetPwdDto } from '../dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from '../user.repository';
 import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
+import { Lock } from 'src/core/decorators/lock.decorator';
 
 /**
  * 用户个人资料服务
@@ -77,6 +78,11 @@ export class UserProfileService {
    * 重置用户密码（管理员操作）
    * 需求 4.9: 密码修改后使所有 Token 失效
    */
+  @Lock({
+    key: 'user:pwd:reset:{body.userId}',
+    leaseTime: 10,
+    message: '密码正在重置中，请稍后重试',
+  })
   async resetPwd(body: ResetPwdDto) {
     if (body.userId === 1) {
       return Result.fail(ResponseCode.BUSINESS_ERROR, '系统用户不能重置密码');

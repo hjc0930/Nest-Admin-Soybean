@@ -4,7 +4,7 @@ import { SUCCESS_CODE } from 'src/shared/response';
 import { UserService } from '../system/user/user.service';
 import { LoginlogService } from '../monitor/loginlog/loginlog.service';
 import { AxiosService } from 'src/module/common/axios/axios.service';
-import { RegisterDto, LoginDto } from './dto/index';
+import { LoginRequestDto, RegisterRequestDto } from './dto/requests';
 import { MenuService } from '../system/menu/menu.service';
 import { ClientInfoDto } from 'src/core/decorators/common.decorator';
 import { StatusEnum } from 'src/shared/enums/index';
@@ -24,7 +24,7 @@ export class MainService {
    * @param user
    * @returns
    */
-  async login(user: LoginDto, clientInfo: ClientInfoDto) {
+  async login(user: LoginRequestDto, clientInfo: ClientInfoDto) {
     const loginLog = {
       ...clientInfo,
       status: StatusEnum.NORMAL,
@@ -81,7 +81,7 @@ export class MainService {
    * @param user
    * @returns
    */
-  async register(user: RegisterDto) {
+  async register(user: RegisterRequestDto) {
     return await this.userService.register(user);
   }
 

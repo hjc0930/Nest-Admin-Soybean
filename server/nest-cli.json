@@ -22,9 +22,10 @@
           "classValidatorShim": true,
           "introspectComments": true,
           "controllerKeyOfComment": "summary",
-          "dtoFileNameSuffix": [".dto.ts", ".vo.ts", ".entity.ts", "dto/index.ts"],
+          "dtoFileNameSuffix": [".dto.ts", ".vo.ts", ".entity.ts", "dto/index.ts", ".response.ts"],
           "controllerFileNameSuffix": ".controller.ts",
-          "dtoKeyOfComment": "description"
+          "dtoKeyOfComment": "description",
+          "operationIdFactory": ["controllerKey", "methodKey"]
         }
       }
     ]

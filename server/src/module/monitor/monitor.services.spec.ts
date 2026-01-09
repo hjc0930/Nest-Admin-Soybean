@@ -517,7 +517,7 @@ describe('Monitor module services', () => {
           loginTime: 'now',
         },
       ]);
-      const res = await service.findAll({ pageNum: 1, pageSize: 10 });
+      const res = await service.findAll({ pageNum: '1', pageSize: '10' });
       expect(res.data.total).toBe(1);
       expect(res.data.rows[0].tokenId).toBe('1');
     });

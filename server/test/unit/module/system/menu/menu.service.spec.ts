@@ -195,6 +195,8 @@ describe('MenuService', () => {
 
   describe('cascadeRemove', () => {
     it('should cascade delete multiple menus', async () => {
+      // Mock findMany to return empty array (no children)
+      (prisma.sysMenu.findMany as jest.Mock).mockResolvedValue([]);
       (prisma.sysMenu.updateMany as jest.Mock).mockResolvedValue({ count: 3 });
 
       const result = await service.cascadeRemove([1, 2, 3]);

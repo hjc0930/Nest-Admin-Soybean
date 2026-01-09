@@ -1,0 +1,21 @@
+# Grafana 数据源配置
+# 
+# 使用说明:
+# 1. 将此文件放置到 Grafana 的 provisioning/datasources 目录
+# 2. 重启 Grafana 服务
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: "15s"
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: "2.40.0"

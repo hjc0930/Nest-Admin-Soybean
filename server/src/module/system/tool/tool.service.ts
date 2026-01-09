@@ -5,7 +5,9 @@ import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { isNotEmpty } from 'class-validator';
 import { TableName, GenDbTableList, GenTableList, GenTableUpdate } from './dto/create-genTable-dto';
 import { Result } from 'src/shared/response';
-import { FormatDate, FormatDateFields, GetNowDate } from 'src/shared/utils/index';
+import { GetNowDate } from 'src/shared/utils/index';
+import { toDtoList, toDtoPage } from 'src/shared/utils/serialize.util';
+import { GenTableResponseDto, DbTableResponseDto } from './dto/responses';
 import toolConfig from './config';
 import { GenConstants } from 'src/shared/constants/gen.constant';
 import { camelCase, toLower } from 'lodash';
@@ -110,7 +112,7 @@ export class ToolService {
       }),
       this.prisma.genTable.count({ where }),
     ]);
-    return Result.page(FormatDateFields(list), total);
+    return Result.page(toDtoList(GenTableResponseDto, list), total, query.pageNum, query.pageSize);
   }
 
   /**
@@ -474,11 +476,7 @@ export class ToolService {
       this.prisma.$queryRaw<Array<{ total: bigint }>>(countSql),
     ]);
     return Result.ok({
-      list: list.map((item) => ({
-        ...item,
-        createTime: FormatDate(item.createTime),
-        updateTime: FormatDate(item.updateTime),
-      })),
+      list: toDtoList(DbTableResponseDto, list),
       total: Number(totalRes[0]?.total ?? 0),
     });
   }

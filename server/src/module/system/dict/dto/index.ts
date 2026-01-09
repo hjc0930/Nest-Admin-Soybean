@@ -1,6 +1,13 @@
-export * from './create-dict-type.dto';
-export * from './update-dict-type.dto';
-export * from './list-dict-type.dto';
-export * from './create-dict-data.dto';
-export * from './update-dict-data.dto';
-export * from './list-dict-data.dto';
+// 请求 DTO
+export * from './requests';
+
+// 响应 DTO
+export * from './responses';
+
+// 兼容旧导出（后续可删除）
+export { CreateDictTypeRequestDto as CreateDictTypeDto } from './requests';
+export { UpdateDictTypeRequestDto as UpdateDictTypeDto } from './requests';
+export { ListDictTypeRequestDto as ListDictType } from './requests';
+export { CreateDictDataRequestDto as CreateDictDataDto } from './requests';
+export { UpdateDictDataRequestDto as UpdateDictDataDto } from './requests';
+export { ListDictDataRequestDto as ListDictData } from './requests';

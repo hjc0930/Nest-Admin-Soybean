@@ -2,8 +2,17 @@ import { Controller, Get, Post, Body, HttpCode, Logger, Headers } from '@nestjs/
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiHeader } from '@nestjs/swagger';
 import { AppConfigService } from 'src/config/app-config.service';
 import { MainService } from './main.service';
-import { AuthLoginDto, AuthRegisterDto, SocialLoginDto } from './dto/auth.dto';
-import { LoginTokenVo, CaptchaCodeVo, LoginTenantVo, UserInfoVo } from './vo/auth.vo';
+import { AuthLoginRequestDto, AuthRegisterRequestDto, SocialLoginRequestDto } from './dto/requests';
+import {
+  LoginTokenResponseDto,
+  CaptchaCodeResponseDto,
+  LoginTenantResponseDto,
+  UserInfoResponseDto,
+  PublicKeyResponseDto,
+  AuthRegisterResultResponseDto,
+  AuthLogoutResponseDto,
+  SocialCallbackResponseDto,
+} from './dto/responses';
 import { createMath } from 'src/shared/utils/captcha';
 import { Result, ResponseCode } from 'src/shared/response';
 import { GenerateUUID } from 'src/shared/utils/index';
@@ -18,6 +27,7 @@ import { TenantContext, IgnoreTenant } from 'src/tenant';
 import { SkipDecrypt } from 'src/security/crypto';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
+import { ApiThrottle, ApiSkipThrottle } from 'src/core/decorators/throttle.decorator';
 
 /**
  * 认证控制器 - 匹配 Soybean 前端 API
@@ -43,20 +53,23 @@ export class AuthController {
   /**
    * 获取租户列表 - GET /auth/tenant/list
    * 对应前端: fetchTenantList()
+   *
+   * 限流配置：跳过限流，因为这是公开的高频接口
    */
   @Api({
     summary: '获取租户列表',
     description: '获取系统中所有可用的租户列表，用于登录时选择租户',
     security: false,
-    type: LoginTenantVo,
+    type: LoginTenantResponseDto,
   })
   @Get('tenant/list')
   @NotRequireAuth()
   @IgnoreTenant()
+  @ApiSkipThrottle() // 跳过限流，公开高频接口
   async getTenantList(): Promise<Result> {
     const tenantEnabled = this.config.tenant.enabled;
 
-    const result: LoginTenantVo = {
+    const result: LoginTenantResponseDto = {
       tenantEnabled,
       voList: [],
     };
@@ -103,7 +116,7 @@ export class AuthController {
     summary: '获取验证码',
     description: '获取登录/注册所需的图形验证码',
     security: false,
-    type: CaptchaCodeVo,
+    type: CaptchaCodeResponseDto,
   })
   @Get('code')
   @NotRequireAuth()
@@ -112,7 +125,7 @@ export class AuthController {
     const enable = await this.sysConfigService.getSystemConfigValue('sys.account.captchaEnabled');
     const captchaEnabled: boolean = enable === 'true';
 
-    const result: CaptchaCodeVo = {
+    const result: CaptchaCodeResponseDto = {
       captchaEnabled,
       uuid: '',
       img: '',
@@ -140,20 +153,23 @@ export class AuthController {
   /**
    * 用户登录 - POST /auth/login
    * 对应前端: fetchLogin()
+   *
+   * 限流配置：每分钟最多 10 次登录尝试，防止暴力破解
    */
   @Api({
     summary: '用户登录',
     description: '用户登录接口，支持租户、验证码验证',
-    body: AuthLoginDto,
+    body: AuthLoginRequestDto,
     security: false,
-    type: LoginTokenVo,
+    type: LoginTokenResponseDto,
   })
   @Post('login')
   @HttpCode(200)
   @NotRequireAuth()
+  @ApiThrottle({ ttl: 60000, limit: 10 }) // 每分钟最多 10 次登录尝试
   @ApiHeader({ name: 'tenant-id', description: '租户ID', required: false })
   async login(
-    @Body() loginDto: AuthLoginDto,
+    @Body() loginDto: AuthLoginRequestDto,
     @ClientInfo() clientInfo: ClientInfoDto,
     @Headers('tenant-id') headerTenantId?: string,
   ): Promise<Result> {
@@ -179,7 +195,7 @@ export class AuthController {
         const jwtExpires = this.config.jwt.expiresin;
         const refreshExpires = this.config.jwt.refreshExpiresIn;
 
-        const loginToken: LoginTokenVo = {
+        const loginToken: LoginTokenResponseDto = {
           access_token: result.data.token,
           refresh_token: result.data.token, // 暂时使用同一个 token
           expire_in: this.parseExpiresIn(jwtExpires),
@@ -199,18 +215,22 @@ export class AuthController {
   /**
    * 用户注册 - POST /auth/register
    * 对应前端: fetchRegister()
+   *
+   * 限流配置：每分钟最多 5 次注册尝试，防止恶意注册
    */
   @Api({
     summary: '用户注册',
     description: '新用户注册接口',
-    body: AuthRegisterDto,
+    body: AuthRegisterRequestDto,
     security: false,
+    type: AuthRegisterResultResponseDto,
   })
   @Post('register')
   @HttpCode(200)
   @NotRequireAuth()
+  @ApiThrottle({ ttl: 60000, limit: 5 }) // 每分钟最多 5 次注册尝试
   @ApiHeader({ name: 'tenant-id', description: '租户ID', required: false })
-  async register(@Body() registerDto: AuthRegisterDto, @Headers('tenant-id') headerTenantId?: string): Promise<Result> {
+  async register(@Body() registerDto: AuthRegisterRequestDto, @Headers('tenant-id') headerTenantId?: string): Promise<Result> {
     // 验证密码一致性
     if (registerDto.password !== registerDto.confirmPassword) {
       return Result.fail(ResponseCode.BAD_REQUEST, '两次输入的密码不一致');
@@ -239,6 +259,7 @@ export class AuthController {
   @Api({
     summary: '退出登录',
     description: '退出当前登录状态，Token 将被加入黑名单',
+    type: AuthLogoutResponseDto,
   })
   @NotRequireAuth()
   @Post('logout')
@@ -261,13 +282,14 @@ export class AuthController {
   @Api({
     summary: '社交登录回调',
     description: '第三方社交平台登录回调处理',
-    body: SocialLoginDto,
+    body: SocialLoginRequestDto,
     security: false,
+    type: SocialCallbackResponseDto,
   })
   @Post('social/callback')
   @HttpCode(200)
   @NotRequireAuth()
-  async socialCallback(@Body() socialDto: SocialLoginDto): Promise<Result> {
+  async socialCallback(@Body() socialDto: SocialLoginRequestDto): Promise<Result> {
     // TODO: 实现社交登录逻辑
     return Result.fail(ResponseCode.NOT_IMPLEMENTED, '社交登录功能暂未实现');
   }
@@ -280,6 +302,7 @@ export class AuthController {
     summary: '获取加密公钥',
     description: '获取RSA公钥用于数据加密',
     security: false,
+    type: PublicKeyResponseDto,
   })
   @Get('publicKey')
   @NotRequireAuth()

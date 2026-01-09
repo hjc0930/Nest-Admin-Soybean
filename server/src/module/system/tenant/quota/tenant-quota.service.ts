@@ -5,13 +5,14 @@ import { BusinessException } from 'src/shared/exceptions';
 import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
 import { TenantContext } from 'src/tenant/context/tenant.context';
-import { FormatDateFields } from 'src/shared/utils/index';
+import { toDtoList } from 'src/shared/utils/index';
 import {
   ListTenantQuotaDto,
   UpdateTenantQuotaDto,
   CheckQuotaDto,
   IncrementQuotaUsageDto,
 } from './dto/tenant-quota.dto';
+import { TenantQuotaResponseDto } from './dto/tenant-quota.response.dto';
 import {
   TenantQuotaVo,
   TenantQuotaDetailVo,
@@ -166,7 +167,7 @@ export class TenantQuotaService {
     }
 
     return Result.ok({
-      rows: FormatDateFields(filteredRows),
+      rows: toDtoList(TenantQuotaResponseDto, filteredRows),
       total: query.status ? filteredRows.length : total,
     });
   }

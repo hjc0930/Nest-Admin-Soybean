@@ -5,6 +5,15 @@ import { JobService } from './job.service';
 import { CreateJobDto, ListJobDto } from './dto/create-job.dto';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
+import {
+  JobListResponseDto,
+  JobResponseDto,
+  CreateJobResultResponseDto,
+  UpdateJobResultResponseDto,
+  DeleteJobResultResponseDto,
+  ChangeJobStatusResultResponseDto,
+  RunJobResultResponseDto,
+} from 'src/module/monitor/dto/responses';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { User } from 'src/module/system/user/user.decorator';
@@ -18,6 +27,7 @@ export class JobController {
   @Api({
     summary: '获取定时任务列表',
     description: '分页查询定时任务列表',
+    type: JobListResponseDto,
   })
   @Get('list')
   @RequirePermission('monitor:job:list')
@@ -29,6 +39,7 @@ export class JobController {
     summary: '获取定时任务详情',
     description: '根据任务ID获取定时任务详细信息',
     params: [{ name: 'jobId', description: '任务ID', type: 'number' }],
+    type: JobResponseDto,
   })
   @Get(':jobId')
   @RequirePermission('monitor:job:query')
@@ -40,6 +51,7 @@ export class JobController {
     summary: '创建定时任务',
     description: '新增定时任务',
     body: CreateJobDto,
+    type: CreateJobResultResponseDto,
   })
   @Post()
   @RequirePermission('monitor:job:add')
@@ -51,6 +63,7 @@ export class JobController {
   @Api({
     summary: '修改任务状态',
     description: '启用或停用定时任务',
+    type: ChangeJobStatusResultResponseDto,
   })
   @Put('changeStatus')
   @RequirePermission('monitor:job:changeStatus')
@@ -62,6 +75,7 @@ export class JobController {
   @Api({
     summary: '修改定时任务',
     description: '更新定时任务信息',
+    type: UpdateJobResultResponseDto,
   })
   @Put('')
   @RequirePermission('monitor:job:edit')
@@ -78,6 +92,7 @@ export class JobController {
     summary: '删除定时任务',
     description: '批量删除定时任务，多个ID用逗号分隔',
     params: [{ name: 'jobIds', description: '任务ID，多个用逗号分隔' }],
+    type: DeleteJobResultResponseDto,
   })
   @Delete(':jobIds')
   @RequirePermission('monitor:job:remove')
@@ -89,6 +104,7 @@ export class JobController {
   @Api({
     summary: '立即执行一次',
     description: '手动触发定时任务执行',
+    type: RunJobResultResponseDto,
   })
   @Put('/run')
   @RequirePermission('monitor:job:changeStatus')

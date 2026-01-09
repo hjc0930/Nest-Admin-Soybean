@@ -4,7 +4,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { OnlineListDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { OnlineUserListVo } from 'src/module/monitor/vo/monitor.vo';
+import { OnlineUserListResponseDto, ForceLogoutResultResponseDto } from 'src/module/monitor/dto/responses';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 
@@ -17,7 +17,7 @@ export class OnlineController {
   @Api({
     summary: '在线用户-列表',
     description: '查询当前在线用户列表',
-    type: OnlineUserListVo,
+    type: OnlineUserListResponseDto,
   })
   @RequirePermission('monitor:online:list')
   @Get('/list')
@@ -29,6 +29,7 @@ export class OnlineController {
     summary: '在线用户-强退',
     description: '强制用户下线',
     params: [{ name: 'token', description: '用户会话Token' }],
+    type: ForceLogoutResultResponseDto,
   })
   @RequirePermission('monitor:online:forceLogout')
   @Operlog({ businessType: BusinessType.FORCE })

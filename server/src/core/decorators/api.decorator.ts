@@ -213,17 +213,12 @@ const baseTypeNames = ['String', 'Number', 'Boolean'];
  * 构建响应 data 字段的 schema
  */
 function buildDataSchema(type?: Type<any>, isArray?: boolean, isPager?: boolean) {
-  // 无类型时返回简单成功标识
+  // 无类型时返回通用对象 schema，允许任意属性
   if (!type) {
     return {
       type: 'object',
-      properties: {
-        value: {
-          type: 'boolean',
-          default: true,
-        },
-      },
-      nullable: true,
+      additionalProperties: true,
+      description: '响应数据',
     };
   }
 

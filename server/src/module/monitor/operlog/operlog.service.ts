@@ -3,9 +3,10 @@ import { REQUEST } from '@nestjs/core';
 import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 import { Result } from 'src/shared/response';
-import { FormatDateFields } from 'src/shared/utils/index';
+import { toDtoList, toDto } from 'src/shared/utils';
 import { AxiosService } from 'src/module/common/axios/axios.service';
 import { QueryOperLogDto } from './dto/operLog.dto';
+import { OperLogResponseDto } from './dto/operlog.response.dto';
 import { ExportTable } from 'src/shared/utils/export';
 import { DictService } from 'src/module/system/dict/dict.service';
 import { isEmpty } from 'src/shared/utils';
@@ -120,7 +121,7 @@ export class OperlogService {
       this.prisma.sysOperLog.count({ where }),
     ]);
 
-    return Result.page(FormatDateFields(list), total);
+    return Result.page(toDtoList(OperLogResponseDto, list), total, query.pageNum, query.pageSize);
   }
 
   async findOne(id: number) {
@@ -129,7 +130,7 @@ export class OperlogService {
         operId: Number(id),
       },
     });
-    return Result.ok(res);
+    return Result.ok(toDto(OperLogResponseDto, res));
   }
 
   async removeAll() {
@@ -221,7 +222,7 @@ export class OperlogService {
     });
     const options = {
       sheetName: '操作日志数据',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '日志编号', dataIndex: 'operId' },
         { title: '系统模块', dataIndex: 'title', width: 15 },
@@ -233,7 +234,7 @@ export class OperlogService {
         {
           title: '消耗时间',
           dataIndex: 'costTime',
-          formateStr(value) {
+          formateStr(value: number) {
             return value + 'ms';
           },
         },

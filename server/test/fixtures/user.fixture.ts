@@ -1,11 +1,69 @@
 import { SysUser } from '@prisma/client';
+import { faker } from '@faker-js/faker';
 
 /**
  * 用户测试数据工厂
  *
  * @description
  * 提供创建测试用户数据的工厂方法
+ * 使用 faker 生成真实的测试数据
  */
+
+/**
+ * 用户 Fixture 配置选项
+ */
+export interface UserFixtureOptions {
+  userName?: string;
+  nickName?: string;
+  email?: string;
+  phonenumber?: string;
+  status?: '0' | '1';
+  userType?: '00' | '01';
+  tenantId?: string;
+  deptId?: number;
+  roleIds?: number[];
+}
+
+/**
+ * 使用 faker 创建随机用户数据
+ */
+export const createUserFixture = (options: UserFixtureOptions = {}): SysUser => {
+  const userId = faker.number.int({ min: 100, max: 99999 });
+  return {
+    userId: options.userName ? faker.number.int({ min: 1, max: 99999 }) : userId,
+    tenantId: options.tenantId ?? '000000',
+    deptId: options.deptId ?? faker.number.int({ min: 100, max: 110 }),
+    userName: options.userName ?? faker.internet.username().toLowerCase(),
+    nickName: options.nickName ?? faker.person.fullName(),
+    userType: options.userType ?? '00',
+    email: options.email ?? faker.internet.email(),
+    phonenumber: options.phonenumber ?? `1${faker.string.numeric(10)}`,
+    sex: faker.helpers.arrayElement(['0', '1', '2']),
+    avatar: faker.image.avatar(),
+    password: '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', // 123456
+    status: options.status ?? '0',
+    delFlag: '0',
+    loginIp: faker.internet.ip(),
+    loginDate: faker.date.recent(),
+    createBy: 'admin',
+    createTime: faker.date.past(),
+    updateBy: 'admin',
+    updateTime: faker.date.recent(),
+    remark: faker.lorem.sentence(),
+  };
+};
+
+/**
+ * 批量创建用户测试数据
+ */
+export const createBatchUsers = (count: number, options: UserFixtureOptions = {}): SysUser[] => {
+  return Array.from({ length: count }, (_, index) =>
+    createUserFixture({
+      ...options,
+      userName: options.userName ? `${options.userName}_${index + 1}` : undefined,
+    }),
+  );
+};
 
 /**
  * 默认用户数据

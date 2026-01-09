@@ -5,13 +5,21 @@ import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { SYS_USER_TYPE } from 'src/shared/constants/index';
 import { BusinessException } from 'src/shared/exceptions';
 import { ExportTable } from 'src/shared/utils/export';
-import { FormatDateFields } from 'src/shared/utils/index';
 import { Response } from 'express';
-import { CreateTenantDto, UpdateTenantDto, ListTenantDto, SyncTenantPackageDto } from './dto/index';
+import {
+  CreateTenantRequestDto,
+  UpdateTenantRequestDto,
+  ListTenantRequestDto,
+  SyncTenantPackageRequestDto,
+  TenantResponseDto,
+} from './dto/index';
+import { toDto, toDtoPage } from 'src/shared/utils/serialize.util';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
 import { TenantContext } from 'src/tenant/context/tenant.context';
 import { Transactional } from 'src/core/decorators/transactional.decorator';
+import { Idempotent } from 'src/core/decorators/idempotent.decorator';
+import { Lock } from 'src/core/decorators/lock.decorator';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { CacheEnum } from 'src/shared/enums/cache.enum';
 import { hashSync } from 'bcryptjs';
@@ -74,8 +82,13 @@ export class TenantService {
    * ```
    */
   @IgnoreTenant()
+  @Idempotent({
+    timeout: 10,
+    keyResolver: '{body.companyName}',
+    message: '租户正在创建中，请勿重复提交',
+  })
   @Transactional()
-  async create(createTenantDto: CreateTenantDto) {
+  async create(createTenantDto: CreateTenantRequestDto) {
     // 自动生成租户ID（6位数字，从100001开始）
     let tenantId = createTenantDto.tenantId;
     if (!tenantId) {
@@ -169,7 +182,7 @@ export class TenantService {
    * ```
    */
   @IgnoreTenant()
-  async findAll(query: ListTenantDto) {
+  async findAll(query: ListTenantRequestDto) {
     const where: Prisma.SysTenantWhereInput = {
       delFlag: DelFlagEnum.NORMAL,
     };
@@ -236,10 +249,10 @@ export class TenantService {
       packageName: item.packageId ? packageMap.get(item.packageId) || '' : '',
     }));
 
-    return Result.ok({
-      rows: FormatDateFields(listWithPackage),
+    return Result.ok(toDtoPage(TenantResponseDto, {
+      rows: listWithPackage,
       total,
-    });
+    }));
   }
 
   /**
@@ -259,7 +272,7 @@ export class TenantService {
       throw new BusinessException(ResponseCode.NOT_FOUND, '租户不存在');
     }
 
-    return Result.ok(tenant);
+    return Result.ok(toDto(TenantResponseDto, tenant));
   }
 
   /**
@@ -273,7 +286,7 @@ export class TenantService {
    * @throws {BusinessException} 当租户不存在或企业名称重复时抛出异常
    */
   @IgnoreTenant()
-  async update(updateTenantDto: UpdateTenantDto) {
+  async update(updateTenantDto: UpdateTenantRequestDto) {
     const { id, ...updateData } = updateTenantDto;
 
     // 检查租户是否存在
@@ -344,6 +357,11 @@ export class TenantService {
    * ```
    */
   @IgnoreTenant()
+  @Lock({
+    key: 'tenant:dict:sync',
+    leaseTime: 120,
+    message: '租户字典同步正在进行中，请稍后重试',
+  })
   @Transactional()
   async syncTenantDict() {
     this.logger.log('开始同步租户字典');
@@ -468,7 +486,12 @@ export class TenantService {
    * @throws {HttpException} 当同步过程发生错误时抛出异常
    */
   @IgnoreTenant()
-  async syncTenantPackage(params: SyncTenantPackageDto) {
+  @Lock({
+    key: 'tenant:package:sync:{params.tenantId}',
+    leaseTime: 60,
+    message: '租户套餐同步正在进行中，请稍后重试',
+  })
+  async syncTenantPackage(params: SyncTenantPackageRequestDto) {
     try {
       const { tenantId, packageId } = params;
 
@@ -520,6 +543,11 @@ export class TenantService {
    * @throws {HttpException} 当同步过程发生错误时抛出异常
    */
   @IgnoreTenant()
+  @Lock({
+    key: 'tenant:config:sync',
+    leaseTime: 120,
+    message: '租户配置同步正在进行中，请稍后重试',
+  })
   async syncTenantConfig() {
     this.logger.log('开始同步租户参数配置');
 
@@ -600,13 +628,13 @@ export class TenantService {
    * @returns Excel文件流
    */
   @IgnoreTenant()
-  async export(res: Response, body: ListTenantDto) {
+  async export(res: Response, body: ListTenantRequestDto) {
     delete body.pageNum;
     delete body.pageSize;
     const list = await this.findAll(body);
     const options = {
       sheetName: '租户数据',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '租户编号', dataIndex: 'tenantId' },
         { title: '企业名称', dataIndex: 'companyName' },

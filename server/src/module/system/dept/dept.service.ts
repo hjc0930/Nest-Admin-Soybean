@@ -3,7 +3,9 @@ import { Prisma } from '@prisma/client';
 import { Result, ResponseCode } from 'src/shared/response';
 import { BusinessException } from 'src/shared/exceptions';
 import { CreateDeptDto, UpdateDeptDto, ListDeptDto } from './dto/index';
-import { FormatDateFields, ListToTree } from 'src/shared/utils/index';
+import { DeptResponseDto } from './dto/responses/dept.response.dto';
+import { ListToTree } from 'src/shared/utils/index';
+import { toDto, toDtoList } from 'src/shared/utils/serialize.util';
 import { CacheEnum, DataScopeEnum, DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { Cacheable, CacheEvict } from 'src/core/decorators/redis.decorator';
 import { PrismaService } from 'src/infrastructure/prisma';
@@ -73,15 +75,13 @@ export class DeptService {
       where,
       orderBy: { orderNum: 'asc' },
     });
-    const formattedRes = FormatDateFields(res);
-    return Result.ok(formattedRes);
+    return Result.ok(toDtoList(DeptResponseDto, res));
   }
 
   @Cacheable(CacheEnum.SYS_DEPT_KEY, 'findOne:{deptId}')
   async findOne(deptId: number) {
     const data = await this.deptRepo.findById(deptId);
-    const formattedData = FormatDateFields(data);
-    return Result.ok(formattedData);
+    return Result.ok(toDto(DeptResponseDto, data));
   }
 
   /**
@@ -140,7 +140,7 @@ export class DeptService {
         },
       },
     });
-    return Result.ok(data);
+    return Result.ok(toDtoList(DeptResponseDto, data));
   }
 
   @CacheEvict(CacheEnum.SYS_DEPT_KEY, '*')
@@ -182,7 +182,7 @@ export class DeptService {
       },
       orderBy: { orderNum: 'asc' },
     });
-    return Result.ok(list);
+    return Result.ok(toDtoList(DeptResponseDto, list));
   }
 
   /**

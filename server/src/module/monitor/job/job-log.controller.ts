@@ -5,6 +5,7 @@ import { RequirePermission } from 'src/core/decorators/require-premission.decora
 import { ListJobLogDto } from './dto/create-job.dto';
 import { Response } from 'express';
 import { Api } from 'src/core/decorators/api.decorator';
+import { JobLogListResponseDto, ClearLogResultResponseDto } from 'src/module/monitor/dto/responses';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 
@@ -17,6 +18,7 @@ export class JobLogController {
   @Api({
     summary: '获取定时任务日志列表',
     description: '分页查询定时任务执行日志',
+    type: JobLogListResponseDto,
   })
   @Get('list')
   @RequirePermission('monitor:job:list')
@@ -27,6 +29,7 @@ export class JobLogController {
   @Api({
     summary: '清空定时任务日志',
     description: '清除所有定时任务执行日志',
+    type: ClearLogResultResponseDto,
   })
   @Delete('clean')
   @RequirePermission('monitor:job:remove')

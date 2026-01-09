@@ -1,18 +1,28 @@
-import { Controller, Get, Post, Body, Query, Request, Put, Res, HttpCode, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Put, Res, HttpCode, Param, Delete } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { DictService } from './dict.service';
 import {
-  CreateDictTypeDto,
-  UpdateDictTypeDto,
-  ListDictType,
-  CreateDictDataDto,
-  UpdateDictDataDto,
-  ListDictData,
+  CreateDictTypeRequestDto,
+  UpdateDictTypeRequestDto,
+  ListDictTypeRequestDto,
+  CreateDictDataRequestDto,
+  UpdateDictDataRequestDto,
+  ListDictDataRequestDto,
+  DictTypeResponseDto,
+  DictTypeListResponseDto,
+  DictDataResponseDto,
+  DictDataListResponseDto,
+  CreateDictTypeResultResponseDto,
+  UpdateDictTypeResultResponseDto,
+  DeleteDictTypeResultResponseDto,
+  CreateDictDataResultResponseDto,
+  UpdateDictDataResultResponseDto,
+  DeleteDictDataResultResponseDto,
+  RefreshCacheResultResponseDto,
 } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Response } from 'express';
 import { Api } from 'src/core/decorators/api.decorator';
-import { DictTypeVo, DictTypeListVo, DictDataVo, DictDataListVo } from './vo/dict.vo';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../user/user.decorator';
@@ -27,19 +37,21 @@ export class DictController {
   @Api({
     summary: '字典类型-创建',
     description: '创建字典类型',
-    body: CreateDictTypeDto,
+    body: CreateDictTypeRequestDto,
+    type: CreateDictTypeResultResponseDto,
   })
   @RequirePermission('system:dict:add')
   @Operlog({ businessType: BusinessType.INSERT })
   @HttpCode(200)
   @Post('/type')
-  createType(@Body() createDictTypeDto: CreateDictTypeDto, @UserTool() { injectCreate }: UserToolType) {
+  createType(@Body() createDictTypeDto: CreateDictTypeRequestDto, @UserTool() { injectCreate }: UserToolType) {
     return this.dictService.createType(injectCreate(createDictTypeDto));
   }
 
   @Api({
     summary: '字典数据-刷新缓存',
     description: '清除并重新加载字典数据缓存',
+    type: RefreshCacheResultResponseDto,
   })
   @RequirePermission('system:dict:remove')
   @Operlog({ businessType: BusinessType.CLEAN })
@@ -52,6 +64,7 @@ export class DictController {
     summary: '字典类型-删除',
     description: '批量删除字典类型，多个ID用逗号分隔',
     params: [{ name: 'id', description: '字典类型ID，多个用逗号分隔' }],
+    type: DeleteDictTypeResultResponseDto,
   })
   @RequirePermission('system:dict:remove')
   @Operlog({ businessType: BusinessType.DELETE })
@@ -64,30 +77,31 @@ export class DictController {
   @Api({
     summary: '字典类型-修改',
     description: '修改字典类型信息',
-    body: UpdateDictTypeDto,
+    body: UpdateDictTypeRequestDto,
+    type: UpdateDictTypeResultResponseDto,
   })
   @RequirePermission('system:dict:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Put('/type')
-  updateType(@Body() updateDictTypeDto: UpdateDictTypeDto) {
+  updateType(@Body() updateDictTypeDto: UpdateDictTypeRequestDto) {
     return this.dictService.updateType(updateDictTypeDto);
   }
 
   @Api({
     summary: '字典类型-列表',
     description: '分页查询字典类型列表',
-    type: DictTypeListVo,
+    type: DictTypeListResponseDto,
   })
   @RequirePermission('system:dict:list')
   @Get('/type/list')
-  findAllType(@Query() query: ListDictType) {
+  findAllType(@Query() query: ListDictTypeRequestDto) {
     return this.dictService.findAllType(query);
   }
 
   @Api({
     summary: '字典类型-下拉选项',
     description: '获取全部字典类型用于下拉选择',
-    type: DictTypeVo,
+    type: DictTypeResponseDto,
     isArray: true,
   })
   @RequirePermission('system:dict:query')
@@ -99,7 +113,7 @@ export class DictController {
   @Api({
     summary: '字典类型-详情',
     description: '根据ID获取字典类型详情',
-    type: DictTypeVo,
+    type: DictTypeResponseDto,
     params: [{ name: 'id', description: '字典类型ID', type: 'number' }],
   })
   @RequirePermission('system:dict:query')
@@ -112,13 +126,14 @@ export class DictController {
   @Api({
     summary: '字典数据-创建',
     description: '在指定字典类型下创建字典数据',
-    body: CreateDictDataDto,
+    body: CreateDictDataRequestDto,
+    type: CreateDictDataResultResponseDto,
   })
   @RequirePermission('system:dict:add')
   @Operlog({ businessType: BusinessType.INSERT })
   @HttpCode(200)
   @Post('/data')
-  createDictData(@Body() createDictDataDto: CreateDictDataDto, @UserTool() { injectCreate }: UserToolType) {
+  createDictData(@Body() createDictDataDto: CreateDictDataRequestDto, @UserTool() { injectCreate }: UserToolType) {
     return this.dictService.createDictData(injectCreate(createDictDataDto));
   }
 
@@ -126,6 +141,7 @@ export class DictController {
     summary: '字典数据-删除',
     description: '批量删除字典数据，多个ID用逗号分隔',
     params: [{ name: 'id', description: '字典数据ID，多个用逗号分隔' }],
+    type: DeleteDictDataResultResponseDto,
   })
   @RequirePermission('system:dict:remove')
   @Operlog({ businessType: BusinessType.DELETE })
@@ -138,30 +154,31 @@ export class DictController {
   @Api({
     summary: '字典数据-修改',
     description: '修改字典数据',
-    body: UpdateDictDataDto,
+    body: UpdateDictDataRequestDto,
+    type: UpdateDictDataResultResponseDto,
   })
   @RequirePermission('system:dict:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Put('/data')
-  updateDictData(@Body() updateDictDataDto: UpdateDictDataDto) {
+  updateDictData(@Body() updateDictDataDto: UpdateDictDataRequestDto) {
     return this.dictService.updateDictData(updateDictDataDto);
   }
 
   @Api({
     summary: '字典数据-列表',
     description: '查询指定字典类型下的数据列表',
-    type: DictDataListVo,
+    type: DictDataListResponseDto,
   })
   @RequirePermission('system:dict:list')
   @Get('/data/list')
-  findAllData(@Query() query: ListDictData) {
+  findAllData(@Query() query: ListDictDataRequestDto) {
     return this.dictService.findAllData(query);
   }
 
   @Api({
     summary: '字典数据-详情',
     description: '根据字典编码获取字典数据详情',
-    type: DictDataVo,
+    type: DictDataResponseDto,
     params: [{ name: 'id', description: '字典数据编码', type: 'number' }],
   })
   @Get('/data/:id')
@@ -172,7 +189,7 @@ export class DictController {
   @Api({
     summary: '字典数据-按类型查询（缓存）',
     description: '根据字典类型获取字典数据列表，优先使用缓存',
-    type: DictDataVo,
+    type: DictDataResponseDto,
     isArray: true,
     params: [{ name: 'id', description: '字典类型标识' }],
   })
@@ -184,26 +201,26 @@ export class DictController {
   @Api({
     summary: '字典类型-导出Excel',
     description: '导出字典类型为xlsx文件',
-    body: ListDictType,
+    body: ListDictTypeRequestDto,
     produces: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
   })
   @RequirePermission('system:dict:export')
   @Operlog({ businessType: BusinessType.EXPORT })
   @Post('/type/export')
-  async export(@Res() res: Response, @Body() body: ListDictType): Promise<void> {
+  async export(@Res() res: Response, @Body() body: ListDictTypeRequestDto): Promise<void> {
     return this.dictService.export(res, body);
   }
 
   @Api({
     summary: '字典数据-导出Excel',
     description: '导出字典数据为xlsx文件',
-    body: ListDictType,
+    body: ListDictTypeRequestDto,
     produces: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
   })
   @RequirePermission('system:dict:export')
   @Operlog({ businessType: BusinessType.EXPORT })
   @Post('/data/export')
-  async exportData(@Res() res: Response, @Body() body: ListDictType): Promise<void> {
+  async exportData(@Res() res: Response, @Body() body: ListDictTypeRequestDto): Promise<void> {
     return this.dictService.exportData(res, body);
   }
 }

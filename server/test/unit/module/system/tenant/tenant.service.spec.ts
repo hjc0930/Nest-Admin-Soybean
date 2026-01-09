@@ -320,7 +320,17 @@ describe('TenantService', () => {
       const result = await service.findOne(1);
 
       expect(result.code).toBe(ResponseCode.SUCCESS);
-      expect(result.data).toEqual(mockTenant);
+      // DTO 会过滤掉敏感字段 (delFlag, createBy, updateBy)
+      expect(result.data.id).toBe(mockTenant.id);
+      expect(result.data.tenantId).toBe(mockTenant.tenantId);
+      expect(result.data.companyName).toBe(mockTenant.companyName);
+      expect(result.data.contactUserName).toBe(mockTenant.contactUserName);
+      expect(result.data.contactPhone).toBe(mockTenant.contactPhone);
+      expect(result.data.status).toBe(mockTenant.status);
+      // 敏感字段应该被过滤
+      expect(result.data.delFlag).toBeUndefined();
+      expect(result.data.createBy).toBeUndefined();
+      expect(result.data.updateBy).toBeUndefined();
     });
 
     it('should throw error when tenant not found', async () => {
@@ -504,6 +514,171 @@ describe('TenantService', () => {
       expect(result.code).toBe(ResponseCode.SUCCESS);
       expect(result.data.detail.tenants).toBe(2);
       expect(redisService.del).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('getSelectList', () => {
+    it('should return tenant list for super admin', async () => {
+      const mockUser = {
+        user: { tenantId: '000000', userId: 1 },
+        token: 'test-token',
+      };
+
+      const mockTenants = [
+        { tenantId: '100001', companyName: '公司1', status: '0' },
+        { tenantId: '100002', companyName: '公司2', status: '0' },
+      ];
+
+      (prisma.sysTenant.findMany as jest.Mock).mockResolvedValue(mockTenants);
+
+      const result = await service.getSelectList(mockUser as any);
+
+      expect(result.code).toBe(ResponseCode.SUCCESS);
+      expect(result.data.list).toHaveLength(2);
+    });
+
+    it('should throw error for non-super admin', async () => {
+      const mockUser = {
+        user: { tenantId: '100001', userId: 1 },
+        token: 'test-token',
+      };
+
+      await expect(service.getSelectList(mockUser as any)).rejects.toThrow(BusinessException);
+    });
+  });
+
+  describe('switchTenant', () => {
+    it('should switch tenant for super admin', async () => {
+      const mockUser = {
+        user: { tenantId: '000000', userId: 1 },
+        token: 'test-token',
+        userName: 'admin',
+      };
+
+      const mockTargetTenant = {
+        tenantId: '100001',
+        companyName: '目标公司',
+        status: '0',
+      };
+
+      const mockOriginalTenant = {
+        tenantId: '000000',
+        companyName: '超级管理员',
+      };
+
+      (prisma.sysTenant.findFirst as jest.Mock)
+        .mockResolvedValueOnce(mockTargetTenant)
+        .mockResolvedValueOnce(mockOriginalTenant);
+      (redisService.set as jest.Mock).mockResolvedValue('OK');
+      (redisService.get as jest.Mock).mockResolvedValue({
+        user: { tenantId: '000000' },
+      });
+
+      const result = await service.switchTenant('100001', mockUser as any);
+
+      expect(result.code).toBe(ResponseCode.SUCCESS);
+      expect(result.data.tenantId).toBe('100001');
+      expect(result.data.companyName).toBe('目标公司');
+    });
+
+    it('should throw error when target tenant not found', async () => {
+      const mockUser = {
+        user: { tenantId: '000000', userId: 1 },
+        token: 'test-token',
+      };
+
+      (prisma.sysTenant.findFirst as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.switchTenant('999999', mockUser as any)).rejects.toThrow(BusinessException);
+    });
+
+    it('should throw error for non-super admin', async () => {
+      const mockUser = {
+        user: { tenantId: '100001', userId: 1 },
+        token: 'test-token',
+      };
+
+      await expect(service.switchTenant('100002', mockUser as any)).rejects.toThrow(BusinessException);
+    });
+  });
+
+  describe('restoreTenant', () => {
+    it('should restore to original tenant', async () => {
+      const mockUser = {
+        user: { tenantId: '100001', userId: 1 },
+        token: 'test-token',
+        userName: 'admin',
+      };
+
+      const mockSwitchOriginal = {
+        originalTenantId: '000000',
+        originalCompanyName: '超级管理员',
+        switchedAt: new Date(),
+      };
+
+      (redisService.get as jest.Mock)
+        .mockResolvedValueOnce(mockSwitchOriginal)
+        .mockResolvedValueOnce({ user: { tenantId: '100001' } });
+      (redisService.set as jest.Mock).mockResolvedValue('OK');
+      (redisService.del as jest.Mock).mockResolvedValue(1);
+
+      const result = await service.restoreTenant(mockUser as any);
+
+      expect(result.code).toBe(ResponseCode.SUCCESS);
+      expect(result.data.originalTenantId).toBe('000000');
+    });
+
+    it('should throw error when no switch record', async () => {
+      const mockUser = {
+        user: { tenantId: '000000', userId: 1 },
+        token: 'test-token',
+      };
+
+      (redisService.get as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.restoreTenant(mockUser as any)).rejects.toThrow(BusinessException);
+    });
+  });
+
+  describe('getSwitchStatus', () => {
+    it('should return not switched status', async () => {
+      const mockUser = {
+        user: { tenantId: '000000', userId: 1 },
+        token: 'test-token',
+      };
+
+      (redisService.get as jest.Mock).mockResolvedValue(null);
+
+      const result = await service.getSwitchStatus(mockUser as any);
+
+      expect(result.code).toBe(ResponseCode.SUCCESS);
+      expect(result.data.isSwitched).toBe(false);
+    });
+
+    it('should return switched status', async () => {
+      const mockUser = {
+        user: { tenantId: '100001', userId: 1 },
+        token: 'test-token',
+      };
+
+      const mockSwitchOriginal = {
+        originalTenantId: '000000',
+        originalCompanyName: '超级管理员',
+        switchedAt: new Date(),
+      };
+
+      (redisService.get as jest.Mock)
+        .mockResolvedValueOnce(mockSwitchOriginal)
+        .mockResolvedValueOnce({
+          user: { tenantId: '100001' },
+          switchedCompanyName: '目标公司',
+        });
+
+      const result = await service.getSwitchStatus(mockUser as any);
+
+      expect(result.code).toBe(ResponseCode.SUCCESS);
+      expect(result.data.isSwitched).toBe(true);
+      expect((result.data as any).originalTenantId).toBe('000000');
     });
   });
 });

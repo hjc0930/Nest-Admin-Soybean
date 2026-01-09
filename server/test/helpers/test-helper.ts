@@ -40,6 +40,7 @@ import { PrismaService } from 'src/infrastructure/prisma';
 import { ClsService } from 'nestjs-cls';
 import { GlobalExceptionFilter } from 'src/core/filters/global-exception.filter';
 import { ResponseInterceptor } from 'src/core/interceptors/response.interceptor';
+import { LoginSecurityService } from 'src/security/login/login-security.service';
 
 /**
  * 测试配置接口
@@ -101,6 +102,7 @@ export class TestHelper {
   private token: string = '';
   private config: TestConfig;
   private prisma: PrismaService | null = null;
+  private loginSecurityService: LoginSecurityService | null = null;
   private createdIds: TestContext['createdIds'] = {
     users: [],
     roles: [],
@@ -164,6 +166,9 @@ export class TestHelper {
     // 获取 Prisma 服务
     this.prisma = this.app.get(PrismaService);
 
+    // 获取 LoginSecurityService
+    this.loginSecurityService = this.app.get(LoginSecurityService);
+
     await this.app.init();
 
     return this.app;
@@ -197,6 +202,18 @@ export class TestHelper {
       throw new Error('TestHelper not initialized. Call init() first.');
     }
     return this.prisma;
+  }
+
+  /**
+   * 解锁账户
+   *
+   * @param username 用户名
+   */
+  async unlockAccount(username: string = this.config.adminUsername): Promise<void> {
+    if (!this.loginSecurityService) {
+      throw new Error('TestHelper not initialized. Call init() first.');
+    }
+    await this.loginSecurityService.unlockAccount(username);
   }
 
   /**

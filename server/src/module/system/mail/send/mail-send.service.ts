@@ -5,6 +5,9 @@ import { SendMailDto, BatchSendMailDto, TestMailDto } from './dto/index';
 import { MailTemplateService } from '../template/mail-template.service';
 import { MailAccountService } from '../account/mail-account.service';
 import { MailLogRepository } from '../log/mail-log.repository';
+import { Idempotent } from 'src/core/decorators/idempotent.decorator';
+import { CircuitBreaker } from 'src/core/decorators/circuit-breaker.decorator';
+import { CircuitBreakerService } from 'src/resilience/circuit-breaker/circuit-breaker.service';
 import * as crypto from 'crypto';
 
 // 简单的密码加密密钥（与 mail-account.service.ts 保持一致）
@@ -27,6 +30,7 @@ export class MailSendService {
     private readonly mailTemplateService: MailTemplateService,
     private readonly mailAccountService: MailAccountService,
     private readonly mailLogRepo: MailLogRepository,
+    private readonly circuitBreakerService: CircuitBreakerService,
   ) {}
 
   /**
@@ -74,6 +78,16 @@ export class MailSendService {
   /**
    * 发送邮件
    */
+  @Idempotent({
+    timeout: 10,
+    keyResolver: '{body.toMail}:{body.templateCode}',
+    message: '邮件正在发送中，请勿重复提交',
+  })
+  @CircuitBreaker({
+    name: 'mail-send',
+    threshold: 3,
+    cooldownMs: 30000,
+  })
   async send(dto: SendMailDto) {
     const { toMail, templateCode, params = {} } = dto;
 
@@ -217,6 +231,11 @@ export class MailSendService {
   /**
    * 测试邮件发送（直接使用账号发送，不使用模板）
    */
+  @CircuitBreaker({
+    name: 'mail-test',
+    threshold: 5,
+    cooldownMs: 30000,
+  })
   async testSend(dto: TestMailDto) {
     const { toMail, accountId, title = '测试邮件', content = '<p>这是一封测试邮件</p>' } = dto;
 

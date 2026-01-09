@@ -1,296 +1,371 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, CallHandler } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { of, throwError } from 'rxjs';
-import { TransactionalInterceptor } from '@/core/interceptors/transactional.interceptor';
-import { PrismaService } from '@/infrastructure/prisma';
+import { of } from 'rxjs';
+import { TransactionalInterceptor } from 'src/core/interceptors/transactional.interceptor';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { TransactionContextService } from 'src/core/transaction/transaction-context.service';
 import {
-  TRANSACTIONAL_KEY,
+  TransactionalOptions,
   IsolationLevel,
   Propagation,
-} from '@/core/decorators/transactional.decorator';
+} from 'src/core/decorators/transactional.decorator';
+import { BusinessException } from 'src/shared/exceptions';
+import { firstValueFrom } from 'rxjs';
 
 describe('TransactionalInterceptor', () => {
   let interceptor: TransactionalInterceptor;
-  let reflector: Reflector;
-  let prismaService: PrismaService;
+  let reflector: jest.Mocked<Reflector>;
+  let prismaService: jest.Mocked<PrismaService>;
+  let transactionContextService: jest.Mocked<TransactionContextService>;
 
-  const mockPrismaService = {
-    $transaction: jest.fn(),
+  const mockExecutionContext = {
+    getHandler: jest.fn().mockReturnValue(() => {}),
+    getClass: jest.fn().mockReturnValue(class {}),
+    switchToHttp: jest.fn().mockReturnValue({
+      getRequest: jest.fn().mockReturnValue({}),
+      getResponse: jest.fn().mockReturnValue({}),
+    }),
+  } as unknown as ExecutionContext;
+
+  const mockCallHandler: CallHandler = {
+    handle: jest.fn().mockReturnValue(of({ success: true })),
   };
-
-  const createMockContext = (): ExecutionContext => {
-    return {
-      switchToHttp: () => ({
-        getRequest: () => ({}),
-      }),
-      getHandler: () => ({}),
-      getClass: () => ({}),
-    } as ExecutionContext;
-  };
-
-  const createMockCallHandler = (result: any = { success: true }): CallHandler => ({
-    handle: () => of(result),
-  });
-
-  const createErrorCallHandler = (error: Error): CallHandler => ({
-    handle: () => throwError(() => error),
-  });
 
   beforeEach(async () => {
+    reflector = {
+      get: jest.fn(),
+    } as any;
+
+    prismaService = {
+      $transaction: jest.fn().mockImplementation(async (fn) => {
+        const mockTx = { id: 'mock-tx' };
+        return fn(mockTx);
+      }),
+    } as any;
+
+    transactionContextService = {
+      isInTransaction: jest.fn().mockReturnValue(false),
+      getCurrentTransaction: jest.fn().mockReturnValue(undefined),
+      setTransaction: jest.fn().mockReturnValue({
+        transactionId: 'tx_123',
+        client: {} as any,
+        startTime: Date.now(),
+        isNested: false,
+      }),
+      clearTransaction: jest.fn(),
+      suspendTransaction: jest.fn().mockReturnValue(undefined),
+      resumeTransaction: jest.fn().mockReturnValue(undefined),
+    } as any;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TransactionalInterceptor,
-        {
-          provide: Reflector,
-          useValue: {
-            get: jest.fn(),
-          },
-        },
-        {
-          provide: PrismaService,
-          useValue: mockPrismaService,
-        },
+        { provide: Reflector, useValue: reflector },
+        { provide: PrismaService, useValue: prismaService },
+        { provide: TransactionContextService, useValue: transactionContextService },
       ],
     }).compile();
 
     interceptor = module.get<TransactionalInterceptor>(TransactionalInterceptor);
-    reflector = module.get<Reflector>(Reflector);
-    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('intercept', () => {
-    it('should pass through when no @Transactional decorator is set', (done) => {
-      jest.spyOn(reflector, 'get').mockReturnValue(undefined);
-      const context = createMockContext();
-      const next = createMockCallHandler();
+  describe('无事务装饰器', () => {
+    it('应直接执行方法', async () => {
+      reflector.get.mockReturnValue(undefined);
 
-      interceptor.intercept(context, next).subscribe({
-        next: (result) => {
-          expect(result).toEqual({ success: true });
-          expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
-          done();
-        },
-      });
-    });
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
 
-    it('should pass through when readOnly is true', (done) => {
-      jest.spyOn(reflector, 'get').mockReturnValue({
-        readOnly: true,
-        propagation: Propagation.REQUIRED,
-        isolationLevel: IsolationLevel.ReadCommitted,
-      });
-      const context = createMockContext();
-      const next = createMockCallHandler();
-
-      interceptor.intercept(context, next).subscribe({
-        next: (result) => {
-          expect(result).toEqual({ success: true });
-          expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
-          done();
-        },
-      });
-    });
-
-    it('should pass through when propagation is NOT_SUPPORTED', (done) => {
-      jest.spyOn(reflector, 'get').mockReturnValue({
-        propagation: Propagation.NOT_SUPPORTED,
-        isolationLevel: IsolationLevel.ReadCommitted,
-      });
-      const context = createMockContext();
-      const next = createMockCallHandler();
-
-      interceptor.intercept(context, next).subscribe({
-        next: (result) => {
-          expect(result).toEqual({ success: true });
-          expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
-          done();
-        },
-      });
-    });
-
-    it('should pass through when propagation is NEVER', (done) => {
-      jest.spyOn(reflector, 'get').mockReturnValue({
-        propagation: Propagation.NEVER,
-        isolationLevel: IsolationLevel.ReadCommitted,
-      });
-      const context = createMockContext();
-      const next = createMockCallHandler();
-
-      interceptor.intercept(context, next).subscribe({
-        next: (result) => {
-          expect(result).toEqual({ success: true });
-          expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
-          done();
-        },
-      });
-    });
-
-    it('should pass through when propagation is SUPPORTS', (done) => {
-      jest.spyOn(reflector, 'get').mockReturnValue({
-        propagation: Propagation.SUPPORTS,
-        isolationLevel: IsolationLevel.ReadCommitted,
-      });
-      const context = createMockContext();
-      const next = createMockCallHandler();
-
-      interceptor.intercept(context, next).subscribe({
-        next: (result) => {
-          expect(result).toEqual({ success: true });
-          expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
-          done();
-        },
-      });
-    });
-
-    it('should wrap in transaction when propagation is REQUIRED', (done) => {
-      jest.spyOn(reflector, 'get').mockReturnValue({
-        propagation: Propagation.REQUIRED,
-        isolationLevel: IsolationLevel.ReadCommitted,
-        timeout: 5000,
-      });
-      mockPrismaService.$transaction.mockImplementation(async (fn) => {
-        return { transactionResult: true };
-      });
-
-      const context = createMockContext();
-      const next = createMockCallHandler({ data: 'test' });
-
-      interceptor.intercept(context, next).subscribe({
-        next: (result) => {
-          expect(mockPrismaService.$transaction).toHaveBeenCalled();
-          done();
-        },
-      });
-    });
-
-    it('should wrap in transaction when propagation is REQUIRES_NEW', (done) => {
-      jest.spyOn(reflector, 'get').mockReturnValue({
-        propagation: Propagation.REQUIRES_NEW,
-        isolationLevel: IsolationLevel.Serializable,
-        timeout: 10000,
-      });
-      mockPrismaService.$transaction.mockImplementation(async (fn) => {
-        return { transactionResult: true };
-      });
-
-      const context = createMockContext();
-      const next = createMockCallHandler();
-
-      interceptor.intercept(context, next).subscribe({
-        next: () => {
-          expect(mockPrismaService.$transaction).toHaveBeenCalled();
-          done();
-        },
-      });
-    });
-
-    it('should use correct isolation level', (done) => {
-      jest.spyOn(reflector, 'get').mockReturnValue({
-        propagation: Propagation.REQUIRED,
-        isolationLevel: IsolationLevel.Serializable,
-      });
-      mockPrismaService.$transaction.mockImplementation(async (fn, options) => {
-        expect(options.isolationLevel).toBe('Serializable');
-        return { success: true };
-      });
-
-      const context = createMockContext();
-      const next = createMockCallHandler();
-
-      interceptor.intercept(context, next).subscribe({
-        next: () => {
-          done();
-        },
-      });
-    });
-
-    it('should use timeout from options', (done) => {
-      jest.spyOn(reflector, 'get').mockReturnValue({
-        propagation: Propagation.REQUIRED,
-        isolationLevel: IsolationLevel.ReadCommitted,
-        timeout: 15000,
-      });
-      mockPrismaService.$transaction.mockImplementation(async (fn, options) => {
-        expect(options.timeout).toBe(15000);
-        return { success: true };
-      });
-
-      const context = createMockContext();
-      const next = createMockCallHandler();
-
-      interceptor.intercept(context, next).subscribe({
-        next: () => {
-          done();
-        },
-      });
+      expect(result).toEqual({ success: true });
+      expect(prismaService.$transaction).not.toHaveBeenCalled();
     });
   });
 
-  describe('shouldRollback', () => {
-    it('should rollback by default on any error', () => {
-      const options = {
+  describe('只读事务', () => {
+    it('应直接执行方法而不创建事务', async () => {
+      const options: TransactionalOptions = {
+        readOnly: true,
         propagation: Propagation.REQUIRED,
         isolationLevel: IsolationLevel.ReadCommitted,
         rollbackFor: [],
         noRollbackFor: [],
       };
-      const error = new Error('Test error');
+      reflector.get.mockReturnValue(options);
 
-      // Access private method through any cast
-      const result = (interceptor as any).shouldRollback(error, options);
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
 
-      expect(result).toBe(true);
+      expect(result).toEqual({ success: true });
+      expect(prismaService.$transaction).not.toHaveBeenCalled();
     });
+  });
 
-    it('should not rollback when error is in noRollbackFor list', () => {
-      class CustomError extends Error {}
-      const options = {
+  describe('REQUIRED 传播行为', () => {
+    it('当没有现有事务时应创建新事务', async () => {
+      const options: TransactionalOptions = {
         propagation: Propagation.REQUIRED,
         isolationLevel: IsolationLevel.ReadCommitted,
         rollbackFor: [],
-        noRollbackFor: [CustomError],
-      };
-      const error = new CustomError('Custom error');
-
-      const result = (interceptor as any).shouldRollback(error, options);
-
-      expect(result).toBe(false);
-    });
-
-    it('should rollback when error is in rollbackFor list', () => {
-      class CustomError extends Error {}
-      const options = {
-        propagation: Propagation.REQUIRED,
-        isolationLevel: IsolationLevel.ReadCommitted,
-        rollbackFor: [CustomError],
         noRollbackFor: [],
       };
-      const error = new CustomError('Custom error');
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(false);
 
-      const result = (interceptor as any).shouldRollback(error, options);
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
 
-      expect(result).toBe(true);
+      expect(result).toEqual({ success: true });
+      expect(prismaService.$transaction).toHaveBeenCalled();
+      expect(transactionContextService.setTransaction).toHaveBeenCalled();
     });
 
-    it('should not rollback when error is not in rollbackFor list', () => {
-      class CustomError extends Error {}
-      class OtherError extends Error {}
-      const options = {
+    it('当存在现有事务时应加入现有事务', async () => {
+      const options: TransactionalOptions = {
         propagation: Propagation.REQUIRED,
         isolationLevel: IsolationLevel.ReadCommitted,
-        rollbackFor: [CustomError],
+        rollbackFor: [],
         noRollbackFor: [],
       };
-      const error = new OtherError('Other error');
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(true);
 
-      const result = (interceptor as any).shouldRollback(error, options);
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
 
-      expect(result).toBe(false);
+      expect(result).toEqual({ success: true });
+      expect(prismaService.$transaction).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('REQUIRES_NEW 传播行为', () => {
+    it('当没有现有事务时应创建新事务', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.REQUIRES_NEW,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(false);
+
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(result).toEqual({ success: true });
+      expect(prismaService.$transaction).toHaveBeenCalled();
+      expect(transactionContextService.suspendTransaction).toHaveBeenCalled();
+      expect(transactionContextService.setTransaction).toHaveBeenCalledWith(expect.anything(), true);
+    });
+
+    it('当存在现有事务时应挂起当前事务并创建新事务', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.REQUIRES_NEW,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(true);
+      transactionContextService.suspendTransaction.mockReturnValue({
+        transactionId: 'tx_parent',
+        client: {} as any,
+        startTime: Date.now(),
+        isNested: false,
+      });
+
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(result).toEqual({ success: true });
+      expect(transactionContextService.suspendTransaction).toHaveBeenCalled();
+      expect(prismaService.$transaction).toHaveBeenCalled();
+      expect(transactionContextService.setTransaction).toHaveBeenCalledWith(expect.anything(), true);
+    });
+  });
+
+  describe('SUPPORTS 传播行为', () => {
+    it('当存在事务时应加入现有事务', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.SUPPORTS,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(true);
+
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(result).toEqual({ success: true });
+      expect(prismaService.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('当没有事务时应非事务执行', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.SUPPORTS,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(false);
+
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(result).toEqual({ success: true });
+      expect(prismaService.$transaction).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('NOT_SUPPORTED 传播行为', () => {
+    it('当存在事务时应挂起事务并非事务执行', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.NOT_SUPPORTED,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(true);
+      transactionContextService.suspendTransaction.mockReturnValue({
+        transactionId: 'tx_suspended',
+        client: {} as any,
+        startTime: Date.now(),
+        isNested: false,
+      });
+
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(result).toEqual({ success: true });
+      expect(transactionContextService.suspendTransaction).toHaveBeenCalled();
+      expect(prismaService.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('当没有事务时应直接非事务执行', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.NOT_SUPPORTED,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(false);
+
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(result).toEqual({ success: true });
+      expect(transactionContextService.suspendTransaction).not.toHaveBeenCalled();
+      expect(prismaService.$transaction).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('MANDATORY 传播行为', () => {
+    it('当存在事务时应加入现有事务', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.MANDATORY,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(true);
+
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(result).toEqual({ success: true });
+      expect(prismaService.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('当没有事务时应抛出异常', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.MANDATORY,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(false);
+
+      await expect(firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler))).rejects.toThrow(
+        BusinessException,
+      );
+    });
+  });
+
+  describe('NEVER 传播行为', () => {
+    it('当没有事务时应非事务执行', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.NEVER,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(false);
+
+      const result = await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(result).toEqual({ success: true });
+      expect(prismaService.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('当存在事务时应抛出异常', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.NEVER,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(true);
+
+      await expect(firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler))).rejects.toThrow(
+        BusinessException,
+      );
+    });
+  });
+
+  describe('隔离级别', () => {
+    it('应使用指定的隔离级别', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.REQUIRED,
+        isolationLevel: IsolationLevel.Serializable,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(false);
+
+      await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(prismaService.$transaction).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.objectContaining({
+          isolationLevel: 'Serializable',
+        }),
+      );
+    });
+  });
+
+  describe('超时配置', () => {
+    it('应使用指定的超时时间', async () => {
+      const options: TransactionalOptions = {
+        propagation: Propagation.REQUIRED,
+        isolationLevel: IsolationLevel.ReadCommitted,
+        timeout: 5000,
+        rollbackFor: [],
+        noRollbackFor: [],
+      };
+      reflector.get.mockReturnValue(options);
+      transactionContextService.isInTransaction.mockReturnValue(false);
+
+      await firstValueFrom(interceptor.intercept(mockExecutionContext, mockCallHandler));
+
+      expect(prismaService.$transaction).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.objectContaining({
+          timeout: 5000,
+        }),
+      );
     });
   });
 });

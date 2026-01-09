@@ -14,21 +14,42 @@ dayjs.tz.setDefault('Asia/Beijing');
 import { DataScopeEnum } from '../enums/index';
 
 /**
- * 数组转树结构
- * @param arr
- * @param getId
- * @param getLabel
- * @returns
+ * 树节点接口
  */
-export function ListToTree(arr, getId, getLabel) {
-  const kData = {}; // 以id做key的对象 暂时储存数据
-  const lData = []; // 最终的数据 arr
+export interface TreeNode {
+  id: number;
+  label: string;
+  parentId: number;
+  children: TreeNode[];
+}
+
+/**
+ * 带有 parentId 属性的基础接口
+ */
+interface HasParentId {
+  parentId: number;
+}
+
+/**
+ * 数组转树结构
+ * @param arr 数据数组
+ * @param getId 获取ID的函数
+ * @param getLabel 获取标签的函数
+ * @returns 树结构数组
+ */
+export function ListToTree<T extends HasParentId>(
+  arr: T[],
+  getId: (item: T) => number,
+  getLabel: (item: T) => string,
+): TreeNode[] {
+  const kData: Record<number, TreeNode> = {}; // 以id做key的对象 暂时储存数据
+  const lData: TreeNode[] = []; // 最终的数据 arr
 
   // 第一次遍历，构建 kData
-  arr.forEach((m) => {
+  arr.forEach((m: T) => {
     const id = getId(m);
     const label = getLabel(m);
-    const parentId = +m.parentId;
+    const parentId = m.parentId;
 
     kData[id] = {
       id,
@@ -43,9 +64,9 @@ export function ListToTree(arr, getId, getLabel) {
     }
   });
   // 第二次遍历，处理子节点
-  arr.forEach((m) => {
+  arr.forEach((m: T) => {
     const id = getId(m);
-    const parentId = +m.parentId;
+    const parentId = m.parentId;
 
     if (parentId !== 0) {
       // 确保父节点存在后再添加子节点
@@ -76,45 +97,6 @@ export function GetNowDate() {
  */
 export function FormatDate(date: Date, format = 'YYYY-MM-DD HH:mm:ss') {
   return date && dayjs(date).format(format);
-}
-
-/**
- * 格式化对象中的时间字段
- * @param obj 要格式化的对象或数组
- * @param dateFields 需要格式化的字段名数组，默认为常用时间字段
- * @returns 格式化后的对象
- */
-export function FormatDateFields<T>(
-  obj: T,
-  dateFields: string[] = ['createTime', 'updateTime', 'loginDate', 'loginTime', 'operTime', 'expireTime'],
-): T {
-  if (!obj) return obj;
-
-  if (Array.isArray(obj)) {
-    return obj.map((item) => FormatDateFields(item, dateFields)) as any;
-  }
-
-  if (typeof obj === 'object') {
-    const formatted = { ...obj };
-    for (const field of dateFields) {
-      if (field in formatted && formatted[field]) {
-        // 处理 Date 对象
-        if (formatted[field] instanceof Date) {
-          formatted[field] = FormatDate(formatted[field]);
-        }
-        // 处理字符串格式的日期（从 Redis 或其他来源）
-        else if (typeof formatted[field] === 'string') {
-          const dateValue = new Date(formatted[field]);
-          if (!isNaN(dateValue.getTime())) {
-            formatted[field] = FormatDate(dateValue);
-          }
-        }
-      }
-    }
-    return formatted;
-  }
-
-  return obj;
 }
 
 /**
@@ -229,8 +211,8 @@ export async function DataScopeFilter<T>(entity: T, dataScope: DataScopeEnum): P
  * @param item
  * @returns {boolean}
  */
-export function isObject(item) {
-  return item && typeof item === 'object' && !Array.isArray(item);
+export function isObject(item: unknown): item is Record<string, unknown> {
+  return item !== null && typeof item === 'object' && !Array.isArray(item);
 }
 
 /**
@@ -238,7 +220,7 @@ export function isObject(item) {
  * @param target
  * @param ...sources
  */
-export function mergeDeep(target, ...sources) {
+export function mergeDeep<T extends Record<string, unknown>>(target: T, ...sources: Partial<T>[]): T {
   if (!sources.length) return target;
   const source = sources.shift();
 
@@ -246,7 +228,7 @@ export function mergeDeep(target, ...sources) {
     for (const key in source) {
       if (isObject(source[key])) {
         if (!target[key]) Object.assign(target, { [key]: {} });
-        mergeDeep(target[key], source[key]);
+        mergeDeep(target[key] as Record<string, unknown>, source[key] as Record<string, unknown>);
       } else {
         Object.assign(target, { [key]: source[key] });
       }
@@ -269,3 +251,4 @@ export { BatchOperationHelper, type BatchResult, type BatchResultItem, type Batc
 export { CacheRefreshHelper, GroupedCacheRefreshHelper } from './cache-refresh.helper';
 export { ExportHelper, ExportConfigFactory, type ExportConfig, type ExportColumn } from './export.helper';
 export { PaginationHelper } from './pagination.helper';
+export { toDto, toDtoList, toDtoPage } from './serialize.util';

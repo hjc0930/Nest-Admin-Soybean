@@ -3,8 +3,10 @@ import { Prisma } from '@prisma/client';
 import { Result } from 'src/shared/response';
 import { DelFlagEnum, StatusEnum, CacheEnum } from 'src/shared/enums/index';
 import { Cacheable } from 'src/core/decorators/redis.decorator';
-import { CreateMenuDto, UpdateMenuDto, ListMenuDto } from './dto/index';
+import { CreateMenuRequestDto, UpdateMenuRequestDto, ListMenuRequestDto } from './dto/requests';
+import { MenuResponseDto } from './dto/responses';
 import { ListToTree, Uniq } from 'src/shared/utils/index';
+import { toDto, toDtoList } from 'src/shared/utils/serialize.util';
 import { UserService } from '../user/user.service';
 import { buildMenus } from './utils';
 import { PrismaService } from 'src/infrastructure/prisma';
@@ -19,19 +21,19 @@ export class MenuService {
     private readonly menuRepo: MenuRepository,
   ) {}
 
-  async create(createMenuDto: CreateMenuDto) {
+  async create(createMenuDto: CreateMenuRequestDto) {
     const res = await this.menuRepo.create({
       ...createMenuDto,
       path: createMenuDto.path ?? '',
       icon: createMenuDto.icon ?? '',
       delFlag: DelFlagEnum.NORMAL,
     });
-    return Result.ok(res);
+    return Result.ok(toDto(MenuResponseDto, res));
   }
 
-  async findAll(query: ListMenuDto) {
+  async findAll(query: ListMenuRequestDto) {
     const res = await this.menuRepo.findAllMenus(query);
-    return Result.ok(res);
+    return Result.ok(toDtoList(MenuResponseDto, res));
   }
 
   async treeSelect() {
@@ -84,12 +86,12 @@ export class MenuService {
 
   async findOne(menuId: number) {
     const res = await this.menuRepo.findById(menuId);
-    return Result.ok(res);
+    return Result.ok(toDto(MenuResponseDto, res));
   }
 
-  async update(updateMenuDto: UpdateMenuDto) {
+  async update(updateMenuDto: UpdateMenuRequestDto) {
     const res = await this.menuRepo.update(updateMenuDto.menuId, updateMenuDto);
-    return Result.ok(res);
+    return Result.ok(toDto(MenuResponseDto, res));
   }
 
   async remove(menuId: number) {

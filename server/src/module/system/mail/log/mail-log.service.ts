@@ -1,8 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Result } from 'src/shared/response';
-import { FormatDateFields } from 'src/shared/utils/index';
-import { ListMailLogDto } from './dto/index';
+import { toDtoList } from 'src/shared/utils/index';
+import { ListMailLogDto, MailLogResponseDto } from './dto/index';
 import { MailLogRepository } from './mail-log.repository';
 
 @Injectable()
@@ -51,7 +51,7 @@ export class MailLogService {
     }));
 
     return Result.ok({
-      rows: FormatDateFields(rows),
+      rows: toDtoList(MailLogResponseDto, rows),
       total,
     });
   }

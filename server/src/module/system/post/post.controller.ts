@@ -1,11 +1,20 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Res, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PostService } from './post.service';
-import { CreatePostDto, UpdatePostDto, ListPostDto } from './dto/index';
+import {
+  CreatePostRequestDto,
+  UpdatePostRequestDto,
+  ListPostRequestDto,
+  PostResponseDto,
+  PostListResponseDto,
+  CreatePostResultResponseDto,
+  UpdatePostResultResponseDto,
+  DeletePostResultResponseDto,
+  DeptTreeResponseDto,
+} from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Response } from 'express';
 import { Api } from 'src/core/decorators/api.decorator';
-import { PostVo, PostListVo } from './vo/post.vo';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../user/user.decorator';
@@ -19,30 +28,31 @@ export class PostController {
   @Api({
     summary: '岗位管理-创建',
     description: '创建新岗位',
-    body: CreatePostDto,
+    body: CreatePostRequestDto,
+    type: CreatePostResultResponseDto,
   })
   @RequirePermission('system:post:add')
   @Operlog({ businessType: BusinessType.INSERT })
   @Post('/')
-  create(@Body() createPostDto: CreatePostDto, @UserTool() { injectCreate }: UserToolType) {
+  create(@Body() createPostDto: CreatePostRequestDto, @UserTool() { injectCreate }: UserToolType) {
     return this.postService.create(injectCreate(createPostDto));
   }
 
   @Api({
     summary: '岗位管理-列表',
     description: '分页查询岗位列表',
-    type: PostListVo,
+    type: PostListResponseDto,
   })
   @RequirePermission('system:post:list')
   @Get('/list')
-  findAll(@Query() query: ListPostDto) {
+  findAll(@Query() query: ListPostRequestDto) {
     return this.postService.findAll(query);
   }
 
   @Api({
     summary: '岗位管理-选择框列表',
     description: '获取岗位选择框列表',
-    type: PostVo,
+    type: PostResponseDto,
     isArray: true,
   })
   @Get('/optionselect')
@@ -54,6 +64,8 @@ export class PostController {
   @Api({
     summary: '岗位管理-部门树',
     description: '获取部门树形结构',
+    type: DeptTreeResponseDto,
+    isArray: true,
   })
   @Get('/deptTree')
   deptTree() {
@@ -63,7 +75,7 @@ export class PostController {
   @Api({
     summary: '岗位管理-详情',
     description: '根据ID获取岗位详情',
-    type: PostVo,
+    type: PostResponseDto,
     params: [{ name: 'id', description: '岗位ID', type: 'number' }],
   })
   @RequirePermission('system:post:query')
@@ -75,12 +87,13 @@ export class PostController {
   @Api({
     summary: '岗位管理-更新',
     description: '修改岗位信息',
-    body: UpdatePostDto,
+    body: UpdatePostRequestDto,
+    type: UpdatePostResultResponseDto,
   })
   @RequirePermission('system:post:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Put('/')
-  update(@Body() updatePostDto: UpdatePostDto) {
+  update(@Body() updatePostDto: UpdatePostRequestDto) {
     return this.postService.update(updatePostDto);
   }
 
@@ -88,6 +101,7 @@ export class PostController {
     summary: '岗位管理-删除',
     description: '批量删除岗位，多个ID用逗号分隔',
     params: [{ name: 'ids', description: '岗位ID，多个用逗号分隔' }],
+    type: DeletePostResultResponseDto,
   })
   @RequirePermission('system:post:remove')
   @Operlog({ businessType: BusinessType.DELETE })
@@ -100,13 +114,13 @@ export class PostController {
   @Api({
     summary: '岗位管理-导出Excel',
     description: '导出岗位数据为xlsx文件',
-    body: ListPostDto,
+    body: ListPostRequestDto,
     produces: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
   })
   @RequirePermission('system:post:export')
   @Operlog({ businessType: BusinessType.EXPORT })
   @Post('/export')
-  async export(@Res() res: Response, @Body() body: ListPostDto): Promise<void> {
+  async export(@Res() res: Response, @Body() body: ListPostRequestDto): Promise<void> {
     return this.postService.export(res, body);
   }
 }

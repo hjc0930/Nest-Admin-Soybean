@@ -4,11 +4,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TenantPackageService } from '@/module/system/tenant-package/tenant-package.service';
 import { PrismaService } from '@/infrastructure/prisma';
 import { BusinessException } from '@/shared/exceptions';
-import { ListTenantPackageDto } from '@/module/system/tenant-package/dto/list-tenant-package.dto';
+import { ListTenantPackageRequestDto } from '@/module/system/tenant-package/dto/index';
 
 // Helper to create DTO instance
-function createListDto(params: Partial<ListTenantPackageDto> = {}): ListTenantPackageDto {
-  const dto = new ListTenantPackageDto();
+function createListDto(params: Partial<ListTenantPackageRequestDto> = {}): ListTenantPackageRequestDto {
+  const dto = new ListTenantPackageRequestDto();
   Object.assign(dto, params);
   return dto;
 }

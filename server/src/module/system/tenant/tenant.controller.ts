@@ -1,11 +1,27 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Res, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { TenantService } from './tenant.service';
-import { CreateTenantDto, UpdateTenantDto, ListTenantDto, SyncTenantPackageDto } from './dto/index';
+import {
+  CreateTenantRequestDto,
+  UpdateTenantRequestDto,
+  ListTenantRequestDto,
+  SyncTenantPackageRequestDto,
+  TenantResponseDto,
+  TenantListResponseDto,
+  TenantSwitchResponseDto,
+  TenantRestoreResponseDto,
+  TenantSelectListResponseDto,
+  CreateTenantResultResponseDto,
+  UpdateTenantResultResponseDto,
+  DeleteTenantResultResponseDto,
+  SyncTenantDictResultResponseDto,
+  SyncTenantPackageResultResponseDto,
+  SyncTenantConfigResultResponseDto,
+  TenantSwitchStatusResponseDto,
+} from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Response } from 'express';
 import { Api } from 'src/core/decorators/api.decorator';
-import { TenantVo, TenantListVo, TenantSwitchVo, TenantRestoreVo, TenantSelectListVo } from './vo/tenant.vo';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { User, UserDto } from 'src/module/system/user/user.decorator';
@@ -19,29 +35,31 @@ export class TenantController {
   @Api({
     summary: '租户管理-创建',
     description: '创建新租户并创建租户管理员账号',
-    body: CreateTenantDto,
+    body: CreateTenantRequestDto,
+    type: CreateTenantResultResponseDto,
   })
   @RequirePermission('system:tenant:add')
   @Operlog({ businessType: BusinessType.INSERT })
   @Post('/')
-  create(@Body() createTenantDto: CreateTenantDto) {
+  create(@Body() createTenantDto: CreateTenantRequestDto) {
     return this.tenantService.create(createTenantDto);
   }
 
   @Api({
     summary: '租户管理-列表',
     description: '分页查询租户列表',
-    type: TenantListVo,
+    type: TenantListResponseDto,
   })
   @RequirePermission('system:tenant:list')
   @Get('/list')
-  findAll(@Query() query: ListTenantDto) {
+  findAll(@Query() query: ListTenantRequestDto) {
     return this.tenantService.findAll(query);
   }
 
   @Api({
     summary: '租户管理-同步租户字典',
     description: '将超级管理员的字典数据同步到所有租户',
+    type: SyncTenantDictResultResponseDto,
   })
   @RequirePermission('system:tenant:edit')
   @Get('/syncTenantDict')
@@ -52,16 +70,18 @@ export class TenantController {
   @Api({
     summary: '租户管理-同步租户套餐',
     description: '同步租户套餐菜单权限',
+    type: SyncTenantPackageResultResponseDto,
   })
   @RequirePermission('system:tenant:edit')
   @Get('/syncTenantPackage')
-  syncTenantPackage(@Query() params: SyncTenantPackageDto) {
+  syncTenantPackage(@Query() params: SyncTenantPackageRequestDto) {
     return this.tenantService.syncTenantPackage(params);
   }
 
   @Api({
     summary: '租户管理-同步租户配置',
     description: '将超级管理员的配置同步到所有租户',
+    type: SyncTenantConfigResultResponseDto,
   })
   @RequirePermission('system:tenant:edit')
   @Get('/syncTenantConfig')
@@ -72,7 +92,7 @@ export class TenantController {
   @Api({
     summary: '租户管理-可切换租户列表',
     description: '获取可切换的租户列表（仅超级管理员可用）',
-    type: TenantSelectListVo,
+    type: TenantSelectListResponseDto,
   })
   @RequirePermission('system:tenant:switch')
   @Get('/select-list')
@@ -83,6 +103,7 @@ export class TenantController {
   @Api({
     summary: '租户管理-获取切换状态',
     description: '获取当前租户切换状态',
+    type: TenantSwitchStatusResponseDto,
   })
   @Get('/switch-status')
   getSwitchStatus(@User() user: UserDto) {
@@ -92,7 +113,7 @@ export class TenantController {
   @Api({
     summary: '租户管理-切换租户',
     description: '切换到指定租户（仅超级管理员可用）',
-    type: TenantSwitchVo,
+    type: TenantSwitchResponseDto,
     params: [{ name: 'tenantId', description: '目标租户ID', type: 'string' }],
   })
   @RequirePermission('system:tenant:switch')
@@ -105,7 +126,7 @@ export class TenantController {
   @Api({
     summary: '租户管理-恢复原租户',
     description: '清除租户切换状态，恢复到原租户',
-    type: TenantRestoreVo,
+    type: TenantRestoreResponseDto,
   })
   @RequirePermission('system:tenant:switch')
   @Operlog({ businessType: BusinessType.UPDATE })
@@ -117,7 +138,7 @@ export class TenantController {
   @Api({
     summary: '租户管理-详情',
     description: '根据ID获取租户详情',
-    type: TenantVo,
+    type: TenantResponseDto,
     params: [{ name: 'id', description: '租户ID', type: 'number' }],
   })
   @RequirePermission('system:tenant:query')
@@ -129,12 +150,13 @@ export class TenantController {
   @Api({
     summary: '租户管理-更新',
     description: '修改租户信息',
-    body: UpdateTenantDto,
+    body: UpdateTenantRequestDto,
+    type: UpdateTenantResultResponseDto,
   })
   @RequirePermission('system:tenant:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Put('/')
-  update(@Body() updateTenantDto: UpdateTenantDto) {
+  update(@Body() updateTenantDto: UpdateTenantRequestDto) {
     return this.tenantService.update(updateTenantDto);
   }
 
@@ -142,6 +164,7 @@ export class TenantController {
     summary: '租户管理-删除',
     description: '批量删除租户',
     params: [{ name: 'ids', description: '租户ID列表，逗号分隔', type: 'string' }],
+    type: DeleteTenantResultResponseDto,
   })
   @RequirePermission('system:tenant:remove')
   @Operlog({ businessType: BusinessType.DELETE })
@@ -158,7 +181,7 @@ export class TenantController {
   @RequirePermission('system:tenant:export')
   @Operlog({ businessType: BusinessType.EXPORT })
   @Post('/export')
-  export(@Res() res: Response, @Body() body: ListTenantDto) {
+  export(@Res() res: Response, @Body() body: ListTenantRequestDto) {
     return this.tenantService.export(res, body);
   }
 }

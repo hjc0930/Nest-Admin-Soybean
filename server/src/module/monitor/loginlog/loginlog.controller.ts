@@ -5,7 +5,12 @@ import { LoginlogService } from './loginlog.service';
 import { ListLoginlogDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { LoginLogListVo } from 'src/module/monitor/vo/monitor.vo';
+import {
+  LoginLogListResponseDto,
+  ClearLogResultResponseDto,
+  DeleteLogResultResponseDto,
+  UnlockUserResultResponseDto,
+} from 'src/module/monitor/dto/responses';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 
@@ -18,7 +23,7 @@ export class LoginlogController {
   @Api({
     summary: '登录日志-列表',
     description: '分页查询登录日志列表',
-    type: LoginLogListVo,
+    type: LoginLogListResponseDto,
   })
   @RequirePermission('monitor:logininfor:list')
   @Get('/list')
@@ -29,6 +34,7 @@ export class LoginlogController {
   @Api({
     summary: '登录日志-清除全部日志',
     description: '清空所有登录日志记录',
+    type: ClearLogResultResponseDto,
   })
   @RequirePermission('monitor:logininfor:remove')
   @Operlog({ businessType: BusinessType.CLEAN })
@@ -41,6 +47,7 @@ export class LoginlogController {
     summary: '登录日志-解锁用户',
     description: '解锁被锁定的用户账号',
     params: [{ name: 'username', description: '用户名' }],
+    type: UnlockUserResultResponseDto,
   })
   @RequirePermission('monitor:logininfor:unlock')
   @Operlog({ businessType: BusinessType.UPDATE })
@@ -53,6 +60,7 @@ export class LoginlogController {
     summary: '登录日志-删除日志',
     description: '批量删除登录日志，多个ID用逗号分隔',
     params: [{ name: 'id', description: '登录日志ID，多个用逗号分隔' }],
+    type: DeleteLogResultResponseDto,
   })
   @RequirePermission('monitor:logininfor:remove')
   @Operlog({ businessType: BusinessType.DELETE })

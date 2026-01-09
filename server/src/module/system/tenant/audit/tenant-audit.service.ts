@@ -3,12 +3,13 @@ import { PrismaService } from 'src/infrastructure/prisma';
 import { Result, ResponseCode } from 'src/shared/response';
 import { BusinessException } from 'src/shared/exceptions';
 import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
-import { FormatDateFields } from 'src/shared/utils/index';
+import { toDtoList } from 'src/shared/utils/index';
 import {
   ListTenantAuditLogDto,
   CreateTenantAuditLogDto,
   ExportTenantAuditLogDto,
 } from './dto/tenant-audit.dto';
+import { TenantAuditLogResponseDto } from './dto/tenant-audit.response.dto';
 import {
   TenantAuditLogVo,
   TenantAuditLogDetailVo,
@@ -61,7 +62,7 @@ export class TenantAuditService {
    * Requirements: 6.1, 6.2
    */
   @IgnoreTenant()
-  async findAll(query: ListTenantAuditLogDto): Promise<Result<TenantAuditLogListVo>> {
+  async findAll(query: ListTenantAuditLogDto): Promise<Result<{ rows: TenantAuditLogResponseDto[]; total: number }>> {
     this.logger.debug('查询租户审计日志列表', query);
 
     // 构建查询条件
@@ -142,7 +143,7 @@ export class TenantAuditService {
     }));
 
     return Result.ok({
-      rows: FormatDateFields(rows),
+      rows: toDtoList(TenantAuditLogResponseDto, rows),
       total,
     });
   }

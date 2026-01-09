@@ -4,8 +4,12 @@ import { DeptService } from './dept.service';
 import { CreateDeptDto, UpdateDeptDto, ListDeptDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { DeptVo } from './vo/dept.vo';
-import { DeptTreeNodeVo } from 'src/shared/dto/dept-tree-node.vo';
+import {
+  DeptResponseDto,
+  CreateDeptResultResponseDto,
+  UpdateDeptResultResponseDto,
+  DeleteDeptResultResponseDto,
+} from './dto/responses/dept.response.dto';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../user/user.decorator';
@@ -20,6 +24,7 @@ export class DeptController {
     summary: '部门管理-创建',
     description: '创建新部门，需要指定父部门ID',
     body: CreateDeptDto,
+    type: CreateDeptResultResponseDto,
   })
   @RequirePermission('system:dept:add')
   @Operlog({ businessType: BusinessType.INSERT })
@@ -32,7 +37,7 @@ export class DeptController {
   @Api({
     summary: '部门管理-列表',
     description: '获取部门列表，支持按名称和状态筛选',
-    type: DeptVo,
+    type: DeptResponseDto,
     isArray: true,
     queries: [
       { name: 'deptName', description: '部门名称', required: false },
@@ -48,7 +53,7 @@ export class DeptController {
   @Api({
     summary: '部门管理-选择框列表',
     description: '获取部门选择框列表',
-    type: DeptVo,
+    type: DeptResponseDto,
     isArray: true,
   })
   @Get('/optionselect')
@@ -59,7 +64,7 @@ export class DeptController {
   @Api({
     summary: '部门管理-详情',
     description: '根据部门ID获取部门详细信息',
-    type: DeptVo,
+    type: DeptResponseDto,
     params: [{ name: 'id', description: '部门ID', type: 'number' }],
   })
   @RequirePermission('system:dept:query')
@@ -71,7 +76,7 @@ export class DeptController {
   @Api({
     summary: '部门管理-排除节点列表',
     description: '查询部门列表（排除指定节点及其子节点），用于编辑时选择父部门',
-    type: DeptVo,
+    type: DeptResponseDto,
     isArray: true,
     params: [{ name: 'id', description: '需要排除的部门ID', type: 'number' }],
   })
@@ -85,6 +90,7 @@ export class DeptController {
     summary: '部门管理-更新',
     description: '更新部门信息',
     body: UpdateDeptDto,
+    type: UpdateDeptResultResponseDto,
   })
   @RequirePermission('system:dept:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
@@ -97,6 +103,7 @@ export class DeptController {
     summary: '部门管理-删除',
     description: '根据ID删除部门，如果存在子部门则无法删除',
     params: [{ name: 'id', description: '部门ID', type: 'number' }],
+    type: DeleteDeptResultResponseDto,
     responses: {
       400: { description: '该部门存在子部门，无法删除' },
     },

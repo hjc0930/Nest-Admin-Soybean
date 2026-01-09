@@ -1,7 +1,15 @@
 import { Controller, Get, Post, Body, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MainService } from './main.service';
-import { RegisterDto, LoginDto } from './dto/index';
+import { LoginRequestDto, RegisterRequestDto } from './dto/requests';
+import {
+  LoginResponseDto,
+  CaptchaResponseDto,
+  GetInfoResponseDto,
+  LogoutResponseDto,
+  RegisterResultResponseDto,
+  RegisterEnabledResponseDto,
+} from './dto/responses';
 import { createMath } from 'src/shared/utils/captcha';
 import { Result, ResponseCode } from 'src/shared/response';
 import { GenerateUUID } from 'src/shared/utils/index';
@@ -11,8 +19,7 @@ import { ConfigService } from 'src/module/system/config/config.service';
 import { ClientInfo, ClientInfoDto } from 'src/core/decorators/common.decorator';
 import { NotRequireAuth, User, UserDto } from 'src/module/system/user/user.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { LoginVo, CaptchaVo, GetInfoVo } from './vo/main.vo';
-import { RouterVo } from 'src/module/system/menu/vo/menu.vo';
+import { RouterResponseDto } from 'src/module/system/menu/dto/responses';
 
 @ApiTags('根目录')
 @Controller('/')
@@ -27,20 +34,21 @@ export class MainController {
   @Api({
     summary: '用户登录',
     description: '用户登录接口，需要用户名、密码和验证码',
-    body: LoginDto,
+    body: LoginRequestDto,
     security: false,
-    type: LoginVo,
+    type: LoginResponseDto,
   })
   @NotRequireAuth()
   @Post('/login')
   @HttpCode(200)
-  login(@Body() user: LoginDto, @ClientInfo() clientInfo: ClientInfoDto) {
+  login(@Body() user: LoginRequestDto, @ClientInfo() clientInfo: ClientInfoDto) {
     return this.mainService.login(user, clientInfo);
   }
 
   @Api({
     summary: '退出登录',
     description: '退出当前登录状态，清除登录令牌',
+    type: LogoutResponseDto,
   })
   @NotRequireAuth()
   @Post('/logout')
@@ -55,13 +63,14 @@ export class MainController {
   @Api({
     summary: '用户注册',
     description: '新用户注册接口，需要用户名、密码和验证码',
-    body: RegisterDto,
+    body: RegisterRequestDto,
     security: false,
+    type: RegisterResultResponseDto,
   })
   @NotRequireAuth()
   @Post('/register')
   @HttpCode(200)
-  register(@Body() user: RegisterDto) {
+  register(@Body() user: RegisterRequestDto) {
     return this.mainService.register(user);
   }
 
@@ -69,6 +78,7 @@ export class MainController {
     summary: '是否开启用户注册',
     description: '查询系统是否开启用户自主注册功能',
     security: false,
+    type: RegisterEnabledResponseDto,
   })
   @NotRequireAuth()
   @Get('/registerUser')
@@ -83,7 +93,7 @@ export class MainController {
     summary: '获取验证码图片',
     description: '获取登录/注册所需的图形验证码，返回 Base64 图片和 UUID',
     security: false,
-    type: CaptchaVo,
+    type: CaptchaResponseDto,
   })
   @NotRequireAuth()
   @Get('/captchaImage')
@@ -116,7 +126,7 @@ export class MainController {
   @Api({
     summary: '获取当前用户信息',
     description: '获取当前登录用户的基本信息、角色和权限',
-    type: GetInfoVo,
+    type: GetInfoResponseDto,
   })
   @Get('/getInfo')
   async getInfo(@User() user: UserDto) {
@@ -132,7 +142,7 @@ export class MainController {
   @Api({
     summary: '获取路由菜单',
     description: '获取当前用户的前端路由菜单数据',
-    type: RouterVo,
+    type: RouterResponseDto,
     isArray: true,
   })
   @Get('/getRouters')

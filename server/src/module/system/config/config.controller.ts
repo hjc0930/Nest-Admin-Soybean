@@ -1,11 +1,10 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Request, Query, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ConfigService } from './config.service';
-import { CreateConfigDto, UpdateConfigDto, ListConfigDto } from './dto/index';
+import { CreateConfigDto, UpdateConfigDto, ListConfigDto, ConfigResponseDto, ConfigListResponseDto, ConfigValueResponseDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { ConfigVo, ConfigListVo } from './vo/config.vo';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../user/user.decorator';
@@ -31,7 +30,7 @@ export class ConfigController {
   @Api({
     summary: '参数设置-列表',
     description: '分页查询系统参数列表',
-    type: ConfigListVo,
+    type: ConfigListResponseDto,
   })
   @RequirePermission('system:config:list')
   @Get('/list')
@@ -42,7 +41,7 @@ export class ConfigController {
   @Api({
     summary: '参数设置-详情',
     description: '根据ID获取参数详情',
-    type: ConfigVo,
+    type: ConfigResponseDto,
     params: [{ name: 'id', description: '参数ID', type: 'number' }],
   })
   @RequirePermission('system:config:query')
@@ -55,6 +54,7 @@ export class ConfigController {
     summary: '参数设置-按Key查询（缓存）',
     description: '根据参数键获取参数值，优先使用缓存',
     params: [{ name: 'id', description: '参数键名' }],
+    type: ConfigValueResponseDto,
   })
   @RequirePermission('system:config:query')
   @Get('/configKey/:id')

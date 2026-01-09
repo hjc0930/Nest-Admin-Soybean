@@ -1,2 +1,2 @@
-export * from './folder.dto';
-export * from './file.dto';
+export * from './requests';
+export * from './responses';

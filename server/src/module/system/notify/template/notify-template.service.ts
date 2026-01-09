@@ -2,8 +2,8 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Result } from 'src/shared/response';
 import { DelFlagEnum } from 'src/shared/enums/index';
-import { FormatDateFields } from 'src/shared/utils/index';
-import { CreateNotifyTemplateDto, UpdateNotifyTemplateDto, ListNotifyTemplateDto } from './dto/index';
+import { toDtoList } from 'src/shared/utils/index';
+import { CreateNotifyTemplateDto, UpdateNotifyTemplateDto, ListNotifyTemplateDto, NotifyTemplateResponseDto } from './dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { NotifyTemplateRepository } from './notify-template.repository';
 import { Transactional } from 'src/core/decorators/transactional.decorator';
@@ -67,7 +67,7 @@ export class NotifyTemplateService {
     const { list, total } = await this.notifyTemplateRepo.findPageWithFilter(where, query.skip, query.take);
 
     return Result.ok({
-      rows: FormatDateFields(list),
+      rows: toDtoList(NotifyTemplateResponseDto, list),
       total,
     });
   }

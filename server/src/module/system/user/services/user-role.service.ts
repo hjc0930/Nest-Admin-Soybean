@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { BusinessException } from 'src/shared/exceptions';
 import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { ResponseCode, Result } from 'src/shared/response';
-import { FormatDateFields } from 'src/shared/utils/index';
+import { toDtoList } from 'src/shared/utils/serialize.util';
 import { PaginationHelper } from 'src/shared/utils/pagination.helper';
 import { Transactional } from 'src/core/decorators/transactional.decorator';
 import { AllocatedListDto } from '../dto/index';
+import { UserResponseDto } from '../dto/responses';
 import { AuthUserCancelDto, AuthUserCancelAllDto, AuthUserSelectAllDto } from '../../role/dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from '../user.repository';
@@ -137,7 +138,7 @@ export class UserRoleService {
       select: { userId: true },
     });
     if (!relations.length) {
-      return Result.page([], 0);
+      return Result.page([], 0, query.pageNum, query.pageSize);
     }
     const userIds = relations.map((item) => item.userId);
     const where: Prisma.SysUserWhereInput = {
@@ -160,9 +161,8 @@ export class UserRoleService {
     ]);
 
     const listWithDept = await this.attachDeptInfo(list);
-    const formattedList = FormatDateFields(listWithDept);
 
-    return Result.page(formattedList, total);
+    return Result.page(toDtoList(UserResponseDto, listWithDept), total, query.pageNum, query.pageSize);
   }
 
   /**
@@ -201,9 +201,8 @@ export class UserRoleService {
     ]);
 
     const listWithDept = await this.attachDeptInfo(list);
-    const formattedList = FormatDateFields(listWithDept);
 
-    return Result.page(formattedList, total);
+    return Result.page(toDtoList(UserResponseDto, listWithDept), total, query.pageNum, query.pageSize);
   }
 
   /**

@@ -1,8 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Result } from 'src/shared/response';
-import { FormatDateFields } from 'src/shared/utils/index';
-import { SendNotifyMessageDto, SendNotifyAllDto, ListNotifyMessageDto, ListMyNotifyMessageDto } from './dto/index';
+import { toDtoList } from 'src/shared/utils/index';
+import { SendNotifyMessageDto, SendNotifyAllDto, ListNotifyMessageDto, ListMyNotifyMessageDto, NotifyMessageResponseDto } from './dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { NotifyMessageRepository } from './notify-message.repository';
 import { NotifyTemplateService } from '../template/notify-template.service';
@@ -145,7 +145,7 @@ export class NotifyMessageService {
     }));
 
     return Result.ok({
-      rows: FormatDateFields(rows),
+      rows: toDtoList(NotifyMessageResponseDto, rows),
       total,
     });
   }
@@ -181,7 +181,7 @@ export class NotifyMessageService {
     }));
 
     return Result.ok({
-      rows: FormatDateFields(rows),
+      rows: toDtoList(NotifyMessageResponseDto, rows),
       total,
     });
   }
@@ -304,6 +304,6 @@ export class NotifyMessageService {
       id: item.id.toString(),
     }));
 
-    return Result.ok(FormatDateFields(rows));
+    return Result.ok(toDtoList(NotifyMessageResponseDto, rows));
   }
 }

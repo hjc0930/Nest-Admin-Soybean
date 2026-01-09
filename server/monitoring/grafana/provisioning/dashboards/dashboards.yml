@@ -1,0 +1,21 @@
+# Grafana 仪表盘自动配置
+# 
+# 使用说明:
+# 1. 将此文件放置到 Grafana 的 provisioning/dashboards 目录
+# 2. 将仪表盘 JSON 文件放置到指定的 path 目录
+# 3. 重启 Grafana 服务
+
+apiVersion: 1
+
+providers:
+  - name: 'Nest-Admin Dashboards'
+    orgId: 1
+    folder: 'Nest-Admin'
+    folderUid: 'nest-admin'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/nest-admin
+      foldersFromFilesStructure: false

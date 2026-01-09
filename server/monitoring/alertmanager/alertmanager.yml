@@ -1,0 +1,84 @@
+# Alertmanager 配置
+#
+# 使用说明:
+# 1. 根据实际需求配置告警接收器 (邮件、Slack、钉钉等)
+# 2. 配置告警路由规则
+
+global:
+  # 全局配置
+  resolve_timeout: 5m
+  # SMTP 配置 (邮件告警)
+  # smtp_smarthost: 'smtp.example.com:587'
+  # smtp_from: 'alertmanager@example.com'
+  # smtp_auth_username: 'alertmanager@example.com'
+  # smtp_auth_password: 'password'
+
+# 告警路由
+route:
+  # 默认接收器
+  receiver: 'default-receiver'
+  # 分组等待时间
+  group_wait: 30s
+  # 分组间隔
+  group_interval: 5m
+  # 重复间隔
+  repeat_interval: 4h
+  # 分组标签
+  group_by: ['alertname', 'severity', 'service']
+  
+  # 子路由
+  routes:
+    # 严重告警 - 立即通知
+    - match:
+        severity: critical
+      receiver: 'critical-receiver'
+      group_wait: 10s
+      repeat_interval: 1h
+    
+    # 警告告警
+    - match:
+        severity: warning
+      receiver: 'warning-receiver'
+      repeat_interval: 4h
+
+# 告警接收器
+receivers:
+  # 默认接收器 (控制台输出)
+  - name: 'default-receiver'
+    # webhook_configs:
+    #   - url: 'http://localhost:5001/webhook'
+
+  # 严重告警接收器
+  - name: 'critical-receiver'
+    # 邮件通知
+    # email_configs:
+    #   - to: 'ops-team@example.com'
+    #     send_resolved: true
+    
+    # Slack 通知
+    # slack_configs:
+    #   - api_url: 'https://hooks.slack.com/services/xxx/xxx/xxx'
+    #     channel: '#alerts-critical'
+    #     send_resolved: true
+    #     title: '{{ .Status | toUpper }}: {{ .CommonAnnotations.summary }}'
+    #     text: '{{ .CommonAnnotations.description }}'
+    
+    # 钉钉通知 (需要 webhook)
+    # webhook_configs:
+    #   - url: 'https://oapi.dingtalk.com/robot/send?access_token=xxx'
+    #     send_resolved: true
+
+  # 警告告警接收器
+  - name: 'warning-receiver'
+    # email_configs:
+    #   - to: 'dev-team@example.com'
+    #     send_resolved: true
+
+# 告警抑制规则
+inhibit_rules:
+  # 当存在 critical 告警时，抑制同名的 warning 告警
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'service']

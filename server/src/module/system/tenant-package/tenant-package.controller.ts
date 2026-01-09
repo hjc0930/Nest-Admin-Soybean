@@ -1,11 +1,17 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Res, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { TenantPackageService } from './tenant-package.service';
-import { CreateTenantPackageDto, UpdateTenantPackageDto, ListTenantPackageDto } from './dto/index';
+import {
+  CreateTenantPackageRequestDto,
+  UpdateTenantPackageRequestDto,
+  ListTenantPackageRequestDto,
+  TenantPackageResponseDto,
+  TenantPackageListResponseDto,
+  TenantPackageSelectResponseDto,
+} from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Response } from 'express';
 import { Api } from 'src/core/decorators/api.decorator';
-import { TenantPackageVo, TenantPackageListVo, TenantPackageSelectVo } from './vo/tenant-package.vo';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 
@@ -18,30 +24,30 @@ export class TenantPackageController {
   @Api({
     summary: '租户套餐管理-创建',
     description: '创建新租户套餐',
-    body: CreateTenantPackageDto,
+    body: CreateTenantPackageRequestDto,
   })
   @RequirePermission('system:tenantPackage:add')
   @Operlog({ businessType: BusinessType.INSERT })
   @Post('/')
-  create(@Body() createTenantPackageDto: CreateTenantPackageDto) {
+  create(@Body() createTenantPackageDto: CreateTenantPackageRequestDto) {
     return this.tenantPackageService.create(createTenantPackageDto);
   }
 
   @Api({
     summary: '租户套餐管理-列表',
     description: '分页查询租户套餐列表',
-    type: TenantPackageListVo,
+    type: TenantPackageListResponseDto,
   })
   @RequirePermission('system:tenantPackage:list')
   @Get('/list')
-  findAll(@Query() query: ListTenantPackageDto) {
+  findAll(@Query() query: ListTenantPackageRequestDto) {
     return this.tenantPackageService.findAll(query);
   }
 
   @Api({
     summary: '租户套餐管理-选择框列表',
     description: '获取租户套餐选择框列表',
-    type: TenantPackageSelectVo,
+    type: TenantPackageSelectResponseDto,
     isArray: true,
   })
   @Get('/selectList')
@@ -52,7 +58,7 @@ export class TenantPackageController {
   @Api({
     summary: '租户套餐管理-详情',
     description: '根据ID获取租户套餐详情',
-    type: TenantPackageVo,
+    type: TenantPackageResponseDto,
     params: [{ name: 'id', description: '套餐ID', type: 'number' }],
   })
   @RequirePermission('system:tenantPackage:query')
@@ -64,12 +70,12 @@ export class TenantPackageController {
   @Api({
     summary: '租户套餐管理-更新',
     description: '修改租户套餐信息',
-    body: UpdateTenantPackageDto,
+    body: UpdateTenantPackageRequestDto,
   })
   @RequirePermission('system:tenantPackage:edit')
   @Operlog({ businessType: BusinessType.UPDATE })
   @Put('/')
-  update(@Body() updateTenantPackageDto: UpdateTenantPackageDto) {
+  update(@Body() updateTenantPackageDto: UpdateTenantPackageRequestDto) {
     return this.tenantPackageService.update(updateTenantPackageDto);
   }
 
@@ -93,7 +99,7 @@ export class TenantPackageController {
   @RequirePermission('system:tenantPackage:export')
   @Operlog({ businessType: BusinessType.EXPORT })
   @Post('/export')
-  export(@Res() res: Response, @Body() body: ListTenantPackageDto) {
+  export(@Res() res: Response, @Body() body: ListTenantPackageRequestDto) {
     return this.tenantPackageService.export(res, body);
   }
 }

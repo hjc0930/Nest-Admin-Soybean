@@ -7,7 +7,12 @@ import { BusinessType } from 'src/shared/constants/business.constant';
 import { BaseOperLogDto, QueryOperLogDto } from './dto/operLog.dto';
 import { Api } from 'src/core/decorators/api.decorator';
 import { Response } from 'express';
-import { OperLogListVo, OperLogVo } from 'src/module/monitor/vo/monitor.vo';
+import {
+  OperLogListResponseDto,
+  OperLogResponseDto,
+  ClearLogResultResponseDto,
+  DeleteLogResultResponseDto,
+} from 'src/module/monitor/dto/responses';
 
 @ApiTags('操作日志')
 @Controller('monitor/operlog')
@@ -18,6 +23,7 @@ export class OperlogController {
   @Api({
     summary: '操作日志-清除全部日志',
     description: '清空所有操作日志记录',
+    type: ClearLogResultResponseDto,
   })
   @RequirePermission('monitor:operlog:remove')
   @Delete('/clean')
@@ -29,7 +35,7 @@ export class OperlogController {
   @Api({
     summary: '操作日志-列表',
     description: '分页查询操作日志列表',
-    type: OperLogListVo,
+    type: OperLogListResponseDto,
   })
   @RequirePermission('monitor:operlog:list')
   @Get('/list')
@@ -41,7 +47,7 @@ export class OperlogController {
     summary: '操作日志-详情',
     description: '根据日志ID获取操作日志详情',
     params: [{ name: 'operId', description: '操作日志ID', type: 'number' }],
-    type: OperLogVo,
+    type: OperLogResponseDto,
   })
   @RequirePermission('monitor:operlog:query')
   @Get(':operId')
@@ -53,6 +59,7 @@ export class OperlogController {
     summary: '操作日志-删除',
     description: '删除指定操作日志记录',
     params: [{ name: 'operId', description: '操作日志ID', type: 'number' }],
+    type: DeleteLogResultResponseDto,
   })
   @RequirePermission('monitor:operlog:remove')
   @Operlog({ businessType: BusinessType.DELETE })

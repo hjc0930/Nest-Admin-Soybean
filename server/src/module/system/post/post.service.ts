@@ -3,13 +3,13 @@ import { Prisma } from '@prisma/client';
 import { Result } from 'src/shared/response';
 import { DelFlagEnum } from 'src/shared/enums/index';
 import { ExportTable } from 'src/shared/utils/export';
-import { FormatDateFields } from 'src/shared/utils/index';
 import { Response } from 'express';
-import { CreatePostDto, UpdatePostDto, ListPostDto } from './dto/index';
+import { CreatePostRequestDto, UpdatePostRequestDto, ListPostRequestDto, PostResponseDto } from './dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { DeptService } from '../dept/dept.service';
 import { PostRepository } from './post.repository';
 import { Transactional } from 'src/core/decorators/transactional.decorator';
+import { toDto, toDtoList } from 'src/shared/utils/serialize.util';
 
 @Injectable()
 export class PostService {
@@ -19,7 +19,7 @@ export class PostService {
     private readonly deptService: DeptService,
     private readonly postRepo: PostRepository,
   ) {}
-  async create(createPostDto: CreatePostDto) {
+  async create(createPostDto: CreatePostRequestDto) {
     await this.postRepo.create({
       deptId: createPostDto.deptId,
       postCode: createPostDto.postCode,
@@ -34,7 +34,7 @@ export class PostService {
     return Result.ok();
   }
 
-  async findAll(query: ListPostDto) {
+  async findAll(query: ListPostRequestDto) {
     const where: Prisma.SysPostWhereInput = {
       delFlag: DelFlagEnum.NORMAL,
     };
@@ -63,17 +63,18 @@ export class PostService {
 
     const { list, total } = await this.postRepo.findPageWithFilter(where, query.skip, query.take);
 
-    return Result.page(FormatDateFields(list), total);
+    const rows = toDtoList(PostResponseDto, list);
+    return Result.page(rows, total, query.pageNum, query.pageSize);
   }
 
   async findOne(postId: number) {
     const res = await this.postRepo.findById(postId);
-    return Result.ok(res);
+    return Result.ok(toDto(PostResponseDto, res));
   }
 
-  async update(updatePostDto: UpdatePostDto) {
+  async update(updatePostDto: UpdatePostRequestDto) {
     const res = await this.postRepo.update(updatePostDto.postId, updatePostDto);
-    return Result.ok(res);
+    return Result.ok(toDto(PostResponseDto, res));
   }
 
   @Transactional()
@@ -88,7 +89,7 @@ export class PostService {
    */
   async optionselect(deptId?: number, postIds?: number[]) {
     const list = await this.postRepo.findForSelect(deptId, postIds);
-    return Result.ok(list);
+    return Result.ok(toDtoList(PostResponseDto, list));
   }
 
   /**
@@ -103,13 +104,13 @@ export class PostService {
    * 导出岗位管理数据为xlsx文件
    * @param res
    */
-  async export(res: Response, body: ListPostDto) {
+  async export(res: Response, body: ListPostRequestDto) {
     delete body.pageNum;
     delete body.pageSize;
     const list = await this.findAll(body);
     const options = {
       sheetName: '岗位数据',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '岗位序号', dataIndex: 'postId' },
         { title: '岗位编码', dataIndex: 'postCode' },

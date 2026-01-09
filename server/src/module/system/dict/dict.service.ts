@@ -5,14 +5,16 @@ import { Result } from 'src/shared/response';
 import { CacheEnum, DelFlagEnum } from 'src/shared/enums/index';
 import { Cacheable } from 'src/core/decorators/redis.decorator';
 import { ExportTable } from 'src/shared/utils/export';
-import { FormatDateFields } from 'src/shared/utils/index';
+import { toDto, toDtoList, toDtoPage } from 'src/shared/utils/serialize.util';
 import {
-  CreateDictTypeDto,
-  UpdateDictTypeDto,
-  ListDictType,
-  CreateDictDataDto,
-  UpdateDictDataDto,
-  ListDictData,
+  CreateDictTypeRequestDto,
+  UpdateDictTypeRequestDto,
+  ListDictTypeRequestDto,
+  CreateDictDataRequestDto,
+  UpdateDictDataRequestDto,
+  ListDictDataRequestDto,
+  DictTypeResponseDto,
+  DictDataResponseDto,
 } from './dto/index';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { PrismaService } from 'src/infrastructure/prisma';
@@ -26,8 +28,8 @@ export class DictService {
     private readonly dictTypeRepo: DictTypeRepository,
     private readonly dictDataRepo: DictDataRepository,
   ) {}
-  async createType(CreateDictTypeDto: CreateDictTypeDto) {
-    await this.dictTypeRepo.create(CreateDictTypeDto);
+  async createType(createDictTypeDto: CreateDictTypeRequestDto) {
+    await this.dictTypeRepo.create(createDictTypeDto);
     return Result.ok();
   }
 
@@ -36,12 +38,12 @@ export class DictService {
     return Result.ok();
   }
 
-  async updateType(updateDictTypeDto: UpdateDictTypeDto) {
+  async updateType(updateDictTypeDto: UpdateDictTypeRequestDto) {
     await this.dictTypeRepo.update(updateDictTypeDto.dictId, updateDictTypeDto);
     return Result.ok();
   }
 
-  async findAllType(query: ListDictType) {
+  async findAllType(query: ListDictTypeRequestDto) {
     const where: Prisma.SysDictTypeWhereInput = {
       delFlag: DelFlagEnum.NORMAL,
     };
@@ -71,24 +73,26 @@ export class DictService {
 
     const { list, total } = await this.dictTypeRepo.findPageWithFilter(where, query.skip, query.take);
 
-    return Result.ok({
-      rows: FormatDateFields(list),
-      total,
-    });
+    return Result.ok(
+      toDtoPage(DictTypeResponseDto, {
+        rows: list,
+        total,
+      }),
+    );
   }
 
   async findOneType(dictId: number) {
     const data = await this.dictTypeRepo.findById(dictId);
-    return Result.ok(data);
+    return Result.ok(toDto(DictTypeResponseDto, data));
   }
 
   async findOptionselect() {
     const data = await this.dictTypeRepo.findAllForSelect();
-    return Result.ok(data);
+    return Result.ok(toDtoList(DictTypeResponseDto, data));
   }
 
   // 字典数据
-  async createDictData(createDictDataDto: CreateDictDataDto) {
+  async createDictData(createDictDataDto: CreateDictDataRequestDto) {
     await this.dictDataRepo.create({
       ...createDictDataDto,
       dictSort: createDictDataDto.dictSort ?? 0,
@@ -104,12 +108,12 @@ export class DictService {
     return Result.ok();
   }
 
-  async updateDictData(updateDictDataDto: UpdateDictDataDto) {
+  async updateDictData(updateDictDataDto: UpdateDictDataRequestDto) {
     await this.dictDataRepo.update(updateDictDataDto.dictCode, updateDictDataDto);
     return Result.ok();
   }
 
-  async findAllData(query: ListDictData) {
+  async findAllData(query: ListDictDataRequestDto) {
     const where: Prisma.SysDictDataWhereInput = {
       delFlag: DelFlagEnum.NORMAL,
     };
@@ -130,10 +134,12 @@ export class DictService {
 
     const { list, total } = await this.dictDataRepo.findPageWithFilter(where, query.skip, query.take);
 
-    return Result.ok({
-      rows: FormatDateFields(list),
-      total,
-    });
+    return Result.ok(
+      toDtoPage(DictDataResponseDto, {
+        rows: list,
+        total,
+      }),
+    );
   }
 
   /**
@@ -147,8 +153,8 @@ export class DictService {
     let data = await this.redisService.get(`${CacheEnum.SYS_DICT_KEY}${dictType}`);
 
     if (data) {
-      // 如果缓存中存在，则直接返回缓存数据
-      return Result.ok(data);
+      // 如果缓存中存在，则直接返回缓存数据（已序列化）
+      return Result.ok(toDtoList(DictDataResponseDto, data as object[]));
     }
 
     // 从数据库中查询字典数据
@@ -156,25 +162,25 @@ export class DictService {
 
     // 将查询到的数据存入Redis缓存，并返回数据
     await this.redisService.set(`${CacheEnum.SYS_DICT_KEY}${dictType}`, data);
-    return Result.ok(data);
+    return Result.ok(toDtoList(DictDataResponseDto, data));
   }
 
   async findOneDictData(dictCode: number) {
     const data = await this.dictDataRepo.findById(dictCode);
-    return Result.ok(data);
+    return Result.ok(toDto(DictDataResponseDto, data));
   }
 
   /**
    * 导出字典数据为xlsx文件
    * @param res
    */
-  async export(res: Response, body: ListDictType) {
+  async export(res: Response, body: ListDictTypeRequestDto) {
     delete body.pageNum;
     delete body.pageSize;
     const list = await this.findAllType(body);
     const options = {
       sheetName: '字典数据',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '字典主键', dataIndex: 'dictId' },
         { title: '字典名称', dataIndex: 'dictName' },
@@ -189,13 +195,13 @@ export class DictService {
    * 导出字典数据为xlsx文件
    * @param res
    */
-  async exportData(res: Response, body: ListDictType) {
+  async exportData(res: Response, body: ListDictTypeRequestDto) {
     delete body.pageNum;
     delete body.pageSize;
     const list = await this.findAllData(body);
     const options = {
       sheetName: '字典数据',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '字典主键', dataIndex: 'dictCode' },
         { title: '字典名称', dataIndex: 'dictLabel' },

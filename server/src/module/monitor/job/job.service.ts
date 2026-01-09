@@ -3,9 +3,10 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { Prisma } from '@prisma/client';
 import { CreateJobDto, ListJobDto } from './dto/create-job.dto';
+import { JobResponseDto } from './dto/job.response.dto';
 import { Result, ResponseCode } from 'src/shared/response';
 import { BusinessException } from 'src/shared/exceptions';
-import { FormatDateFields } from 'src/shared/utils/index';
+import { toDtoList, toDto } from 'src/shared/utils';
 import { TaskService } from './task.service';
 import { ExportTable } from 'src/shared/utils/export';
 import { StatusEnum } from 'src/shared/enums/index';
@@ -59,14 +60,14 @@ export class JobService {
       this.prisma.sysJob.count({ where }),
     ]);
 
-    return Result.page(FormatDateFields(list), total);
+    return Result.page(toDtoList(JobResponseDto, list), total, query.pageNum, query.pageSize);
   }
 
   // 获取单个任务
   async getJob(jobId: number) {
     const job = await this.prisma.sysJob.findUnique({ where: { jobId: Number(jobId) } });
     BusinessException.throwIfNull(job, '任务不存在', ResponseCode.DATA_NOT_FOUND);
-    return Result.ok(job);
+    return Result.ok(toDto(JobResponseDto, job));
   }
 
   // 创建任务
@@ -225,7 +226,7 @@ export class JobService {
     const list = await this.list(body);
     const options = {
       sheetName: '定时任务',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '任务编号', dataIndex: 'jobId' },
         { title: '任务名称', dataIndex: 'jobName' },

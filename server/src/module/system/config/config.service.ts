@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Response } from 'express';
-import { Prisma, SysConfig } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { Result, ResponseCode } from 'src/shared/response';
 import { BusinessException } from 'src/shared/exceptions';
 import { ExportTable } from 'src/shared/utils/export';
-import { FormatDateFields } from 'src/shared/utils/index';
-import { CreateConfigDto, UpdateConfigDto, ListConfigDto } from './dto/index';
+import { toDto, toDtoPage } from 'src/shared/utils/index';
+import { CreateConfigDto, UpdateConfigDto, ListConfigDto, ConfigResponseDto } from './dto/index';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { CacheEnum, DelFlagEnum } from 'src/shared/enums/index';
 import { Cacheable, CacheEvict } from 'src/core/decorators/redis.decorator';
@@ -60,15 +60,15 @@ export class ConfigService {
 
     const { list, total } = await this.configRepo.findPageWithFilter(where, query.skip, query.take);
 
-    return Result.ok({
-      rows: FormatDateFields(list),
+    return Result.ok(toDtoPage(ConfigResponseDto, {
+      rows: list,
       total,
-    });
+    }));
   }
 
   async findOne(configId: number) {
     const data = await this.configRepo.findById(configId);
-    return Result.ok(data);
+    return Result.ok(toDto(ConfigResponseDto, data));
   }
 
   async findOneByConfigKey(configKey: string) {
@@ -186,7 +186,7 @@ export class ConfigService {
     const list = await this.findAll(body);
     const options = {
       sheetName: '参数管理',
-      data: list.data.rows,
+      data: list.data.rows as unknown as Record<string, unknown>[],
       header: [
         { title: '参数主键', dataIndex: 'configId' },
         { title: '参数名称', dataIndex: 'configName' },

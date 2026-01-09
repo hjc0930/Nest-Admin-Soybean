@@ -4,3 +4,4 @@
 
 export * from './response.interface';
 export * from './result';
+export * from './error-codes.doc';

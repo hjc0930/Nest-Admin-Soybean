@@ -3,6 +3,7 @@ import { AuthModule } from './auth/auth.module';
 import { DeptModule } from './dept/dept.module';
 import { SysConfigModule } from './config/config.module';
 import { DictModule } from './dict/dict.module';
+import { DocsModule } from './docs/docs.module';
 import { MenuModule } from './menu/menu.module';
 import { NoticeModule } from './notice/notice.module';
 import { PostModule } from './post/post.module';
@@ -23,6 +24,7 @@ import { NotifyModule } from './notify/notify.module';
     SysConfigModule, // 系统配置
     DeptModule,
     DictModule,
+    DocsModule, // API 文档
     MenuModule,
     NoticeModule,
     PostModule,

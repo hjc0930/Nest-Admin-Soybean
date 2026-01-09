@@ -29,6 +29,12 @@ const API_INFO = {
 - requestId 用于请求追踪，可在日志中查找对应请求
 - 需要认证的接口请在请求头携带 \`Authorization: Bearer <token>\`
 
+### 错误码文档
+- 获取所有错误码: \`GET /api/system/docs/error-codes\`
+- 按分类获取错误码: \`GET /api/system/docs/error-codes/by-category\`
+- Markdown 格式文档: \`GET /api/system/docs/error-codes/markdown\`
+- JSON 格式文档: \`GET /api/system/docs/error-codes/json\`
+
 ### API 版本控制
 - 支持 URI 版本控制: \`/api/v1/...\`, \`/api/v2/...\`
 - 默认版本: v1 (未指定版本的请求将路由到 v1)

@@ -4,15 +4,27 @@ import { Result, ResponseCode } from 'src/shared/response';
 import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { BusinessException } from 'src/shared/exceptions';
 import {
-  CreateFolderDto,
-  UpdateFolderDto,
-  ListFolderDto,
-  ListFileDto,
-  MoveFileDto,
-  RenameFileDto,
-  CreateShareDto,
-  GetShareDto,
-} from './dto';
+  CreateFolderRequestDto,
+  UpdateFolderRequestDto,
+  ListFolderRequestDto,
+  ListFileRequestDto,
+  MoveFileRequestDto,
+  RenameFileRequestDto,
+  CreateShareRequestDto,
+  GetShareRequestDto,
+} from './dto/requests';
+import {
+  FolderResponseDto,
+  FolderTreeNodeResponseDto,
+  FileResponseDto,
+  FileVersionResponseDto,
+  ShareResponseDto,
+  CreateShareResultResponseDto,
+  StorageStatsResponseDto,
+  AccessTokenResponseDto,
+  RestoreVersionResultResponseDto,
+} from './dto/responses';
+import { toDto, toDtoList, toDtoPage } from 'src/shared/utils/serialize.util';
 import { TenantContext } from 'src/tenant/context/tenant.context';
 import { PaginationHelper } from 'src/shared/utils/pagination.helper';
 import { Prisma, SysFileFolder } from '@prisma/client';
@@ -50,7 +62,7 @@ export class FileManagerService {
   /**
    * 创建文件夹
    */
-  async createFolder(createFolderDto: CreateFolderDto, username: string) {
+  async createFolder(createFolderDto: CreateFolderRequestDto, username: string) {
     const tenantId = TenantContext.getTenantId();
     const { parentId = 0, folderName, orderNum = 0, remark } = createFolderDto;
 
@@ -89,13 +101,13 @@ export class FileManagerService {
       },
     });
 
-    return Result.ok(folder);
+    return Result.ok(toDto(FolderResponseDto, folder));
   }
 
   /**
    * 更新文件夹
    */
-  async updateFolder(updateFolderDto: UpdateFolderDto, username: string) {
+  async updateFolder(updateFolderDto: UpdateFolderRequestDto, username: string) {
     const tenantId = TenantContext.getTenantId();
     const { folderId, folderName, orderNum, remark } = updateFolderDto;
 
@@ -133,7 +145,7 @@ export class FileManagerService {
       },
     });
 
-    return Result.ok(updated);
+    return Result.ok(toDto(FolderResponseDto, updated));
   }
 
   /**
@@ -204,7 +216,7 @@ export class FileManagerService {
   /**
    * 获取文件夹列表
    */
-  async listFolders(query: ListFolderDto) {
+  async listFolders(query: ListFolderRequestDto) {
     const tenantId = TenantContext.getTenantId();
     const { parentId, folderName } = query;
 
@@ -226,7 +238,7 @@ export class FileManagerService {
       orderBy: [{ orderNum: 'asc' }, { createTime: 'desc' }],
     });
 
-    return Result.ok(folders);
+    return Result.ok(toDtoList(FolderResponseDto, folders));
   }
 
   /**
@@ -244,10 +256,10 @@ export class FileManagerService {
     });
 
     // 构建树形结构
-    const buildTree = (parentId: number = 0): FolderTreeNode[] => {
+    const buildTree = (parentId: number = 0): FolderTreeNodeResponseDto[] => {
       return folders
         .filter((f) => f.parentId === parentId)
-        .map((folder) => ({
+        .map((folder) => toDto(FolderTreeNodeResponseDto, {
           ...folder,
           children: buildTree(folder.folderId),
         }));
@@ -261,7 +273,7 @@ export class FileManagerService {
   /**
    * 获取文件列表
    */
-  async listFiles(query: ListFileDto) {
+  async listFiles(query: ListFileRequestDto) {
     const tenantId = TenantContext.getTenantId();
     const { folderId, fileName, ext, exts, storageType } = query;
 
@@ -317,13 +329,13 @@ export class FileManagerService {
       { where },
     );
 
-    return Result.ok({ rows, total });
+    return Result.ok(toDtoPage(FileResponseDto, { rows: rows as Record<string, unknown>[], total }));
   }
 
   /**
    * 移动文件
    */
-  async moveFiles(moveFileDto: MoveFileDto, username: string) {
+  async moveFiles(moveFileDto: MoveFileRequestDto, username: string) {
     const tenantId = TenantContext.getTenantId();
     const { uploadIds, targetFolderId } = moveFileDto;
 
@@ -356,7 +368,7 @@ export class FileManagerService {
   /**
    * 重命名文件
    */
-  async renameFile(renameFileDto: RenameFileDto, username: string) {
+  async renameFile(renameFileDto: RenameFileRequestDto, username: string) {
     const tenantId = TenantContext.getTenantId();
     const { uploadId, newFileName } = renameFileDto;
 
@@ -377,7 +389,7 @@ export class FileManagerService {
       },
     });
 
-    return Result.ok(updated);
+    return Result.ok(toDto(FileResponseDto, updated));
   }
 
   /**
@@ -446,7 +458,7 @@ export class FileManagerService {
       return Result.fail(ResponseCode.INTERNAL_SERVER_ERROR, '文件不存在');
     }
 
-    return Result.ok(file);
+    return Result.ok(toDto(FileResponseDto, file));
   }
 
   // ==================== 文件分享 ====================
@@ -454,7 +466,7 @@ export class FileManagerService {
   /**
    * 创建分享链接
    */
-  async createShare(createShareDto: CreateShareDto, username: string) {
+  async createShare(createShareDto: CreateShareRequestDto, username: string) {
     const tenantId = TenantContext.getTenantId();
     const { uploadId, shareCode, expireHours = -1, maxDownload = -1 } = createShareDto;
 
@@ -486,18 +498,18 @@ export class FileManagerService {
       },
     });
 
-    return Result.ok({
+    return Result.ok(toDto(CreateShareResultResponseDto, {
       shareId: share.shareId,
       shareUrl: `/share/${share.shareId}`,
       shareCode: share.shareCode,
       expireTime: share.expireTime,
-    });
+    }));
   }
 
   /**
    * 获取分享信息
    */
-  async getShare(getShareDto: GetShareDto) {
+  async getShare(getShareDto: GetShareRequestDto) {
     const { shareId, shareCode } = getShareDto;
 
     const share = await this.prisma.sysFileShare.findUnique({
@@ -533,8 +545,8 @@ export class FileManagerService {
     }
 
     return Result.ok({
-      shareInfo: share,
-      fileInfo: file,
+      shareInfo: toDto(ShareResponseDto, share),
+      fileInfo: toDto(FileResponseDto, file),
     });
   }
 
@@ -591,7 +603,7 @@ export class FileManagerService {
       orderBy: { createTime: 'desc' },
     });
 
-    return Result.ok(shares);
+    return Result.ok(toDtoList(ShareResponseDto, shares));
   }
 
   // ==================== 回收站管理 ====================
@@ -599,7 +611,7 @@ export class FileManagerService {
   /**
    * 获取回收站文件列表
    */
-  async getRecycleList(query: ListFileDto) {
+  async getRecycleList(query: ListFileRequestDto) {
     const tenantId = TenantContext.getTenantId();
     const { pageNum = 1, pageSize = 10, fileName } = query;
 
@@ -624,7 +636,7 @@ export class FileManagerService {
     ]);
 
     return Result.ok({
-      rows: files,
+      rows: toDtoList(FileResponseDto, files),
       total,
       pageNum,
       pageSize,
@@ -747,7 +759,7 @@ export class FileManagerService {
 
     return Result.ok({
       currentVersion: currentFile.version,
-      versions,
+      versions: toDtoList(FileVersionResponseDto, versions),
     });
   }
 
@@ -839,10 +851,10 @@ export class FileManagerService {
 
     this.logger.log(`恢复版本: 从版本${targetVersion.version}创建新版本${newVersion}`);
 
-    return Result.ok({
+    return Result.ok(toDto(RestoreVersionResultResponseDto, {
       newVersion,
       uploadId: newUploadId,
-    });
+    }));
   }
 
   // ==================== 文件下载 ====================
@@ -863,10 +875,10 @@ export class FileManagerService {
 
     const token = this.fileAccessService.generateAccessToken(uploadId, tenantId);
 
-    return Result.ok({
+    return Result.ok(toDto(AccessTokenResponseDto, {
       token,
       expiresIn: 1800, // 30分钟
-    });
+    }));
   }
 
   /**
@@ -998,12 +1010,12 @@ export class FileManagerService {
     const { storageQuota, storageUsed, companyName } = tenant;
     const percentage = storageQuota > 0 ? (storageUsed / storageQuota) * 100 : 0;
 
-    return Result.ok({
+    return Result.ok(toDto(StorageStatsResponseDto, {
       used: storageUsed,
       quota: storageQuota,
       percentage: parseFloat(percentage.toFixed(2)),
       remaining: storageQuota - storageUsed,
       companyName,
-    });
+    }));
   }
 }
