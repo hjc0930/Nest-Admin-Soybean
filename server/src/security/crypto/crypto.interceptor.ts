@@ -1,5 +1,6 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { Reflector } from '@nestjs/core';
 import { CryptoService } from './crypto.service';
 import { SKIP_DECRYPT_KEY } from './crypto.decorator';
@@ -52,16 +53,23 @@ export class DecryptInterceptor implements NestInterceptor {
       const { encryptedKey, encryptedData } = request.body;
 
       if (encryptedKey && encryptedData) {
-        // 解密请求体
-        const decryptedBody = this.cryptoService.decryptRequest(encryptedKey, encryptedData);
-        request.body = decryptedBody;
-
-        this.logger.log(`Request body decrypted successfully: ${JSON.stringify(decryptedBody)}`);
+        // 解密请求体（异步，包含nonce和时间戳校验）
+        return from(this.cryptoService.decryptRequest(encryptedKey, encryptedData)).pipe(
+          switchMap((decryptedBody) => {
+            request.body = decryptedBody;
+            this.logger.log(`Request body decrypted successfully: ${JSON.stringify(decryptedBody)}`);
+            return next.handle();
+          }),
+        );
       }
     } catch (error) {
       this.logger.error('Failed to decrypt request body:', error.message);
       this.logger.error('Error stack:', error.stack);
       // 解密失败时，保持原始请求体，让后续处理决定如何响应
+      // 如果是BadRequestException，直接抛出让全局异常过滤器处理
+      if (error.constructor.name === 'BadRequestException') {
+        throw error;
+      }
     }
 
     return next.handle();

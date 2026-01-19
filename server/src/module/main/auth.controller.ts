@@ -24,7 +24,7 @@ import { ClientInfo, ClientInfoDto } from 'src/core/decorators/common.decorator'
 import { NotRequireAuth, User, UserDto } from 'src/module/system/user/user.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
 import { TenantContext, IgnoreTenant } from 'src/tenant';
-import { SkipDecrypt } from 'src/security/crypto';
+import { SkipDecrypt, CryptoService } from 'src/security/crypto';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
 import { ApiThrottle, ApiSkipThrottle } from 'src/core/decorators/throttle.decorator';
@@ -48,6 +48,7 @@ export class AuthController {
     private readonly config: AppConfigService,
     private readonly prisma: PrismaService,
     private readonly tokenBlacklistService: TokenBlacklistService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   /**
@@ -309,9 +310,10 @@ export class AuthController {
   })
   @Get('publicKey')
   @NotRequireAuth()
+  @SkipDecrypt()
   async getPublicKey(): Promise<Result> {
-    // TODO: 从 CryptoService 获取公钥
-    return Result.ok({ publicKey: '' });
+    const publicKey = this.cryptoService.getPublicKey();
+    return Result.ok({ publicKey });
   }
 
   /**

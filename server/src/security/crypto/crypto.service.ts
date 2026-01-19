@@ -1,5 +1,6 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, BadRequestException } from '@nestjs/common';
 import { AppConfigService } from 'src/config/app-config.service';
+import { RedisService } from 'src/module/common/redis/redis.service';
 import * as crypto from 'crypto';
 import * as forge from 'node-forge';
 
@@ -23,7 +24,19 @@ export class CryptoService implements OnModuleInit {
   // 是否启用加密
   private enabled: boolean = false;
 
-  constructor(private config: AppConfigService) {}
+  // Nonce过期时间（毫秒），默认5分钟，可从环境变量 CRYPTO_NONCE_TTL 配置
+  private readonly NONCE_TTL: number;
+  // 时间戳允许的最大偏差（毫秒），默认5分钟，可从环境变量 CRYPTO_TIMESTAMP_TOLERANCE 配置
+  private readonly TIMESTAMP_TOLERANCE: number;
+
+  constructor(
+    private config: AppConfigService,
+    private redisService: RedisService,
+  ) {
+    // 从配置读取nonce TTL和时间戳容忍度，如果未配置则使用默认值（5分钟）
+    this.NONCE_TTL = this.config.crypto.nonceTtl || 5 * 60 * 1000;
+    this.TIMESTAMP_TOLERANCE = this.config.crypto.timestampTolerance || 5 * 60 * 1000;
+  }
 
   onModuleInit() {
     this.enabled = this.config.crypto.enabled;
@@ -234,15 +247,50 @@ export class CryptoService implements OnModuleInit {
   }
 
   /**
-   * 解密请求数据
+   * 校验nonce是否已使用（防重放攻击）
+   * @param nonce 唯一随机数
+   * @throws BadRequestException 如果nonce已使用
+   */
+  private async validateNonce(nonce: string): Promise<void> {
+    const nonceKey = `crypto:nonce:${nonce}`;
+    const exists = await this.redisService.get(nonceKey);
+    
+    if (exists) {
+      this.logger.warn(`Replay attack detected: nonce ${nonce} already used`);
+      throw new BadRequestException('请求已过期或重复，请重新提交');
+    }
+    
+    // 将nonce存储到Redis，设置TTL
+    await this.redisService.set(nonceKey, '1', this.NONCE_TTL);
+  }
+
+  /**
+   * 校验时间戳是否在允许范围内
+   * @param timestamp 请求时间戳（毫秒）
+   * @throws BadRequestException 如果时间戳超出允许范围
+   */
+  private validateTimestamp(timestamp: number): void {
+    const now = Date.now();
+    const diff = Math.abs(now - timestamp);
+    
+    if (diff > this.TIMESTAMP_TOLERANCE) {
+      this.logger.warn(`Timestamp out of range: ${timestamp}, current: ${now}, diff: ${diff}ms`);
+      throw new BadRequestException('请求时间戳无效，请检查系统时间');
+    }
+  }
+
+  /**
+   * 解密请求数据并校验nonce和时间戳（防重放攻击）
    * 前端发送格式: { encryptedKey: string, encryptedData: string }
    *
    * 流程:
    * 1. RSA 解密 encryptedKey 得到 Base64 编码的 AES 密钥
    * 2. Base64 解码得到原始 AES 密钥
    * 3. 使用 AES 密钥解密数据
+   * 4. 提取并校验nonce和时间戳
+   * 5. 从解密数据中移除nonce和时间戳字段
    */
-  decryptRequest(encryptedKey: string, encryptedData: string): unknown {
+  async decryptRequest(encryptedKey: string, encryptedData: string): Promise<unknown> {
     // 1. 使用 RSA 私钥解密 AES 密钥 (得到 Base64 编码的密钥)
     const aesKeyBase64 = this.rsaDecrypt(encryptedKey);
 
@@ -255,7 +303,39 @@ export class CryptoService implements OnModuleInit {
     const decryptedJson = this.aesDecrypt(encryptedData, aesKey);
 
     // 4. 解析 JSON
-    return JSON.parse(decryptedJson);
+    const decryptedData = JSON.parse(decryptedJson);
+
+    // 5. 提取nonce和时间戳
+    const nonce = decryptedData._nonce;
+    const timestamp = decryptedData._timestamp;
+
+    // 6. 校验nonce和时间戳
+    if (!nonce || typeof nonce !== 'string') {
+      throw new BadRequestException('请求缺少nonce参数');
+    }
+
+    if (!timestamp || typeof timestamp !== 'number') {
+      throw new BadRequestException('请求缺少timestamp参数');
+    }
+
+    // 校验时间戳
+    this.validateTimestamp(timestamp);
+
+    // 校验nonce（防重放攻击）
+    await this.validateNonce(nonce);
+
+    // 7. 从解密数据中移除nonce和时间戳字段
+    delete decryptedData._nonce;
+    delete decryptedData._timestamp;
+
+    // 8. 如果原始数据是字符串或数组，前端会包装成 { data: ... } 格式
+    // 为了保持向后兼容，如果只有 data 字段且没有其他字段，则返回 data 字段的值
+    const keys = Object.keys(decryptedData);
+    if (keys.length === 1 && keys[0] === 'data') {
+      return decryptedData.data;
+    }
+
+    return decryptedData;
   }
 
   /**

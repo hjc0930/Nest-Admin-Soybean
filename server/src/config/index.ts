@@ -162,6 +162,12 @@ export default () => {
       enabled: bool(process.env.CRYPTO_ENABLED, false),
       rsaPublicKey: process.env.CRYPTO_RSA_PUBLIC_KEY || '',
       rsaPrivateKey: process.env.CRYPTO_RSA_PRIVATE_KEY || '',
+      nonceTtl: process.env.CRYPTO_NONCE_TTL
+        ? num(process.env.CRYPTO_NONCE_TTL, 5 * 60 * 1000)
+        : undefined,
+      timestampTolerance: process.env.CRYPTO_TIMESTAMP_TOLERANCE
+        ? num(process.env.CRYPTO_TIMESTAMP_TOLERANCE, 5 * 60 * 1000)
+        : undefined,
     },
 
     client: {

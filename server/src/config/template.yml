@@ -92,6 +92,10 @@ crypto:
   rsaPublicKey: ''
   # RSA 私钥 (PEM 格式，留空则自动生成)
   rsaPrivateKey: ''
+  # Nonce过期时间（毫秒），默认5分钟（300000），用于防重放攻击
+  # CRYPTO_NONCE_TTL=300000
+  # 时间戳允许的最大偏差（毫秒），默认5分钟（300000），用于防重放攻击
+  # CRYPTO_TIMESTAMP_TOLERANCE=300000
 
 # 客户端配置 (用于 OAuth2 / 多端登录)
 client:

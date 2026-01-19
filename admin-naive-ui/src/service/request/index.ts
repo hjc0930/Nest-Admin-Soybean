@@ -214,13 +214,34 @@ function handleEncrypt(config: InternalAxiosRequestConfig) {
     if (isEncrypt && (config.method === 'post' || config.method === 'put')) {
       // 生成一个 AES 密钥
       const aesKey = generateAesKey();
+      
+      // 生成nonce（唯一随机数）和时间戳（防重放攻击）
+      const nonce = globalThis.crypto.randomUUID();
+      const timestamp = Date.now();
+      
+      // 将nonce和时间戳添加到请求数据中
+      // 如果data是对象，则合并；如果是字符串或其他类型，则包装成对象
+      let requestData: any;
+      if (typeof config.data === 'object' && config.data !== null && !Array.isArray(config.data)) {
+        // 对象类型，直接合并
+        requestData = {
+          ...config.data,
+          _nonce: nonce,
+          _timestamp: timestamp
+        };
+      } else {
+        // 字符串、数组或其他类型，包装成对象
+        requestData = {
+          data: config.data,
+          _nonce: nonce,
+          _timestamp: timestamp
+        };
+      }
+      
       // 使用 RSA 加密 AES 密钥
       const encryptedKey = encrypt(encryptBase64(aesKey));
-      // 使用 AES 加密请求数据
-      const encryptedData =
-        typeof config.data === 'object'
-          ? encryptWithAes(JSON.stringify(config.data), aesKey)
-          : encryptWithAes(config.data, aesKey);
+      // 使用 AES 加密请求数据（包含nonce和时间戳）
+      const encryptedData = encryptWithAes(JSON.stringify(requestData), aesKey);
 
       // 设置加密标识头
       config.headers['x-encrypted'] = 'true';

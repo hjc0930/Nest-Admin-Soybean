@@ -208,6 +208,14 @@ class EnvironmentVariables {
   @IsString()
   CRYPTO_RSA_PRIVATE_KEY?: string;
 
+  @IsOptional()
+  @IsString()
+  CRYPTO_NONCE_TTL?: string;
+
+  @IsOptional()
+  @IsString()
+  CRYPTO_TIMESTAMP_TOLERANCE?: string;
+
   // ==================== COS 配置 ====================
 
   @IsOptional()
