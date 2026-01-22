@@ -1,4 +1,11 @@
-export * from './create-mail-account.dto';
-export * from './update-mail-account.dto';
-export * from './list-mail-account.dto';
-export * from './mail-account.response.dto';
+// 请求 DTO
+export * from './requests';
+
+// 响应 DTO
+export * from './responses';
+
+// 向后兼容别名
+export { CreateMailAccountRequestDto as CreateMailAccountDto } from './requests';
+export { UpdateMailAccountRequestDto as UpdateMailAccountDto } from './requests';
+export { ListMailAccountRequestDto as ListMailAccountDto } from './requests';
+export { MailAccountResponseDto } from './responses';

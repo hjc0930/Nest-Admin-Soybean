@@ -4,7 +4,7 @@ import { SmsChannelService } from './sms-channel.service';
 import { CreateSmsChannelDto, UpdateSmsChannelDto, ListSmsChannelDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { SmsChannelDetailVo, SmsChannelListVo } from './vo/index';
+import { SmsChannelResponseDto } from './dto';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../../user/user.decorator';
@@ -30,7 +30,7 @@ export class SmsChannelController {
   @Api({
     summary: '短信渠道-列表',
     description: '分页查询短信渠道列表',
-    type: SmsChannelListVo,
+    type: SmsChannelResponseDto,
   })
   @RequirePermission('system:sms:channel:list')
   @Get('/list')
@@ -51,7 +51,7 @@ export class SmsChannelController {
   @Api({
     summary: '短信渠道-详情',
     description: '根据ID获取短信渠道详情',
-    type: SmsChannelDetailVo,
+    type: SmsChannelResponseDto,
     params: [{ name: 'id', description: '渠道ID', type: 'number' }],
   })
   @RequirePermission('system:sms:channel:query')

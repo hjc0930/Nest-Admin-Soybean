@@ -5,9 +5,9 @@ import {
   RequireQuotaGuard,
   RequireQuotaOptions,
   REQUIRE_QUOTA_KEY,
-} from '../../../../src/tenant/guards/require-quota.guard';
-import { TenantQuotaService, QuotaResource } from '../../../../src/tenant/services/quota.service';
-import { TenantContext } from '../../../../src/tenant/context/tenant.context';
+} from '@/tenant/guards/require-quota.guard';
+import { TenantQuotaService, QuotaResource } from '@/tenant/services/quota.service';
+import { TenantContext } from '@/tenant/context/tenant.context';
 
 describe('RequireQuotaGuard', () => {
   let guard: RequireQuotaGuard;

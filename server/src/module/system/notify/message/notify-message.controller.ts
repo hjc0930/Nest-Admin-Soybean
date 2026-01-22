@@ -4,7 +4,7 @@ import { NotifyMessageService } from './notify-message.service';
 import { SendNotifyMessageDto, SendNotifyAllDto, ListNotifyMessageDto, ListMyNotifyMessageDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { NotifyMessageDetailVo, NotifyMessageListVo, UnreadCountVo } from './vo/index';
+import { NotifyMessageResponseDto, UnreadCountResponseDto } from './dto';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { User, UserDto } from '../../user/user.decorator';
@@ -42,7 +42,7 @@ export class NotifyMessageController {
   @Api({
     summary: '站内信-列表（管理员）',
     description: '分页查询所有站内信消息列表',
-    type: NotifyMessageListVo,
+    type: NotifyMessageResponseDto,
   })
   @RequirePermission('system:notify:message:list')
   @Get('/list')
@@ -53,7 +53,7 @@ export class NotifyMessageController {
   @Api({
     summary: '站内信-我的消息列表',
     description: '分页查询当前用户的站内信列表',
-    type: NotifyMessageListVo,
+    type: NotifyMessageResponseDto,
   })
   @Get('/my-list')
   findMyMessages(@Query() query: ListMyNotifyMessageDto, @User() user: UserDto) {
@@ -63,7 +63,7 @@ export class NotifyMessageController {
   @Api({
     summary: '站内信-未读数量',
     description: '获取当前用户的未读站内信数量',
-    type: UnreadCountVo,
+    type: UnreadCountResponseDto,
   })
   @Get('/unread-count')
   getUnreadCount(@User() user: UserDto) {
@@ -73,7 +73,7 @@ export class NotifyMessageController {
   @Api({
     summary: '站内信-最近消息',
     description: '获取当前用户最近的站内信列表（用于通知铃铛下拉）',
-    type: NotifyMessageListVo,
+    type: NotifyMessageResponseDto,
   })
   @Get('/recent')
   getRecentMessages(@Query('limit') limit: string, @User() user: UserDto) {
@@ -83,7 +83,7 @@ export class NotifyMessageController {
   @Api({
     summary: '站内信-详情',
     description: '根据ID获取站内信详情',
-    type: NotifyMessageDetailVo,
+    type: NotifyMessageResponseDto,
     params: [{ name: 'id', description: '消息ID', type: 'string' }],
   })
   @Get(':id')

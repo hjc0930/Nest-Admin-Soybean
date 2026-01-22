@@ -3,7 +3,7 @@ import {
   formatDateValue,
   DEFAULT_DATE_FORMAT,
   DEFAULT_TIMEZONE,
-} from '../../../../src/shared/decorators/date-format.decorator';
+} from '@/shared/decorators/date-format.decorator';
 
 /**
  * Property-Based Tests for DateFormat Decorator

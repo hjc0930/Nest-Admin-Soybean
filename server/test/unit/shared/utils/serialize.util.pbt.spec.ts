@@ -6,8 +6,8 @@
  */
 import * as fc from 'fast-check';
 import { Expose, Exclude } from 'class-transformer';
-import { toDto, toDtoList, toDtoPage } from '../../../../src/shared/utils/serialize.util';
-import { DateFormat } from '../../../../src/shared/decorators/date-format.decorator';
+import { toDto, toDtoList, toDtoPage } from '@/shared/utils/serialize.util';
+import { DateFormat } from '@/shared/decorators/date-format.decorator';
 
 /**
  * 测试用 DTO - 包含 @DateFormat 装饰器

@@ -6,13 +6,14 @@ import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
 import { TenantContext } from 'src/tenant/context/tenant.context';
 import {
+  DashboardDataResponseDto,
   TenantStatsVo,
   TenantTrendDataVo,
   PackageDistributionVo,
   ExpiringTenantVo,
   QuotaTopTenantVo,
   DashboardDataVo,
-} from './vo/tenant-dashboard.vo';
+} from './dto/index';
 
 /**
  * 租户仪表盘服务

@@ -1,17 +1,19 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { TenantDashboardService } from './tenant-dashboard.service';
-import { DashboardTimeRangeQueryDto, ExpiringTenantsQueryDto } from './dto/tenant-dashboard.dto';
-import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
-import { Api } from 'src/core/decorators/api.decorator';
 import {
+  DashboardTimeRangeQueryDto,
+  ExpiringTenantsQueryDto,
+  DashboardDataResponseDto,
   TenantStatsVo,
   TenantTrendDataVo,
   PackageDistributionVo,
   ExpiringTenantVo,
   QuotaTopTenantVo,
   DashboardDataVo,
-} from './vo/tenant-dashboard.vo';
+} from './dto/index';
+import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
+import { Api } from 'src/core/decorators/api.decorator';
 
 /**
  * 租户仪表盘控制器

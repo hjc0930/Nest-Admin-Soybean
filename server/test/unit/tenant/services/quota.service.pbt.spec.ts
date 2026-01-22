@@ -1,8 +1,8 @@
 import * as fc from 'fast-check';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TenantQuotaService, QuotaResource } from '../../../../src/tenant/services/quota.service';
-import { PrismaService } from '../../../../src/infrastructure/prisma';
-import { RedisService } from '../../../../src/module/common/redis/redis.service';
+import { TenantQuotaService, QuotaResource } from '@/tenant/services/quota.service';
+import { PrismaService } from '@/infrastructure/prisma';
+import { RedisService } from '@/module/common/redis/redis.service';
 
 /**
  * TenantQuotaService 属性测试

@@ -4,7 +4,7 @@ import { MailAccountService } from './mail-account.service';
 import { CreateMailAccountDto, UpdateMailAccountDto, ListMailAccountDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { MailAccountDetailVo, MailAccountListVo } from './vo/index';
+import { MailAccountResponseDto } from './dto';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../../user/user.decorator';
@@ -30,7 +30,7 @@ export class MailAccountController {
   @Api({
     summary: '邮箱账号-列表',
     description: '分页查询邮箱账号列表',
-    type: MailAccountListVo,
+    type: MailAccountResponseDto,
   })
   @RequirePermission('system:mail:account:list')
   @Get('/list')
@@ -51,7 +51,7 @@ export class MailAccountController {
   @Api({
     summary: '邮箱账号-详情',
     description: '根据ID获取邮箱账号详情',
-    type: MailAccountDetailVo,
+    type: MailAccountResponseDto,
     params: [{ name: 'id', description: '账号ID', type: 'number' }],
   })
   @RequirePermission('system:mail:account:query')

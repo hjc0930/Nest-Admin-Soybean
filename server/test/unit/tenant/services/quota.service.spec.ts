@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TenantQuotaService, QuotaResource, QuotaCheckResult } from '../../../../src/tenant/services/quota.service';
-import { PrismaService } from '../../../../src/infrastructure/prisma';
-import { RedisService } from '../../../../src/module/common/redis/redis.service';
-import { BusinessException } from '../../../../src/shared/exceptions';
+import { TenantQuotaService, QuotaResource, QuotaCheckResult } from '@/tenant/services/quota.service';
+import { PrismaService } from '@/infrastructure/prisma';
+import { RedisService } from '@/module/common/redis/redis.service';
+import { BusinessException } from '@/shared/exceptions';
 
 describe('TenantQuotaService', () => {
   let service: TenantQuotaService;

@@ -1,6 +1,6 @@
 import { plainToInstance } from 'class-transformer';
 import { Expose } from 'class-transformer';
-import { BaseResponseDto } from '../../../../src/shared/dto/base.response.dto';
+import { BaseResponseDto } from '@/shared/dto/base.response.dto';
 
 /**
  * Unit Tests for BaseResponseDto

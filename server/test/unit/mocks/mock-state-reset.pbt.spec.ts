@@ -9,9 +9,9 @@
  */
 
 import * as fc from 'fast-check';
-import { createMockPrisma } from '../../mocks/prisma.mock';
-import { createMockRedis } from '../../mocks/redis.mock';
-import { createMockConfig } from '../../mocks/config.mock';
+import { createMockPrisma } from '@/test/mocks/prisma.mock';
+import { createMockRedis } from '@/test/mocks/redis.mock';
+import { createMockConfig } from '@/test/mocks/config.mock';
 
 describe('Mock 服务 - 属性测试', () => {
   describe('Property 4: Mock 状态重置', () => {

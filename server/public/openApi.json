@@ -13693,7 +13693,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/TenantStatsVo"
+                          "$ref": "#/components/schemas/TenantStatsResponseDto"
                         }
                       }
                     }
@@ -13824,7 +13824,7 @@
                         "data": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/TenantTrendDataVo"
+                            "$ref": "#/components/schemas/TenantTrendDataResponseDto"
                           }
                         }
                       }
@@ -13935,7 +13935,7 @@
                         "data": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/PackageDistributionVo"
+                            "$ref": "#/components/schemas/PackageDistributionResponseDto"
                           }
                         }
                       }
@@ -14057,7 +14057,7 @@
                         "data": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/ExpiringTenantVo"
+                            "$ref": "#/components/schemas/ExpiringTenantResponseDto"
                           }
                         }
                       }
@@ -14168,7 +14168,7 @@
                         "data": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/QuotaTopTenantVo"
+                            "$ref": "#/components/schemas/QuotaTopTenantResponseDto"
                           }
                         }
                       }
@@ -14298,7 +14298,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/DashboardDataVo"
+                          "$ref": "#/components/schemas/DashboardDataResponseDto"
                         }
                       }
                     }
@@ -14493,7 +14493,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/TenantQuotaListVo"
+                          "$ref": "#/components/schemas/TenantQuotaResponseDto"
                         }
                       }
                     }
@@ -14610,7 +14610,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/TenantQuotaDetailVo"
+                          "$ref": "#/components/schemas/TenantQuotaResponseDto"
                         }
                       }
                     }
@@ -14710,7 +14710,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateTenantQuotaDto"
+                "$ref": "#/components/schemas/UpdateTenantQuotaRequestDto"
               }
             }
           }
@@ -14830,7 +14830,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CheckQuotaDto"
+                "$ref": "#/components/schemas/CheckQuotaRequestDto"
               }
             }
           }
@@ -14848,7 +14848,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/QuotaCheckResultVo"
+                          "$ref": "#/components/schemas/TenantQuotaResponseDto"
                         }
                       }
                     }
@@ -15415,7 +15415,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ExportTenantAuditLogDto"
+                "$ref": "#/components/schemas/ExportTenantAuditLogRequestDto"
               }
             }
           }
@@ -20928,7 +20928,7 @@
                         "data": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/DeptTreeNodeVo"
+                            "$ref": "#/components/schemas/DeptTreeNodeResponseDto"
                           }
                         }
                       }
@@ -25001,7 +25001,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateSmsChannelDto"
+                "$ref": "#/components/schemas/CreateSmsChannelRequestDto"
               }
             }
           }
@@ -25122,7 +25122,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateSmsChannelDto"
+                "$ref": "#/components/schemas/UpdateSmsChannelRequestDto"
               }
             }
           }
@@ -25332,7 +25332,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/SmsChannelListVo"
+                          "$ref": "#/components/schemas/SmsChannelResponseDto"
                         }
                       }
                     }
@@ -25560,7 +25560,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/SmsChannelDetailVo"
+                          "$ref": "#/components/schemas/SmsChannelResponseDto"
                         }
                       }
                     }
@@ -25778,7 +25778,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateSmsTemplateDto"
+                "$ref": "#/components/schemas/CreateSmsTemplateRequestDto"
               }
             }
           }
@@ -25899,7 +25899,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateSmsTemplateDto"
+                "$ref": "#/components/schemas/UpdateSmsTemplateRequestDto"
               }
             }
           }
@@ -26132,7 +26132,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/SmsTemplateListVo"
+                          "$ref": "#/components/schemas/SmsTemplateResponseDto"
                         }
                       }
                     }
@@ -26250,7 +26250,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/SmsTemplateDetailVo"
+                          "$ref": "#/components/schemas/SmsTemplateResponseDto"
                         }
                       }
                     }
@@ -26954,7 +26954,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/SmsLogListVo"
+                          "$ref": "#/components/schemas/SmsLogResponseDto"
                         }
                       }
                     }
@@ -27072,7 +27072,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/SmsLogDetailVo"
+                          "$ref": "#/components/schemas/SmsLogResponseDto"
                         }
                       }
                     }
@@ -27292,7 +27292,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateMailAccountDto"
+                "$ref": "#/components/schemas/CreateMailAccountRequestDto"
               }
             }
           }
@@ -27413,7 +27413,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateMailAccountDto"
+                "$ref": "#/components/schemas/UpdateMailAccountRequestDto"
               }
             }
           }
@@ -27623,7 +27623,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/MailAccountListVo"
+                          "$ref": "#/components/schemas/MailAccountResponseDto"
                         }
                       }
                     }
@@ -27851,7 +27851,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/MailAccountDetailVo"
+                          "$ref": "#/components/schemas/MailAccountResponseDto"
                         }
                       }
                     }
@@ -28069,7 +28069,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateMailTemplateDto"
+                "$ref": "#/components/schemas/CreateMailTemplateRequestDto"
               }
             }
           }
@@ -28190,7 +28190,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateMailTemplateDto"
+                "$ref": "#/components/schemas/UpdateMailTemplateRequestDto"
               }
             }
           }
@@ -28409,7 +28409,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/MailTemplateListVo"
+                          "$ref": "#/components/schemas/MailTemplateResponseDto"
                         }
                       }
                     }
@@ -28527,7 +28527,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/MailTemplateDetailVo"
+                          "$ref": "#/components/schemas/MailTemplateResponseDto"
                         }
                       }
                     }
@@ -29336,7 +29336,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/MailLogListVo"
+                          "$ref": "#/components/schemas/MailLogResponseDto"
                         }
                       }
                     }
@@ -29564,7 +29564,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/MailLogDetailVo"
+                          "$ref": "#/components/schemas/MailLogResponseDto"
                         }
                       }
                     }
@@ -29664,7 +29664,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateNotifyTemplateDto"
+                "$ref": "#/components/schemas/CreateNotifyTemplateRequestDto"
               }
             }
           }
@@ -29785,7 +29785,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateNotifyTemplateDto"
+                "$ref": "#/components/schemas/UpdateNotifyTemplateRequestDto"
               }
             }
           }
@@ -30004,7 +30004,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/NotifyTemplateListVo"
+                          "$ref": "#/components/schemas/NotifyTemplateResponseDto"
                         }
                       }
                     }
@@ -30112,7 +30112,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/NotifyTemplateSelectVo"
+                          "$ref": "#/components/schemas/NotifyTemplateResponseDto"
                         }
                       }
                     }
@@ -30230,7 +30230,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/NotifyTemplateDetailVo"
+                          "$ref": "#/components/schemas/NotifyTemplateResponseDto"
                         }
                       }
                     }
@@ -30448,7 +30448,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SendNotifyMessageDto"
+                "$ref": "#/components/schemas/SendNotifyMessageRequestDto"
               }
             }
           }
@@ -30571,7 +30571,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SendNotifyAllDto"
+                "$ref": "#/components/schemas/SendNotifyAllRequestDto"
               }
             }
           }
@@ -30784,7 +30784,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/NotifyMessageListVo"
+                          "$ref": "#/components/schemas/NotifyMessageResponseDto"
                         }
                       }
                     }
@@ -30956,7 +30956,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/NotifyMessageListVo"
+                          "$ref": "#/components/schemas/NotifyMessageResponseDto"
                         }
                       }
                     }
@@ -31064,7 +31064,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/UnreadCountVo"
+                          "$ref": "#/components/schemas/UnreadCountResponseDto"
                         }
                       }
                     }
@@ -31181,7 +31181,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/NotifyMessageListVo"
+                          "$ref": "#/components/schemas/NotifyMessageResponseDto"
                         }
                       }
                     }
@@ -31299,7 +31299,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/NotifyMessageDetailVo"
+                          "$ref": "#/components/schemas/NotifyMessageResponseDto"
                         }
                       }
                     }
@@ -41809,7 +41809,7 @@
           "total"
         ]
       },
-      "DeptTreeNodeVo": {
+      "DeptTreeNodeResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -41824,7 +41824,7 @@
             "description": "子节点列表",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DeptTreeNodeVo"
+              "$ref": "#/components/schemas/DeptTreeNodeResponseDto"
             }
           }
         },
@@ -41847,7 +41847,7 @@
             "description": "部门树数据",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DeptTreeNodeVo"
+              "$ref": "#/components/schemas/DeptTreeNodeResponseDto"
             }
           }
         },
@@ -42715,7 +42715,7 @@
           }
         }
       },
-      "TenantStatsVo": {
+      "TenantStatsResponseDto": {
         "type": "object",
         "properties": {
           "totalTenants": {
@@ -42762,7 +42762,7 @@
           "totalApiCalls"
         ]
       },
-      "TenantTrendDataVo": {
+      "TenantTrendDataResponseDto": {
         "type": "object",
         "properties": {
           "date": {
@@ -42784,7 +42784,7 @@
           "totalTenants"
         ]
       },
-      "PackageDistributionVo": {
+      "PackageDistributionResponseDto": {
         "type": "object",
         "properties": {
           "packageId": {
@@ -42811,7 +42811,7 @@
           "percentage"
         ]
       },
-      "ExpiringTenantVo": {
+      "ExpiringTenantResponseDto": {
         "type": "object",
         "properties": {
           "tenantId": {
@@ -42854,7 +42854,7 @@
           "packageName"
         ]
       },
-      "QuotaTopTenantVo": {
+      "QuotaTopTenantResponseDto": {
         "type": "object",
         "properties": {
           "tenantId": {
@@ -42891,14 +42891,14 @@
           "overallUsage"
         ]
       },
-      "DashboardDataVo": {
+      "DashboardDataResponseDto": {
         "type": "object",
         "properties": {
           "stats": {
             "description": "统计卡片数据",
             "allOf": [
               {
-                "$ref": "#/components/schemas/TenantStatsVo"
+                "$ref": "#/components/schemas/TenantStatsResponseDto"
               }
             ]
           },
@@ -42906,28 +42906,28 @@
             "description": "租户增长趋势",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TenantTrendDataVo"
+              "$ref": "#/components/schemas/TenantTrendDataResponseDto"
             }
           },
           "packageDistribution": {
             "description": "套餐分布",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PackageDistributionVo"
+              "$ref": "#/components/schemas/PackageDistributionResponseDto"
             }
           },
           "expiringTenants": {
             "description": "即将到期租户",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ExpiringTenantVo"
+              "$ref": "#/components/schemas/ExpiringTenantResponseDto"
             }
           },
           "quotaTopTenants": {
             "description": "配额使用TOP10",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/QuotaTopTenantVo"
+              "$ref": "#/components/schemas/QuotaTopTenantResponseDto"
             }
           }
         },
@@ -42939,15 +42939,37 @@
           "quotaTopTenants"
         ]
       },
-      "TenantQuotaVo": {
+      "TenantQuotaResponseDto": {
         "type": "object",
         "properties": {
+          "createBy": {
+            "type": "string",
+            "description": "创建者"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updateBy": {
+            "type": "string",
+            "description": "更新者"
+          },
+          "updateTime": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
           "id": {
             "type": "number",
             "description": "配额记录ID"
           },
           "tenantId": {
-            "type": "string",
+            "type": "number",
             "description": "租户ID"
           },
           "companyName": {
@@ -42991,182 +43013,21 @@
             "description": "API配额使用率"
           },
           "status": {
+            "type": "string",
+            "description": "配额状态",
             "enum": [
               "normal",
               "warning",
               "danger"
-            ],
-            "type": "string",
-            "description": "配额状态"
-          },
-          "createTime": {
-            "format": "date-time",
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updateTime": {
-            "format": "date-time",
-            "type": "string",
-            "description": "更新时间"
-          }
-        },
-        "required": [
-          "id",
-          "tenantId",
-          "companyName",
-          "userQuota",
-          "userUsed",
-          "userUsageRate",
-          "storageQuota",
-          "storageUsed",
-          "storageUsageRate",
-          "apiQuota",
-          "apiUsed",
-          "apiUsageRate",
-          "status",
-          "createTime",
-          "updateTime"
-        ]
-      },
-      "TenantQuotaListVo": {
-        "type": "object",
-        "properties": {
-          "rows": {
-            "description": "配额列表",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TenantQuotaVo"
-            }
-          },
-          "total": {
-            "type": "number",
-            "description": "总数"
-          }
-        },
-        "required": [
-          "rows",
-          "total"
-        ]
-      },
-      "QuotaChangeRecordVo": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "记录ID"
-          },
-          "quotaType": {
-            "type": "string",
-            "description": "配额类型",
-            "enum": [
-              "user",
-              "storage",
-              "api"
             ]
           },
-          "oldValue": {
-            "type": "number",
-            "description": "原值"
-          },
-          "newValue": {
-            "type": "number",
-            "description": "新值"
-          },
-          "changeBy": {
+          "delFlag": {
             "type": "string",
-            "description": "修改人"
+            "description": "删除标记 - 不返回给前端"
           },
-          "changeTime": {
-            "format": "date-time",
+          "password": {
             "type": "string",
-            "description": "修改时间"
-          }
-        },
-        "required": [
-          "id",
-          "quotaType",
-          "oldValue",
-          "newValue",
-          "changeBy",
-          "changeTime"
-        ]
-      },
-      "TenantQuotaDetailVo": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "配额记录ID"
-          },
-          "tenantId": {
-            "type": "string",
-            "description": "租户ID"
-          },
-          "companyName": {
-            "type": "string",
-            "description": "企业名称"
-          },
-          "userQuota": {
-            "type": "number",
-            "description": "用户数量配额，-1表示不限"
-          },
-          "userUsed": {
-            "type": "number",
-            "description": "已使用用户数"
-          },
-          "userUsageRate": {
-            "type": "number",
-            "description": "用户配额使用率"
-          },
-          "storageQuota": {
-            "type": "number",
-            "description": "存储配额（MB），-1表示不限"
-          },
-          "storageUsed": {
-            "type": "number",
-            "description": "已使用存储（MB）"
-          },
-          "storageUsageRate": {
-            "type": "number",
-            "description": "存储配额使用率"
-          },
-          "apiQuota": {
-            "type": "number",
-            "description": "API调用配额（月），-1表示不限"
-          },
-          "apiUsed": {
-            "type": "number",
-            "description": "本月已调用次数"
-          },
-          "apiUsageRate": {
-            "type": "number",
-            "description": "API配额使用率"
-          },
-          "status": {
-            "enum": [
-              "normal",
-              "warning",
-              "danger"
-            ],
-            "type": "string",
-            "description": "配额状态"
-          },
-          "createTime": {
-            "format": "date-time",
-            "type": "string",
-            "description": "创建时间"
-          },
-          "updateTime": {
-            "format": "date-time",
-            "type": "string",
-            "description": "更新时间"
-          },
-          "quotaHistory": {
-            "description": "配额变更历史",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/QuotaChangeRecordVo"
-            }
+            "description": "密码 - 不返回给前端"
           }
         },
         "required": [
@@ -43182,13 +43043,10 @@
           "apiQuota",
           "apiUsed",
           "apiUsageRate",
-          "status",
-          "createTime",
-          "updateTime",
-          "quotaHistory"
+          "status"
         ]
       },
-      "UpdateTenantQuotaDto": {
+      "UpdateTenantQuotaRequestDto": {
         "type": "object",
         "properties": {
           "tenantId": {
@@ -43215,44 +43073,7 @@
           "tenantId"
         ]
       },
-      "QuotaCheckResultVo": {
-        "type": "object",
-        "properties": {
-          "allowed": {
-            "type": "boolean",
-            "description": "是否允许"
-          },
-          "quotaType": {
-            "type": "string",
-            "description": "配额类型"
-          },
-          "used": {
-            "type": "number",
-            "description": "当前使用量"
-          },
-          "limit": {
-            "type": "number",
-            "description": "配额限制"
-          },
-          "usageRate": {
-            "type": "number",
-            "description": "使用率"
-          },
-          "message": {
-            "type": "string",
-            "description": "提示信息"
-          }
-        },
-        "required": [
-          "allowed",
-          "quotaType",
-          "used",
-          "limit",
-          "usageRate",
-          "message"
-        ]
-      },
-      "CheckQuotaDto": {
+      "CheckQuotaRequestDto": {
         "type": "object",
         "properties": {
           "tenantId": {
@@ -43283,7 +43104,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "object",
+            "type": "number",
             "description": "日志ID"
           },
           "tenantId": {
@@ -43300,22 +43121,11 @@
           },
           "operatorName": {
             "type": "string",
-            "description": "操作人姓名"
+            "description": "操作人名称"
           },
           "actionType": {
             "type": "string",
-            "description": "操作类型",
-            "enum": [
-              "login",
-              "logout",
-              "create",
-              "update",
-              "delete",
-              "permission_change",
-              "config_change",
-              "export",
-              "other"
-            ]
+            "description": "操作类型"
           },
           "actionDesc": {
             "type": "string",
@@ -43323,7 +43133,7 @@
           },
           "module": {
             "type": "string",
-            "description": "操作模块"
+            "description": "模块"
           },
           "ipAddress": {
             "type": "string",
@@ -43331,7 +43141,7 @@
           },
           "userAgent": {
             "type": "string",
-            "description": "User Agent"
+            "description": "用户代理"
           },
           "requestUrl": {
             "type": "string",
@@ -43350,6 +43160,7 @@
         "required": [
           "id",
           "tenantId",
+          "companyName",
           "operatorId",
           "operatorName",
           "actionType",
@@ -43363,7 +43174,7 @@
         "type": "object",
         "properties": {
           "rows": {
-            "description": "日志列表",
+            "description": "日志记录",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TenantAuditLogVo"
@@ -43383,7 +43194,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "object",
+            "type": "number",
             "description": "日志ID"
           },
           "tenantId": {
@@ -43400,22 +43211,11 @@
           },
           "operatorName": {
             "type": "string",
-            "description": "操作人姓名"
+            "description": "操作人名称"
           },
           "actionType": {
             "type": "string",
-            "description": "操作类型",
-            "enum": [
-              "login",
-              "logout",
-              "create",
-              "update",
-              "delete",
-              "permission_change",
-              "config_change",
-              "export",
-              "other"
-            ]
+            "description": "操作类型"
           },
           "actionDesc": {
             "type": "string",
@@ -43423,7 +43223,7 @@
           },
           "module": {
             "type": "string",
-            "description": "操作模块"
+            "description": "模块"
           },
           "ipAddress": {
             "type": "string",
@@ -43431,7 +43231,7 @@
           },
           "userAgent": {
             "type": "string",
-            "description": "User Agent"
+            "description": "用户代理"
           },
           "requestUrl": {
             "type": "string",
@@ -43448,24 +43248,33 @@
           },
           "requestParams": {
             "type": "string",
-            "description": "请求参数（JSON）"
+            "description": "请求参数"
           },
           "beforeData": {
             "type": "string",
-            "description": "操作前数据（JSON）"
+            "description": "操作前数据"
           },
           "afterData": {
             "type": "string",
-            "description": "操作后数据（JSON）"
+            "description": "操作后数据"
           },
           "responseData": {
             "type": "string",
-            "description": "响应数据（JSON）"
+            "description": "响应数据"
+          },
+          "result": {
+            "type": "string",
+            "description": "操作结果"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "错误信息"
           }
         },
         "required": [
           "id",
           "tenantId",
+          "companyName",
           "operatorId",
           "operatorName",
           "actionType",
@@ -43535,7 +43344,7 @@
           "byModule"
         ]
       },
-      "ExportTenantAuditLogDto": {
+      "ExportTenantAuditLogRequestDto": {
         "type": "object",
         "properties": {
           "tenantId": {
@@ -46173,7 +45982,7 @@
           "companyName"
         ]
       },
-      "CreateSmsChannelDto": {
+      "CreateSmsChannelRequestDto": {
         "type": "object",
         "properties": {
           "code": {
@@ -46247,75 +46056,84 @@
           "apiSecret"
         ]
       },
-      "SmsChannelListVo": {
+      "SmsChannelResponseDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "createBy": {
+            "type": "string",
+            "description": "创建者"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updateBy": {
+            "type": "string",
+            "description": "更新者"
+          },
+          "updateTime": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "id": {
             "type": "number",
-            "description": "响应码",
-            "example": 200
+            "description": "渠道ID"
           },
-          "msg": {
+          "code": {
             "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
+            "description": "渠道编码"
           },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
+          "name": {
             "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            "description": "渠道名称"
           },
-          "timestamp": {
+          "signature": {
             "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
+            "description": "签名"
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "API Key"
+          },
+          "callbackUrl": {
+            "type": "string",
+            "description": "回调URL"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态"
+          },
+          "apiSecret": {
+            "type": "string"
+          },
+          "delFlag": {
+            "type": "string",
+            "description": "删除标记 - 不返回给前端"
+          },
+          "tenantId": {
+            "type": "number",
+            "description": "租户ID - 不返回给前端"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码 - 不返回给前端"
           }
         },
         "required": [
+          "id",
           "code",
-          "msg",
-          "data"
+          "name",
+          "signature",
+          "status"
         ]
       },
-      "SmsChannelDetailVo": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "code",
-          "msg",
-          "data"
-        ]
-      },
-      "UpdateSmsChannelDto": {
+      "UpdateSmsChannelRequestDto": {
         "type": "object",
         "properties": {
           "code": {
@@ -46390,7 +46208,7 @@
           "id"
         ]
       },
-      "CreateSmsTemplateDto": {
+      "CreateSmsTemplateRequestDto": {
         "type": "object",
         "properties": {
           "channelId": {
@@ -46464,75 +46282,99 @@
           "type"
         ]
       },
-      "SmsTemplateListVo": {
+      "SmsTemplateResponseDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "createBy": {
+            "type": "string",
+            "description": "创建者"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updateBy": {
+            "type": "string",
+            "description": "更新者"
+          },
+          "updateTime": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "id": {
             "type": "number",
-            "description": "响应码",
-            "example": 200
+            "description": "模板ID"
           },
-          "msg": {
+          "code": {
             "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
+            "description": "模板编码"
           },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
+          "name": {
             "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            "description": "模板名称"
           },
-          "timestamp": {
+          "channelId": {
+            "type": "number",
+            "description": "渠道ID"
+          },
+          "channelCode": {
             "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
+            "description": "渠道编码"
+          },
+          "channelName": {
+            "type": "string",
+            "description": "渠道名称"
+          },
+          "type": {
+            "type": "number",
+            "description": "模板类型"
+          },
+          "content": {
+            "type": "string",
+            "description": "模板内容"
+          },
+          "params": {
+            "type": "string",
+            "description": "参数列表"
+          },
+          "apiTemplateId": {
+            "type": "string",
+            "description": "API模板ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态"
+          },
+          "delFlag": {
+            "type": "string",
+            "description": "删除标记 - 不返回给前端"
+          },
+          "tenantId": {
+            "type": "number",
+            "description": "租户ID - 不返回给前端"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码 - 不返回给前端"
           }
         },
         "required": [
+          "id",
           "code",
-          "msg",
-          "data"
+          "name",
+          "channelId",
+          "type",
+          "content",
+          "status"
         ]
       },
-      "SmsTemplateDetailVo": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "code",
-          "msg",
-          "data"
-        ]
-      },
-      "UpdateSmsTemplateDto": {
+      "UpdateSmsTemplateRequestDto": {
         "type": "object",
         "properties": {
           "channelId": {
@@ -46673,75 +46515,113 @@
           "templateCode"
         ]
       },
-      "SmsLogListVo": {
+      "SmsLogResponseDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "createBy": {
+            "type": "string",
+            "description": "创建者"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updateBy": {
+            "type": "string",
+            "description": "更新者"
+          },
+          "updateTime": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "id": {
             "type": "number",
-            "description": "响应码",
-            "example": 200
+            "description": "日志ID"
           },
-          "msg": {
+          "channelId": {
+            "type": "number",
+            "description": "渠道ID"
+          },
+          "channelCode": {
             "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
+            "description": "渠道编码"
           },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
+          "templateId": {
+            "type": "number",
+            "description": "模板ID"
           },
-          "requestId": {
+          "templateCode": {
             "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            "description": "模板编码"
           },
-          "timestamp": {
+          "mobile": {
             "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
+            "description": "手机号码"
+          },
+          "content": {
+            "type": "string",
+            "description": "短信内容"
+          },
+          "params": {
+            "type": "string",
+            "description": "模板参数"
+          },
+          "sendStatus": {
+            "type": "number",
+            "description": "发送状态"
+          },
+          "apiSendCode": {
+            "type": "string",
+            "description": "API发送编码"
+          },
+          "apiReceiveCode": {
+            "type": "string",
+            "description": "API接收编码"
+          },
+          "errorMsg": {
+            "type": "string",
+            "description": "错误信息"
+          },
+          "sendTime": {
+            "type": "string",
+            "description": "发送时间"
+          },
+          "receiveTime": {
+            "type": "string",
+            "description": "接收时间"
+          },
+          "delFlag": {
+            "type": "string",
+            "description": "删除标记 - 不返回给前端"
+          },
+          "tenantId": {
+            "type": "number",
+            "description": "租户ID - 不返回给前端"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码 - 不返回给前端"
           }
         },
         "required": [
-          "code",
-          "msg",
-          "data"
+          "id",
+          "channelId",
+          "channelCode",
+          "templateId",
+          "templateCode",
+          "mobile",
+          "content",
+          "sendStatus",
+          "sendTime"
         ]
       },
-      "SmsLogDetailVo": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "code",
-          "msg",
-          "data"
-        ]
-      },
-      "CreateMailAccountDto": {
+      "CreateMailAccountRequestDto": {
         "type": "object",
         "properties": {
           "mail": {
@@ -46809,75 +46689,83 @@
           "port"
         ]
       },
-      "MailAccountListVo": {
+      "MailAccountResponseDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "createBy": {
+            "type": "string",
+            "description": "创建者"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updateBy": {
+            "type": "string",
+            "description": "更新者"
+          },
+          "updateTime": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "id": {
             "type": "number",
-            "description": "响应码",
-            "example": 200
+            "description": "账号ID"
           },
-          "msg": {
+          "mail": {
             "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
+            "description": "邮箱地址"
           },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
+          "username": {
             "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            "description": "用户名"
           },
-          "timestamp": {
+          "host": {
             "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
+            "description": "SMTP主机"
+          },
+          "port": {
+            "type": "number",
+            "description": "SMTP端口"
+          },
+          "sslEnable": {
+            "type": "boolean",
+            "description": "是否启用SSL"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码 - 不返回给前端"
+          },
+          "delFlag": {
+            "type": "string",
+            "description": "删除标记 - 不返回给前端"
+          },
+          "tenantId": {
+            "type": "number",
+            "description": "租户ID - 不返回给前端"
           }
         },
         "required": [
-          "code",
-          "msg",
-          "data"
+          "id",
+          "mail",
+          "username",
+          "host",
+          "port",
+          "sslEnable",
+          "status"
         ]
       },
-      "MailAccountDetailVo": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "code",
-          "msg",
-          "data"
-        ]
-      },
-      "UpdateMailAccountDto": {
+      "UpdateMailAccountRequestDto": {
         "type": "object",
         "properties": {
           "mail": {
@@ -46946,7 +46834,7 @@
           "id"
         ]
       },
-      "CreateMailTemplateDto": {
+      "CreateMailTemplateRequestDto": {
         "type": "object",
         "properties": {
           "name": {
@@ -47017,75 +46905,96 @@
           "content"
         ]
       },
-      "MailTemplateListVo": {
+      "MailTemplateResponseDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "createBy": {
+            "type": "string",
+            "description": "创建者"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updateBy": {
+            "type": "string",
+            "description": "更新者"
+          },
+          "updateTime": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "id": {
             "type": "number",
-            "description": "响应码",
-            "example": 200
+            "description": "模板ID"
           },
-          "msg": {
+          "name": {
             "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
+            "description": "模板名称"
           },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
+          "code": {
             "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            "description": "模板编码"
           },
-          "timestamp": {
+          "accountId": {
+            "type": "number",
+            "description": "发送账号ID"
+          },
+          "accountMail": {
             "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
+            "description": "发送账号邮箱"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "发送人昵称"
+          },
+          "title": {
+            "type": "string",
+            "description": "邮件标题"
+          },
+          "content": {
+            "type": "string",
+            "description": "邮件内容（HTML）"
+          },
+          "params": {
+            "type": "string",
+            "description": "参数列表"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态"
+          },
+          "delFlag": {
+            "type": "string",
+            "description": "删除标记 - 不返回给前端"
+          },
+          "tenantId": {
+            "type": "number",
+            "description": "租户ID - 不返回给前端"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码 - 不返回给前端"
           }
         },
         "required": [
+          "id",
+          "name",
           "code",
-          "msg",
-          "data"
+          "accountId",
+          "nickname",
+          "title",
+          "content",
+          "status"
         ]
       },
-      "MailTemplateDetailVo": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "code",
-          "msg",
-          "data"
-        ]
-      },
-      "UpdateMailTemplateDto": {
+      "UpdateMailTemplateRequestDto": {
         "type": "object",
         "properties": {
           "name": {
@@ -47252,75 +47161,119 @@
           "accountId"
         ]
       },
-      "MailLogListVo": {
+      "MailLogResponseDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "createBy": {
+            "type": "string",
+            "description": "创建者"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updateBy": {
+            "type": "string",
+            "description": "更新者"
+          },
+          "updateTime": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "id": {
+            "type": "string",
+            "description": "日志ID"
+          },
+          "userId": {
             "type": "number",
-            "description": "响应码",
-            "example": 200
+            "description": "用户ID"
           },
-          "msg": {
+          "userType": {
+            "type": "number",
+            "description": "用户类型"
+          },
+          "toMail": {
             "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
+            "description": "收件邮箱"
           },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
+          "accountId": {
+            "type": "number",
+            "description": "账号ID"
           },
-          "requestId": {
+          "fromMail": {
             "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            "description": "发件邮箱"
           },
-          "timestamp": {
+          "templateId": {
+            "type": "number",
+            "description": "模板ID"
+          },
+          "templateCode": {
             "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
+            "description": "模板编码"
+          },
+          "templateParams": {
+            "type": "string",
+            "description": "模板参数"
+          },
+          "templateTitle": {
+            "type": "string",
+            "description": "邮件标题"
+          },
+          "templateContent": {
+            "type": "string",
+            "description": "邮件内容"
+          },
+          "sendStatus": {
+            "type": "number",
+            "description": "发送状态"
+          },
+          "sendTime": {
+            "type": "string",
+            "description": "发送时间"
+          },
+          "sendMessageId": {
+            "type": "string",
+            "description": "发送消息ID"
+          },
+          "sendException": {
+            "type": "string",
+            "description": "发送异常"
+          },
+          "delFlag": {
+            "type": "string",
+            "description": "删除标记 - 不返回给前端"
+          },
+          "tenantId": {
+            "type": "number",
+            "description": "租户ID - 不返回给前端"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码 - 不返回给前端"
           }
         },
         "required": [
-          "code",
-          "msg",
-          "data"
+          "id",
+          "userId",
+          "userType",
+          "toMail",
+          "accountId",
+          "fromMail",
+          "templateId",
+          "templateCode",
+          "templateTitle",
+          "templateContent",
+          "sendStatus"
         ]
       },
-      "MailLogDetailVo": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "code",
-          "msg",
-          "data"
-        ]
-      },
-      "CreateNotifyTemplateDto": {
+      "CreateNotifyTemplateRequestDto": {
         "type": "object",
         "properties": {
           "name": {
@@ -47383,109 +47336,87 @@
           "content"
         ]
       },
-      "NotifyTemplateListVo": {
+      "NotifyTemplateResponseDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "createBy": {
+            "type": "string",
+            "description": "创建者"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updateBy": {
+            "type": "string",
+            "description": "更新者"
+          },
+          "updateTime": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "id": {
             "type": "number",
-            "description": "响应码",
-            "example": 200
+            "description": "模板ID"
           },
-          "msg": {
+          "name": {
             "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
+            "description": "模板名称"
           },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
+          "code": {
             "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            "description": "模板编码"
           },
-          "timestamp": {
+          "nickname": {
             "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
+            "description": "发送人名称"
+          },
+          "content": {
+            "type": "string",
+            "description": "模板内容"
+          },
+          "type": {
+            "type": "number",
+            "description": "模板类型"
+          },
+          "params": {
+            "type": "string",
+            "description": "参数列表"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态"
+          },
+          "delFlag": {
+            "type": "string",
+            "description": "删除标记 - 不返回给前端"
+          },
+          "tenantId": {
+            "type": "number",
+            "description": "租户ID - 不返回给前端"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码 - 不返回给前端"
           }
         },
         "required": [
+          "id",
+          "name",
           "code",
-          "msg",
-          "data"
+          "nickname",
+          "content",
+          "type",
+          "status"
         ]
       },
-      "NotifyTemplateSelectVo": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "code",
-          "msg",
-          "data"
-        ]
-      },
-      "NotifyTemplateDetailVo": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "code",
-          "msg",
-          "data"
-        ]
-      },
-      "UpdateNotifyTemplateDto": {
+      "UpdateNotifyTemplateRequestDto": {
         "type": "object",
         "properties": {
           "name": {
@@ -47550,7 +47481,7 @@
           "id"
         ]
       },
-      "SendNotifyMessageDto": {
+      "SendNotifyMessageRequestDto": {
         "type": "object",
         "properties": {
           "userIds": {
@@ -47584,7 +47515,7 @@
           "templateCode"
         ]
       },
-      "SendNotifyAllDto": {
+      "SendNotifyAllRequestDto": {
         "type": "object",
         "properties": {
           "templateCode": {
@@ -47604,106 +47535,105 @@
           "templateCode"
         ]
       },
-      "NotifyMessageListVo": {
+      "NotifyMessageResponseDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "createBy": {
+            "type": "string",
+            "description": "创建者"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updateBy": {
+            "type": "string",
+            "description": "更新者"
+          },
+          "updateTime": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2025-01-01 00:00:00"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "id": {
+            "type": "string",
+            "description": "消息ID"
+          },
+          "userId": {
             "type": "number",
-            "description": "响应码",
-            "example": 200
+            "description": "用户ID"
           },
-          "msg": {
+          "userType": {
+            "type": "number",
+            "description": "用户类型"
+          },
+          "templateId": {
+            "type": "number",
+            "description": "模板ID"
+          },
+          "templateCode": {
             "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
+            "description": "模板编码"
           },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
+          "templateNickname": {
             "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            "description": "模板发送人名称"
           },
-          "timestamp": {
+          "templateContent": {
             "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
+            "description": "模板内容"
+          },
+          "templateParams": {
+            "type": "string",
+            "description": "模板参数"
+          },
+          "readStatus": {
+            "type": "boolean",
+            "description": "是否已读"
+          },
+          "readTime": {
+            "type": "string",
+            "description": "阅读时间"
+          },
+          "delFlag": {
+            "type": "string",
+            "description": "删除标记 - 不返回给前端"
+          },
+          "tenantId": {
+            "type": "number",
+            "description": "租户ID - 不返回给前端"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码 - 不返回给前端"
           }
         },
         "required": [
-          "code",
-          "msg",
-          "data"
+          "id",
+          "userId",
+          "userType",
+          "templateId",
+          "templateCode",
+          "templateNickname",
+          "templateContent",
+          "readStatus"
         ]
       },
-      "UnreadCountVo": {
+      "UnreadCountResponseDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "count": {
             "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
+            "description": "未读计数"
           }
         },
         "required": [
-          "code",
-          "msg",
-          "data"
-        ]
-      },
-      "NotifyMessageDetailVo": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "number",
-            "description": "响应码",
-            "example": 200
-          },
-          "msg": {
-            "type": "string",
-            "description": "响应消息",
-            "example": "操作成功"
-          },
-          "data": {
-            "type": "object",
-            "description": "响应数据"
-          },
-          "requestId": {
-            "type": "string",
-            "description": "请求ID，用于追踪",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "时间戳",
-            "example": "2025-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "code",
-          "msg",
-          "data"
+          "count"
         ]
       },
       "JobResponseDto": {

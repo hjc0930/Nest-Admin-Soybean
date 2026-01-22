@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RequireFeatureGuard } from '../../../../src/tenant/guards/require-feature.guard';
-import { FeatureToggleService } from '../../../../src/tenant/services/feature-toggle.service';
-import { TenantContext } from '../../../../src/tenant/context/tenant.context';
+import { RequireFeatureGuard } from '@/tenant/guards/require-feature.guard';
+import { FeatureToggleService } from '@/tenant/services/feature-toggle.service';
+import { TenantContext } from '@/tenant/context/tenant.context';
 import {
   REQUIRE_FEATURE_KEY,
   RequireFeatureOptions,
-} from '../../../../src/tenant/decorators/require-feature.decorator';
+} from '@/tenant/decorators/require-feature.decorator';
 
 describe('RequireFeatureGuard', () => {
   let guard: RequireFeatureGuard;

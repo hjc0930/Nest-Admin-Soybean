@@ -4,7 +4,7 @@ import { MailLogService } from './mail-log.service';
 import { ListMailLogDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { MailLogDetailVo, MailLogListVo } from './vo/index';
+import { MailLogResponseDto } from './dto';
 
 @ApiTags('邮件日志')
 @Controller('system/mail/log')
@@ -15,7 +15,7 @@ export class MailLogController {
   @Api({
     summary: '邮件日志-列表',
     description: '分页查询邮件日志列表',
-    type: MailLogListVo,
+    type: MailLogResponseDto,
   })
   @RequirePermission('system:mail:log:list')
   @Get('/list')
@@ -36,7 +36,7 @@ export class MailLogController {
   @Api({
     summary: '邮件日志-详情',
     description: '根据ID获取邮件日志详情',
-    type: MailLogDetailVo,
+    type: MailLogResponseDto,
     params: [{ name: 'id', description: '日志ID' }],
   })
   @RequirePermission('system:mail:log:query')

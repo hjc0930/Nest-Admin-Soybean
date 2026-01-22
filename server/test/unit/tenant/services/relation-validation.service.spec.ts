@@ -4,9 +4,9 @@ import {
   RelationValidationService,
   RelationValidationResult,
   DependencyCheckResult,
-} from '../../../../src/tenant/services/relation-validation.service';
-import { PrismaService } from '../../../../src/infrastructure/prisma';
-import { TenantContext } from '../../../../src/tenant/context/tenant.context';
+} from '@/tenant/services/relation-validation.service';
+import { PrismaService } from '@/infrastructure/prisma';
+import { TenantContext } from '@/tenant/context/tenant.context';
 
 describe('RelationValidationService', () => {
   let service: RelationValidationService;

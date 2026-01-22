@@ -3,11 +3,11 @@ import {
   TenantLifecycleService,
   CreateTenantParams,
   TenantInitData,
-} from '../../../../src/tenant/services/tenant-lifecycle.service';
-import { PrismaService } from '../../../../src/infrastructure/prisma';
-import { TenantStatus } from '../../../../src/shared/enums';
-import { BusinessException } from '../../../../src/shared/exceptions';
-import { ResponseCode } from '../../../../src/shared/response';
+} from '@/tenant/services/tenant-lifecycle.service';
+import { PrismaService } from '@/infrastructure/prisma';
+import { TenantStatus } from '@/shared/enums';
+import { BusinessException } from '@/shared/exceptions';
+import { ResponseCode } from '@/shared/response';
 
 describe('TenantLifecycleService', () => {
   let service: TenantLifecycleService;

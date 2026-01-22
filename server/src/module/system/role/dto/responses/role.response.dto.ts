@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { BaseResponseDto } from 'src/shared/dto/base.response.dto';
 import { StatusEnum, StatusEnumSchema, DataScopeEnum, DataScopeEnumSchema } from 'src/shared/enums';
-import { DeptTreeNodeVo } from 'src/shared/dto/dept-tree-node.vo';
+import { DeptTreeNodeResponseDto } from 'src/shared/dto/dept-tree-node.response.dto';
 
 /**
  * 角色基础信息响应 DTO
@@ -64,8 +64,8 @@ export class RoleDeptTreeResponseDto {
   @ApiProperty({ description: '已选中的部门ID列表', type: [Number] })
   checkedKeys: number[];
 
-  @ApiProperty({ description: '部门树数据', type: [DeptTreeNodeVo] })
-  depts: DeptTreeNodeVo[];
+  @ApiProperty({ description: '部门树数据', type: [DeptTreeNodeResponseDto] })
+  depts: DeptTreeNodeResponseDto[];
 }
 
 /**

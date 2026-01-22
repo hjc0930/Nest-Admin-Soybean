@@ -44,7 +44,7 @@ import { User, UserDto, UserTool, UserToolType } from 'src/module/system/user/us
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { DeptTreeNodeVo } from 'src/shared/dto/dept-tree-node.vo';
+import { DeptTreeNodeResponseDto } from 'src/shared/dto/dept-tree-node.response.dto';
 
 @ApiTags('用户管理')
 @Controller('system/user')
@@ -184,7 +184,7 @@ export class UserController {
   @Api({
     summary: '用户-部门树',
     description: '获取部门树形结构，用于用户筛选',
-    type: DeptTreeNodeVo,
+    type: DeptTreeNodeResponseDto,
     isArray: true,
   })
   @RequirePermission('system:dept:query')

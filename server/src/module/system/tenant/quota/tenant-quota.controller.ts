@@ -1,11 +1,11 @@
 import { Controller, Get, Put, Post, Query, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { TenantQuotaService } from './tenant-quota.service';
-import { ListTenantQuotaDto, UpdateTenantQuotaDto, CheckQuotaDto } from './dto/tenant-quota.dto';
+import { ListTenantQuotaDto, UpdateTenantQuotaDto, CheckQuotaDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
 import { User } from 'src/module/system/user/user.decorator';
-import { TenantQuotaVo, TenantQuotaDetailVo, QuotaCheckResultVo, TenantQuotaListVo } from './vo/tenant-quota.vo';
+import { TenantQuotaResponseDto } from './dto';
 
 /**
  * 租户配额管理控制器
@@ -22,7 +22,7 @@ export class TenantQuotaController {
   @Api({
     summary: '租户配额列表',
     description: '分页查询所有租户的配额使用情况',
-    type: TenantQuotaListVo,
+    type: TenantQuotaResponseDto,
   })
   @RequirePermission('system:tenant:quota:list')
   @Get('/list')
@@ -33,7 +33,7 @@ export class TenantQuotaController {
   @Api({
     summary: '租户配额详情',
     description: '获取单个租户的配额详情，包含变更历史',
-    type: TenantQuotaDetailVo,
+    type: TenantQuotaResponseDto,
   })
   @RequirePermission('system:tenant:quota:query')
   @Get('/:tenantId')
@@ -54,7 +54,7 @@ export class TenantQuotaController {
   @Api({
     summary: '检查配额',
     description: '检查指定租户的配额是否允许操作',
-    type: QuotaCheckResultVo,
+    type: TenantQuotaResponseDto,
   })
   @RequirePermission('system:tenant:quota:query')
   @Post('/check')

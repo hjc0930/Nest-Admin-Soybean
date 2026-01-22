@@ -1,7 +1,7 @@
 import * as fc from 'fast-check';
-import { TenantContext } from '../../../../src/tenant/context/tenant.context';
-import { tenantExtensionHelpers } from '../../../../src/tenant/extensions/tenant.extension';
-import { SUPER_TENANT_ID, TENANT_MODELS } from '../../../../src/tenant/constants/tenant-models';
+import { TenantContext } from '@/tenant/context/tenant.context';
+import { tenantExtensionHelpers } from '@/tenant/extensions/tenant.extension';
+import { SUPER_TENANT_ID, TENANT_MODELS } from '@/tenant/constants/tenant-models';
 
 const { shouldApplyFilter, addTenantFilter, setTenantId, setTenantIdForMany, validateTenantOwnership } =
   tenantExtensionHelpers;

@@ -4,7 +4,7 @@ import { SmsTemplateService } from './sms-template.service';
 import { CreateSmsTemplateDto, UpdateSmsTemplateDto, ListSmsTemplateDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { SmsTemplateDetailVo, SmsTemplateListVo } from './vo/index';
+import { SmsTemplateResponseDto } from './dto';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../../user/user.decorator';
@@ -30,7 +30,7 @@ export class SmsTemplateController {
   @Api({
     summary: '短信模板-列表',
     description: '分页查询短信模板列表',
-    type: SmsTemplateListVo,
+    type: SmsTemplateResponseDto,
   })
   @RequirePermission('system:sms:template:list')
   @Get('/list')
@@ -41,7 +41,7 @@ export class SmsTemplateController {
   @Api({
     summary: '短信模板-详情',
     description: '根据ID获取短信模板详情',
-    type: SmsTemplateDetailVo,
+    type: SmsTemplateResponseDto,
     params: [{ name: 'id', description: '模板ID', type: 'number' }],
   })
   @RequirePermission('system:sms:template:query')

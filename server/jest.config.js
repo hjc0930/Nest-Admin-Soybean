@@ -36,6 +36,12 @@ module.exports = {
     '^@faker-js/faker$': '<rootDir>/test/mocks/faker.mock.ts',
   },
 
+  // Jest 模块解析
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
+
+  // 支持从test目录中的spec文件导入src中的文件
+  // TypeScript会处理相对路径解析
+
   // 覆盖率收集配置
   collectCoverageFrom: [
     'src/**/*.ts',

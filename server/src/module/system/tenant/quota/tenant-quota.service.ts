@@ -11,15 +11,13 @@ import {
   UpdateTenantQuotaDto,
   CheckQuotaDto,
   IncrementQuotaUsageDto,
-} from './dto/tenant-quota.dto';
-import { TenantQuotaResponseDto } from './dto/tenant-quota.response.dto';
-import {
+  TenantQuotaResponseDto,
   TenantQuotaVo,
   TenantQuotaDetailVo,
+  QuotaChangeRecordVo,
   QuotaCheckResultVo,
   QuotaStatus,
-  QuotaChangeRecordVo,
-} from './vo/tenant-quota.vo';
+} from './dto/index';
 
 /**
  * 租户配额服务

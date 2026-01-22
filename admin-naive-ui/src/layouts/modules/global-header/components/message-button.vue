@@ -28,7 +28,7 @@ const toGitee = () => {
           <NButton quaternary class="bell-button h-36px text-icon" :focusable="false">
             <NBadge :value="noticeNum" :max="99" :offset="[2, -2]">
               <div class="bell-icon flex-center gap-8px">
-                <SvgIcon local-icon="bell" />
+                <SvgIcon icon="mdi:message-badge-outline" class="text-18px" />
               </div>
             </NBadge>
           </NButton>

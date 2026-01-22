@@ -4,7 +4,7 @@ import { SmsLogService } from './sms-log.service';
 import { ListSmsLogDto } from './dto';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { SmsLogDetailVo, SmsLogListVo } from './vo';
+import { SmsLogResponseDto } from './dto';
 
 @ApiTags('短信日志')
 @Controller('system/sms/log')
@@ -15,7 +15,7 @@ export class SmsLogController {
   @Api({
     summary: '短信日志-列表',
     description: '分页查询短信日志列表',
-    type: SmsLogListVo,
+    type: SmsLogResponseDto,
   })
   @RequirePermission('system:sms:log:list')
   @Get('/list')
@@ -26,7 +26,7 @@ export class SmsLogController {
   @Api({
     summary: '短信日志-详情',
     description: '根据ID获取短信日志详情',
-    type: SmsLogDetailVo,
+    type: SmsLogResponseDto,
     params: [{ name: 'id', description: '日志ID', type: 'number' }],
   })
   @RequirePermission('system:sms:log:query')

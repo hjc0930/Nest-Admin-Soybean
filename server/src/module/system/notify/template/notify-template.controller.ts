@@ -4,7 +4,7 @@ import { NotifyTemplateService } from './notify-template.service';
 import { CreateNotifyTemplateDto, UpdateNotifyTemplateDto, ListNotifyTemplateDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { NotifyTemplateDetailVo, NotifyTemplateListVo, NotifyTemplateSelectVo } from './vo/index';
+import { NotifyTemplateResponseDto } from './dto';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../../user/user.decorator';
@@ -30,7 +30,7 @@ export class NotifyTemplateController {
   @Api({
     summary: '站内信模板-列表',
     description: '分页查询站内信模板列表',
-    type: NotifyTemplateListVo,
+    type: NotifyTemplateResponseDto,
   })
   @RequirePermission('system:notify:template:list')
   @Get('/list')
@@ -41,7 +41,7 @@ export class NotifyTemplateController {
   @Api({
     summary: '站内信模板-下拉选择',
     description: '获取所有启用的站内信模板（用于下拉选择）',
-    type: NotifyTemplateSelectVo,
+    type: NotifyTemplateResponseDto,
   })
   @RequirePermission('system:notify:template:list')
   @Get('/select')
@@ -52,7 +52,7 @@ export class NotifyTemplateController {
   @Api({
     summary: '站内信模板-详情',
     description: '根据ID获取站内信模板详情',
-    type: NotifyTemplateDetailVo,
+    type: NotifyTemplateResponseDto,
     params: [{ name: 'id', description: '模板ID', type: 'number' }],
   })
   @RequirePermission('system:notify:template:query')

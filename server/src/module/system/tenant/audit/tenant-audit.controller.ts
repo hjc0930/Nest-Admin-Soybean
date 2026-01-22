@@ -2,15 +2,17 @@ import { Controller, Get, Post, Query, Param, Body, Res } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { TenantAuditService } from './tenant-audit.service';
-import { ListTenantAuditLogDto, ExportTenantAuditLogDto } from './dto/tenant-audit.dto';
+import {
+  ListTenantAuditLogDto,
+  ExportTenantAuditLogDto,
+  TenantAuditLogResponseDto,
+  TenantAuditLogStatsResponseDto,
+  TenantAuditLogListVo,
+  TenantAuditLogDetailVo,
+  TenantAuditLogStatsVo,
+} from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import {
-  TenantAuditLogVo,
-  TenantAuditLogDetailVo,
-  TenantAuditLogListVo,
-  TenantAuditLogStatsVo,
-} from './vo/tenant-audit.vo';
 
 /**
  * 租户审计日志控制器

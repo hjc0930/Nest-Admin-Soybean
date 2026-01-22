@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import { BaseResponseDto } from 'src/shared/dto/base.response.dto';
-import { DeptTreeNodeVo } from 'src/shared/dto/dept-tree-node.vo';
+import { DeptTreeNodeResponseDto } from 'src/shared/dto/dept-tree-node.response.dto';
 
 /**
  * 部门响应 DTO
@@ -67,16 +67,16 @@ export class DeptListResponseDto {
  * 部门树响应 DTO
  */
 export class DeptTreeResponseDto {
-  @ApiProperty({ description: '部门树数据', type: [DeptTreeNodeVo] })
-  data: DeptTreeNodeVo[];
+  @ApiProperty({ description: '部门树数据', type: [DeptTreeNodeResponseDto] })
+  data: DeptTreeNodeResponseDto[];
 }
 
 /**
  * 部门下拉树选项响应 DTO
  */
 export class DeptTreeSelectResponseDto {
-  @ApiProperty({ description: '部门下拉树数据', type: [DeptTreeNodeVo] })
-  data: DeptTreeNodeVo[];
+  @ApiProperty({ description: '部门下拉树数据', type: [DeptTreeNodeResponseDto] })
+  data: DeptTreeNodeResponseDto[];
 }
 
 /**
@@ -86,8 +86,8 @@ export class RoleDeptTreeSelectResponseDto {
   @ApiProperty({ description: '已选中的部门ID列表', type: [Number] })
   checkedKeys: number[];
 
-  @ApiProperty({ description: '部门树数据', type: [DeptTreeNodeVo] })
-  depts: DeptTreeNodeVo[];
+  @ApiProperty({ description: '部门树数据', type: [DeptTreeNodeResponseDto] })
+  depts: DeptTreeNodeResponseDto[];
 }
 
 /**

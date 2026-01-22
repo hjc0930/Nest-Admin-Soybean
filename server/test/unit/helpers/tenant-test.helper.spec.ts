@@ -7,8 +7,8 @@
  * @requirements 1.1, 2.1, 3.1
  */
 
-import { TenantContext } from '../../../src/tenant/context/tenant.context';
-import { SUPER_TENANT_ID } from '../../../src/tenant/constants/tenant-models';
+import { TenantContext } from '@/tenant/context/tenant.context';
+import { SUPER_TENANT_ID } from '@/tenant/constants/tenant-models';
 import {
   TenantTestHelper,
   runWithTenant,
@@ -24,7 +24,7 @@ import {
   generateRandomTenantId,
   generateNormalTenantId,
   generateTenantIdPair,
-} from '../../helpers/tenant-test.helper';
+} from '@/test/helpers/tenant-test.helper';
 import {
   createTenantMockPrisma,
   createTenantMockRedis,
@@ -33,7 +33,7 @@ import {
   isTenantModel,
   getTenantModels,
   getNonTenantModels,
-} from '../../mocks/tenant.mock';
+} from '@/test/mocks/tenant.mock';
 
 describe('TenantTestHelper', () => {
   describe('TenantTestHelper 类', () => {

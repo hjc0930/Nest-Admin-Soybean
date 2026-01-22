@@ -1,6 +1,6 @@
 import * as fc from 'fast-check';
-import { Result } from '../../../../src/shared/response/result';
-import { ResponseCode, ResponseMessage } from '../../../../src/shared/response/response.interface';
+import { Result } from '@/shared/response/result';
+import { ResponseCode, ResponseMessage } from '@/shared/response/response.interface';
 
 /**
  * Property-Based Tests for Result class

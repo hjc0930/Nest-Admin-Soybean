@@ -4,7 +4,7 @@ import { MailTemplateService } from './mail-template.service';
 import { CreateMailTemplateDto, UpdateMailTemplateDto, ListMailTemplateDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-premission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { MailTemplateDetailVo, MailTemplateListVo } from './vo/index';
+import { MailTemplateResponseDto } from './dto';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 import { UserTool, UserToolType } from '../../user/user.decorator';
@@ -30,7 +30,7 @@ export class MailTemplateController {
   @Api({
     summary: '邮件模板-列表',
     description: '分页查询邮件模板列表',
-    type: MailTemplateListVo,
+    type: MailTemplateResponseDto,
   })
   @RequirePermission('system:mail:template:list')
   @Get('/list')
@@ -41,7 +41,7 @@ export class MailTemplateController {
   @Api({
     summary: '邮件模板-详情',
     description: '根据ID获取邮件模板详情',
-    type: MailTemplateDetailVo,
+    type: MailTemplateResponseDto,
     params: [{ name: 'id', description: '模板ID', type: 'number' }],
   })
   @RequirePermission('system:mail:template:query')

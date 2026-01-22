@@ -1,8 +1,8 @@
 import * as fc from 'fast-check';
 import { Test, TestingModule } from '@nestjs/testing';
-import { FeatureToggleService } from '../../../../src/tenant/services/feature-toggle.service';
-import { PrismaService } from '../../../../src/infrastructure/prisma';
-import { RedisService } from '../../../../src/module/common/redis/redis.service';
+import { FeatureToggleService } from '@/tenant/services/feature-toggle.service';
+import { PrismaService } from '@/infrastructure/prisma';
+import { RedisService } from '@/module/common/redis/redis.service';
 
 /**
  * FeatureToggleService 属性测试

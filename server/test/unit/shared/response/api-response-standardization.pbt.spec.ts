@@ -5,10 +5,10 @@
  * 测试 API 响应格式标准化修复效果
  */
 import * as fc from 'fast-check';
-import { Result } from '../../../../src/shared/response/result';
-import { toDto, toDtoList, toDtoPage } from '../../../../src/shared/utils/serialize.util';
+import { Result } from '@/shared/response/result';
+import { toDto, toDtoList, toDtoPage } from '@/shared/utils/serialize.util';
 import { Exclude, Expose } from 'class-transformer';
-import { BaseResponseDto } from '../../../../src/shared/dto/base.response.dto';
+import { BaseResponseDto } from '@/shared/dto/base.response.dto';
 
 /**
  * 测试用响应 DTO - 继承 BaseResponseDto 自动排除敏感字段

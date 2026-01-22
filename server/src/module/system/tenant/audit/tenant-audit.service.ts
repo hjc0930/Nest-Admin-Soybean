@@ -4,14 +4,17 @@ import { Result, ResponseCode } from 'src/shared/response';
 import { BusinessException } from 'src/shared/exceptions';
 import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
 import { toDtoList } from 'src/shared/utils/index';
-import { ListTenantAuditLogDto, CreateTenantAuditLogDto, ExportTenantAuditLogDto } from './dto/tenant-audit.dto';
-import { TenantAuditLogResponseDto } from './dto/tenant-audit.response.dto';
 import {
+  ListTenantAuditLogDto,
+  CreateTenantAuditLogDto,
+  ExportTenantAuditLogDto,
+  TenantAuditLogResponseDto,
+  TenantAuditLogStatsResponseDto,
   TenantAuditLogVo,
   TenantAuditLogDetailVo,
   TenantAuditLogListVo,
   TenantAuditLogStatsVo,
-} from './vo/tenant-audit.vo';
+} from './dto/index';
 
 /**
  * 租户审计日志服务

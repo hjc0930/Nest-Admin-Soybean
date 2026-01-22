@@ -2,8 +2,8 @@
  * Result 类单元测试
  * 测试统一响应结果类的所有方法
  */
-import { Result } from '../../../../src/shared/response/result';
-import { ResponseCode, ResponseMessage } from '../../../../src/shared/response/response.interface';
+import { Result } from '@/shared/response/result';
+import { ResponseCode, ResponseMessage } from '@/shared/response/response.interface';
 
 describe('Result', () => {
   /**

@@ -1,7 +1,7 @@
 import * as fc from 'fast-check';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TenantLifecycleService } from '../../../../src/tenant/services/tenant-lifecycle.service';
-import { PrismaService } from '../../../../src/infrastructure/prisma';
+import { TenantLifecycleService } from '@/tenant/services/tenant-lifecycle.service';
+import { PrismaService } from '@/infrastructure/prisma';
 
 // 属性测试配置
 const PBT_CONFIG = { numRuns: 100 };
