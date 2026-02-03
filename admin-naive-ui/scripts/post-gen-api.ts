@@ -156,7 +156,8 @@ function parseOpenAPISpec(spec: OpenAPISpec): ApiInfo[] {
       apis.push({
         operationId: operation.operationId,
         method: method.toUpperCase(),
-        path: pathUrl.replace('/api/v1', ''), // 移除 API 前缀
+        // path: pathUrl.replace('/api/v1', ''), // 移除 API 前缀
+        path: pathUrl, // 移除 API 前缀
         summary: operation.summary || '',
         description: operation.description || '',
         tag: operation.tags?.[0] || 'default',
